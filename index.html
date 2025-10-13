@@ -291,8 +291,8 @@ function animate(){
     dropsOffset -= dropsSpeed;
     dropsContainer.style.transform = `translateX(${dropsOffset}px)`;
     const adjust = recycleIfNeeded(dropsContainer, 'dropsOffset', dropsSpeed);
-    if(adjust) dropsOffset
-    if(adjust) dropsOffset += adjust;
+    if (adjust) dropsOffset += adjust;
+
   }
   if(!pausedGallery){
     galleryOffset -= gallerySpeed;
