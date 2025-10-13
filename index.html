@@ -48,6 +48,12 @@ html, body {
   max-width: 100%;
   position: relative;
 }
+@media (max-width: 768px) {
+  .logo-container img {
+    max-width: 70vw;   /* controls how wide it can get */
+    height: auto;
+  }
+}
 
 #matrix{ position:fixed; inset:0; width:100%; height:100%; z-index:-1; background:var(--bg); }
 
