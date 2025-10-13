@@ -49,8 +49,18 @@ html, body {
   position: relative;
 }
 @media (max-width: 768px) {
+  .logo-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    max-width: 100%;
+    overflow: visible;
+  }
+
   .logo-container img {
-    max-width: 70vw;   /* controls how wide it can get */
+    width: auto;
+    max-width: 50%;
     height: auto;
   }
 }
