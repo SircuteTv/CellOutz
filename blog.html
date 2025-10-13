@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CellOutz Blog</title>
+<link href="https://fonts.googleapis.com/css2?family=UnifrakturCook:wght@700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+:root{
+  --red:#FF1A1A;
+  --bg:#0B0000;
+  --text:#FF1A1A;
+  --accent: rgba(255,26,26,0.15);
+}
+*{box-sizing:border-box;}
+body{
+  margin:0;
+  font-family:'Share Tech Mono',monospace;
+  background:var(--bg);
+  color:var(--text);
+  overflow-x:hidden;
+}
+header{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  padding:20px 40px 10px 40px;
+  position:relative;
+}
+.logo-container{
+  max-width:480px;
+  width:100%;
+  margin-bottom:20px;
+}
+.logo-container img{
+  width:100%;
+  height:auto;
+  display:block;
+  object-fit:contain;
+  animation:logo-glitch 3s infinite;
+  opacity:0; 
+  transform: translateY(-6px) scale(0.98);
+  transition: opacity 600ms ease, transform 600ms cubic-bezier(.2,.9,.2,1);
+}
+.logo-visible { opacity:1 !important; transform: translateY(0) scale(1) !important; }
+
+@keyframes logo-glitch{
+  0%{transform:translate(0,0)}
+  20%{transform:translate(-1px,1px) rotate(-0.5deg)}
+  40%{transform:translate(1px,-1px) rotate(0.5deg)}
+  60%{transform:translate(-1px,1px) rotate(0)}
+  80%{transform:translate(1px,-1px) rotate(-0.5deg)}
+  100%{transform:translate(0,0)}
+}
+
+nav{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;align-items:center;margin-bottom:20px;}
+nav a{
+  text-decoration:none;
+  color:var(--text);
+  padding:8px 12px;
+  border:1px solid var(--red);
+  border-radius:6px;
+  transition:0.3s;
+  position:relative;
+}
+nav a:hover{
+  background:var(--red); 
+  color:var(--bg); 
+  box-shadow:0 0 20px var(--red);
+}
+
+#cart-button{
+  position:fixed; top:18px; right:24px;
+  width:64px; height:64px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+  border:3px solid var(--red); background:rgba(0,0,0,0.35); cursor:pointer; z-index:2000;
+  transition: transform .12s ease;
+}
+#cart-button:hover{ transform: scale(1.03) }
+#cart-button img{ width:34px; height:34px; object-fit:contain; filter: invert(27%) sepia(100%) saturate(7000%) hue-rotate(340deg) }
+#cart-count{ position:absolute; top:-8px; right:-8px; width:22px; height:22px; border-radius:50%; background:var(--red); color:#000; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:12px; }
+
+.blog-container{
+  max-width:1000px;
+  margin:0 auto;
+  padding:20px;
+  display:grid;
+  grid-template-columns:1fr;
+  gap:20px;
+}
+
+.blog-post{
+  background:rgba(0,0,0,0.6);
+  border:2px solid var(--red);
+  border-radius:12px;
+  padding:20px;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.blog-post:hover{
+  transform:scale(1.02);
+  box-shadow:0 0 20px var(--red);
+}
+.blog-post h2{
+  margin:0 0 8px 0;
+  font-size:24px;
+}
+.blog-post .date{
+  font-size:12px;
+  opacity:0.6;
+  margin-bottom:12px;
+}
+.blog-post p{
+  margin:0 0 12px 0;
+  line-height:1.4;
+}
+.read-more{
+  display:inline-block;
+  padding:8px 12px;
+  border:1px solid var(--red);
+  border-radius:6px;
+  color:var(--text);
+  text-decoration:none;
+  transition:0.3s;
+}
+.read-more:hover{
+  background:var(--red);
+  color:var(--bg);
+  box-shadow:0 0 12px var(--red);
+}
+
+@media(max-width:800px){
+  .blog-post h2{font-size:20px;}
+  .logo-container{max-width:320px;}
+}
+
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-container">
+    <img id="site-logo" src="images/logo.png" alt="CellOutz Logo">
+  </div>
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="prints.html">Prints</a>
+    <a href="clothes.html">Clothes</a>
+    <a href="gallery.html">Gallery</a>
+    <a href="contact.html">Contact</a>
+  </nav>
+  <div id="cart-button" aria-label="Cart" title="Cart">
+    <img src="images/cart.png" alt="Cart">
+    <div id="cart-count" class="hidden">0</div>
+  </div>
+</header>
+
+<div class="blog-container" id="blog-container">
+  <!-- Blog posts will be injected here -->
+</div>
+
+<script>
+const blogPosts = [
+  { title:'The Philosophy of Dark Fashion', date:'Oct 1, 2025', excerpt:'Exploring the underground gothic and cyber aesthetics that inspire our creations.', link:'#' },
+  { title:'Behind Present Polarity', date:'Sep 25, 2025', excerpt:'A deep dive into the concept and meaning behind our latest digital art collection.', link:'#' },
+  { title:'Creating Chaos Wizard', date:'Sep 18, 2025', excerpt:'An inside look at how we built the 3x3 digital art series.', link:'#' },
+  { title:'Limited Edition Prints: What Makes Them Special', date:'Sep 10, 2025', excerpt:'Why our prints are unique and why you should act fast to collect them.', link:'#' },
+  { title:'The Story of CellOutz', date:'Sep 2, 2025', excerpt:'How the brand started and the creative vision driving it today.', link:'#' }
+];
+
+const container = document.getElementById('blog-container');
+blogPosts.forEach(post=>{
+  const div = document.createElement('div');
+  div.className = 'blog-post';
+  div.innerHTML = `
+    <h2>${post.title}</h2>
+    <div class="date">${post.date}</div>
+    <p>${post.excerpt}</p>
+    <a class="read-more" href="${post.link}">Read More</a>
+  `;
+  container.appendChild(div);
+});
+
+// Logo animation
+const logo = document.getElementById('site-logo');
+const seen = sessionStorage.getItem('celloutz_logo_seen');
+if(!seen){
+  setTimeout(()=> logo.classList.add('logo-visible'), 80);
+  sessionStorage.setItem('celloutz_logo_seen','1');
+} else {
+  logo.classList.add('logo-visible');
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CellOutz Clothes</title>
+<link href="https://fonts.googleapis.com/css2?family=UnifrakturCook:wght@700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+:root{
+  --red:#FF1A1A;
+  --bg:#0B0000;
+  --text:#FF1A1A;
+  --accent: rgba(255,26,26,0.15);
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:'Share Tech Mono',monospace;
+  background:var(--bg);
+  color:var(--text);
+  overflow-x:hidden;
+}
+header{display:flex;flex-direction:column;align-items:center;padding:20px 40px 10px 40px;position:relative;}
+nav{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;align-items:center;}
+nav a{text-decoration:none;color:var(--text);padding:8px 12px;border:1px solid var(--red);border-radius:6px;transition:0.3s;}
+nav a:hover{ background:var(--red); color:var(--bg); box-shadow:0 0 20px var(--red);}
+h1{text-align:center;margin:20px 0;}
+.clothes-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:20px;padding:20px;max-width:1200px;margin:0 auto;}
+.clothes-card{background:rgba(0,0,0,0.6);border:2px solid var(--red);border-radius:12px;overflow:hidden;cursor:pointer;position:relative;transition:transform 0.2s;}
+.clothes-card img{width:100%;display:block;object-fit:contain;}
+.clothes-card:hover{transform:scale(1.02);}
+#cart-button{
+  position:fixed; top:18px; right:24px;
+  width:64px; height:64px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+  border:3px solid var(--red); background:rgba(0,0,0,0.35); cursor:pointer; z-index:2000;
+  transition: transform .12s ease;
+}
+#cart-button:hover{ transform: scale(1.03) }
+#cart-button img{ width:34px; height:34px; object-fit:contain; filter: invert(27%) sepia(100%) saturate(7000%) hue-rotate(340deg) }
+#cart-count{ position:absolute; top:-8px; right:-8px; width:22px; height:22px; border-radius:50%; background:var(--red); color:#000; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:12px; }
+
+.item-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:1500;justify-content:center;align-items:center;padding:20px;}
+.item-overlay.show{display:flex;}
+.modal-box{position:relative;background:var(--bg);border:2px solid var(--red);border-radius:12px;max-width:90%;max-height:90%;overflow:hidden;display:flex;flex-direction:row;align-items:center;}
+.modal-left{position:relative;flex:1 1 55%;display:flex;justify-content:center;align-items:center;padding:12px;}
+.modal-left img{max-width:100%;max-height:80vh;object-fit:contain;}
+.magnifier{position:absolute;border:2px solid var(--red);border-radius:50%;width:120px;height:120px;pointer-events:none;display:none;box-shadow:0 0 15px var(--red);}
+.modal-right{flex:1 1 45%;padding:20px;display:flex;flex-direction:column;justify-content:flex-start;color:var(--red);}
+.modal-right h2{margin:0 0 8px 0;font-size:24px;}
+.modal-right p{margin:6px 0;line-height:1.35;}
+#add-cart-btn{margin-top:auto;padding:12px;border-radius:8px;border:none;background:var(--red);color:#000;font-weight:700;cursor:pointer;}
+#modal-close{position:absolute;top:10px;right:16px;font-size:28px;color:var(--red);cursor:pointer;}
+@media(max-width:820px){
+  .modal-box{flex-direction:column;}
+  .modal-left, .modal-right{max-width:100%;padding:12px;}
+  .modal-left img{max-height:50vh;}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-container">
+    <a href="index.html"><img src="images/logo.png" alt="CellOutz Logo"></a>
+  </div>
+  <nav>
+    <a href="index.html">HOME</a>
+    <a href="prints.html">PRINTS</a>
+    <a href="clothes.html">CLOTHES</a>
+    <a class="insta-link" href="https://www.instagram.com/allusionstoograndeur/" target="_blank">IG</a>
+    <a href="blog.html">BLOG</a>
+    <a href="gallery.html">GALLERY</a>
+    <a href="contact.html">CONTACT</a>
+  </nav>
+  <div id="cart-button" aria-label="Cart" title="Cart">
+    <img src="images/cart.png" alt="Cart">
+    <div id="cart-count" class="hidden">0</div>
+  </div>
+</header>
+
+<h1>Clothing Collection</h1>
+<div class="clothes-grid" id="clothes-grid"></div>
+
+<div id="lightbox" class="item-overlay" aria-hidden="true">
+  <div class="modal-box" role="dialog" aria-modal="true">
+    <div class="modal-left">
+      <img id="overlay-img" src="" alt="">
+      <div class="magnifier" id="magnifier"></div>
+    </div>
+    <div class="modal-right">
+      <h2 id="overlay-name"></h2>
+      <p id="overlay-price"></p>
+      <p id="overlay-desc"></p>
+      <button id="add-cart-btn">Add to Cart</button>
+    </div>
+    <div id="modal-close" aria-label="Close modal">&times;</div>
+  </div>
+</div>
+
+<footer style="text-align:center;margin:20px 0;">© 2025 CellOutz</footer>
+
+<script>
+// Clothes items demo data
+const clothesItems = [
+  { src: 'images/hoodie1.png', name: 'Chrome Red Hoodie', price: 49.99, desc: 'Edgy gothic hoodie in red chrome.' },
+  { src: 'images/hoodie2.png', name: 'Obsidian Hoodie', price: 52.99, desc: 'Dark themed hoodie.' },
+  { src: 'images/tshirt1.png', name: 'Gothic Tee', price: 29.99, desc: 'Limited edition gothic t-shirt.' },
+  { src: 'images/jacket1.png', name: 'Leather Jacket', price: 99.99, desc: 'High-quality leather jacket.' }
+];
+
+// Create clothes cards
+const grid = document.getElementById('clothes-grid');
+clothesItems.forEach(item=>{
+  const card = document.createElement('div');
+  card.className='clothes-card';
+  card.dataset.name=item.name;
+  card.dataset.price=item.price;
+  card.dataset.desc=item.desc;
+  card.dataset.src=item.src;
+
+  const img = document.createElement('img');
+  img.src=item.src;
+  img.alt=item.name;
+  card.appendChild(img);
+  grid.appendChild(card);
+});
+
+// Modal and cart logic
+const overlay=document.getElementById('lightbox');
+const ovImg=document.getElementById('overlay-img');
+const ovName=document.getElementById('overlay-name');
+const ovPrice=document.getElementById('overlay-price');
+const ovDesc=document.getElementById('overlay-desc');
+const addBtn=document.getElementById('add-cart-btn');
+const closeBtn=document.getElementById('modal-close');
+const magnifier=document.getElementById('magnifier');
+let selectedItem=null;
+let cart=[];
+
+function renderCart(){
+  const cartCount=document.getElementById('cart-count');
+  if(cart.length>0){
+    cartCount.textContent=cart.length;
+    cartCount.classList.remove('hidden');
+  } else cartCount.classList.add('hidden');
+}
+
+// Show modal
+document.querySelectorAll('.clothes-card').forEach(card=>{
+  card.addEventListener('click',(e)=>{
+    const rect=card.getBoundingClientRect();
+    ovImg.src=card.dataset.src;
+    ovName.textContent=card.dataset.name;
+    ovPrice.textContent=`$${card.dataset.price}`;
+    ovDesc.textContent=card.dataset.desc;
+    selectedItem={name:card.dataset.name, price:parseFloat(card.dataset.price)};
+    addBtn.style.display='block';
+    overlay.classList.add('show');
+    overlay.setAttribute('aria-hidden','false');
+  });
+});
+
+// Close modal
+closeBtn.addEventListener('click',()=>overlay.classList.remove('show'));
+overlay.addEventListener('click',e=>{if(e.target===overlay) overlay.classList.remove('show');});
+document.addEventListener('keydown',e=>{if(e.key==='Escape') overlay.classList.remove('show');});
+
+// Add to cart
+addBtn.addEventListener('click',()=>{
+  if(selectedItem){cart.push(selectedItem); renderCart(); overlay.classList.remove('show');}
+});
+
+// Cart button
+const cartButton=document.getElementById('cart-button');
+cartButton.addEventListener('click',()=>{
+  if(cart.length===0){alert('Your cart is empty.'); return;}
+  let txt='Cart:\n';
+  cart.forEach((it,idx)=>txt+=`${idx+1}. ${it.name} — $${it.price.toFixed(2)}\n`);
+  txt+=`\nTotal: $${cart.reduce((s,i)=>s+i.price,0).toFixed(2)}\n\n(Checkout not configured.)`;
+  alert(txt);
+});
+
+// Magnifier
+overlay.addEventListener('mousemove',e=>{
+  const rect=ovImg.getBoundingClientRect();
+  if(e.target===ovImg){
+    magnifier.style.display='block';
+    let x=e.clientX-rect.left;
+    let y=e.clientY-rect.top;
+    magnifier.style.left=`${x-60}px`;
+    magnifier.style.top=`${y-60}px`;
+    magnifier.style.background=`url(${ovImg.src}) no-repeat`;
+    magnifier.style.backgroundSize=`${rect.width*2}px ${rect.height*2}px`;
+    magnifier.style.backgroundPosition=`${-x*2+60}px ${-y*2+60}px`;
+  } else magnifier.style.display='none';
+});
+overlay.addEventListener('mouseleave',()=>{magnifier.style.display='none';});
+</script>
+
+</body>
+</html>
