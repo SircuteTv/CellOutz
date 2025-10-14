@@ -7,12 +7,12 @@
 <link href="https://fonts.googleapis.com/css2?family=UnifrakturCook:wght@700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
 :root{
-.hidden { display: none !important; }
   --red:#FF1A1A;
   --bg:#0B0000;
   --text:#FF1A1A;
   --accent: rgba(255,26,26,0.15);
 }
+.hidden { display: none !important; }
 *{box-sizing:border-box;}
 body{
   margin:0;
@@ -29,19 +29,8 @@ header{
   padding:20px 40px 10px 40px;
   position:relative;
 }
-
-.logo-container{
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  margin-bottom:20px;
-  max-width:100%;
-}
-.logo-container img{
-  max-width:480px; /* Large logo like Clothes page */
-  width:100%;
-  height:auto;
-}
+.logo-container{ display:flex; justify-content:center; align-items:center; margin-bottom:20px; max-width:100%; }
+.logo-container img{ max-width:480px; width:100%; height:auto; }
 
 nav{
   display:flex;
@@ -58,11 +47,9 @@ nav a{
   border-radius:6px;
   transition:0.3s;
 }
-nav a:hover{
-  background:var(--red);
-  color:var(--bg);
-  box-shadow:0 0 20px var(--red);
-}
+nav a:hover{ background:var(--red); color:var(--bg); box-shadow:0 0 20px var(--red); }
+/* inline instagram icon sizing */
+nav .insta-link svg{ width:20px;height:20px; display:block; }
 
 .prints-grid{
   display:grid;
@@ -81,11 +68,7 @@ nav a:hover{
   position:relative;
   transition:transform 0.2s;
 }
-.print-card img{
-  width:100%;
-  display:block;
-  object-fit:contain;
-}
+.print-card img{ width:100%; display:block; object-fit:contain; }
 .print-card:hover{transform:scale(1.02);}
 
 #cart-button{
@@ -104,83 +87,29 @@ nav a:hover{
 
 .item-overlay{
   display:none;
-  position:fixed;
-  inset:0;
+  position:fixed; inset:0;
   background:rgba(0,0,0,0.85);
   z-index:1500;
-  justify-content:center;
-  align-items:center;
-  padding:20px;
+  justify-content:center; align-items:center; padding:20px;
 }
 .item-overlay.show{display:flex;}
 
 .modal-box{
-  position:relative;
-  background:var(--bg);
-  border:2px solid var(--red);
-  border-radius:12px;
-  max-width:90%;
-  max-height:90%;
-  overflow:hidden;
-  display:flex;
-  flex-direction:row;
-  align-items:center;
+  position:relative; background:var(--bg); border:2px solid var(--red); border-radius:12px;
+  max-width:90%; max-height:90%; overflow:hidden; display:flex; flex-direction:row; align-items:center;
 }
-.modal-left{
-  position:relative;
-  flex:1 1 55%;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  background:rgba(0,0,0,0.1);
-}
-.modal-left img{
-  max-width:100%;
-  max-height:80vh;
-  object-fit:contain;
-  cursor:none;
-}
+.modal-left{ position:relative; flex:1 1 55%; display:flex; justify-content:center; align-items:center; background:rgba(0,0,0,0.1); }
+.modal-left img{ max-width:100%; max-height:80vh; object-fit:contain; cursor:none; }
 .magnifier-lens{
-  position:absolute;
-  border:3px solid var(--red);
-  border-radius:50%;
-  width:120px;
-  height:120px;
-  pointer-events:none;
-  display:none;
-  background-repeat:no-repeat;
-  background-size:200% 200%;
-  z-index:2000;
+  position:absolute; border:3px solid var(--red); border-radius:50%;
+  width:120px; height:120px; pointer-events:none; display:none;
+  background-repeat:no-repeat; background-size:200% 200%; z-index:2000;
 }
-
-.modal-right{
-  flex:1 1 45%;
-  padding:18px;
-  color:var(--red);
-  display:flex;
-  flex-direction:column;
-  justify-content:flex-start;
-}
+.modal-right{ flex:1 1 45%; padding:18px; color:var(--red); display:flex; flex-direction:column; justify-content:flex-start; }
 .modal-right h2{margin:0 0 8px 0;font-size:20px;}
 .modal-right p{margin:6px 0;line-height:1.35;}
-#add-cart-btn{
-  margin-top:auto;
-  padding:12px;
-  border-radius:8px;
-  border:none;
-  background:var(--red);
-  color:#000;
-  font-weight:700;
-  cursor:pointer;
-}
-#modal-close{
-  position:absolute;
-  top:8px;
-  right:12px;
-  font-size:28px;
-  color:var(--red);
-  cursor:pointer;
-}
+#add-cart-btn{ margin-top:auto; padding:12px; border-radius:8px; border:none; background:var(--red); color:#000; font-weight:700; cursor:pointer; }
+#modal-close{ position:absolute; top:8px; right:12px; font-size:28px; color:var(--red); cursor:pointer; }
 
 @media(max-width:800px){
   .modal-box{flex-direction:column;}
@@ -188,7 +117,6 @@ nav a:hover{
   .modal-left img{max-height:50vh;}
   .magnifier-lens{width:80px;height:80px;}
 }
-
 </style>
 </head>
 <body>
@@ -201,6 +129,13 @@ nav a:hover{
     <a href="index.html">Home</a>
     <a href="prints.html">Prints</a>
     <a href="clothes.html">Clothes</a>
+    <a class="insta-link" href="https://www.instagram.com/allusionstoograndeur/" target="_blank" rel="noopener" aria-label="Instagram">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <rect x="3" y="3" width="18" height="18" rx="5" stroke="currentColor" stroke-width="2"/>
+        <circle cx="12" cy="12" r="4.2" stroke="currentColor" stroke-width="2"/>
+        <circle cx="17.3" cy="6.7" r="1.2" fill="currentColor"/>
+      </svg>
+    </a>
     <a href="blog.html">Blog</a>
     <a href="gallery.html">Gallery</a>
     <a href="contact.html">Contact</a>
@@ -284,15 +219,15 @@ overlayImg.addEventListener('mousemove', e=>{
   const rect = overlayImg.getBoundingClientRect();
   let x = e.clientX - rect.left;
   let y = e.clientY - rect.top;
-  let lensWidth = lens.offsetWidth / 2;
-  let lensHeight = lens.offsetHeight / 2;
-  x = Math.max(lensWidth, Math.min(x, rect.width - lensWidth));
-  y = Math.max(lensHeight, Math.min(y, rect.height - lensHeight));
-  lens.style.left = (x - lensWidth) + 'px';
-  lens.style.top = (y - lensHeight) + 'px';
+  let lw = lens.offsetWidth / 2;
+  let lh = lens.offsetHeight / 2;
+  x = Math.max(lw, Math.min(x, rect.width - lw));
+  y = Math.max(lh, Math.min(y, rect.height - lh));
+  lens.style.left = (x - lw) + 'px';
+  lens.style.top = (y - lh) + 'px';
   lens.style.backgroundImage = `url('${overlayImg.src}')`;
   lens.style.backgroundSize = (overlayImg.width * 2) + 'px ' + (overlayImg.height * 2) + 'px';
-  lens.style.backgroundPosition = `-${x*2 - lensWidth}px -${y*2 - lensHeight}px`;
+  lens.style.backgroundPosition = `-${x*2 - lw}px -${y*2 - lh}px`;
 });
 overlayImg.addEventListener('mouseleave', ()=>lens.style.display='none');
 
@@ -324,6 +259,5 @@ document.getElementById('cart-button').addEventListener('click', ()=>{
   }
 });
 </script>
-
 </body>
 </html>
