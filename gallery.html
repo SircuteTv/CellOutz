@@ -3,258 +3,381 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>CellOutz Gallery</title>
+<title>CellOutz — Gallery</title>
 <link href="https://fonts.googleapis.com/css2?family=UnifrakturCook:wght@700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
-:root{
-  --red:#FF1A1A;
-  --bg:#0B0000;
-  --text:#FF1A1A;
-  --accent: rgba(255,26,26,0.15);
+:root{ --red:#FF1A1A; --bg:#0B0000; --text:#FF1A1A; --accent:rgba(255,26,26,.15) }
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;font-family:'Share Tech Mono',monospace;background:var(--bg);color:var(--text);overflow-x:hidden}
+
+/* Matrix bg */
+#matrix{position:fixed;inset:0;width:100%;height:100%;z-index:-2;background:var(--bg)}
+.vignette:before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+  background:
+    radial-gradient(1200px 800px at 50% 18%, rgba(255,26,26,.12), transparent 55%),
+    radial-gradient(1800px 1200px at 50% 110%, rgba(255,26,26,.08), transparent 60%);
 }
-*{box-sizing:border-box;}
-body{
-  margin:0;
-  font-family:'Share Tech Mono',monospace;
-  background:var(--bg);
-  color:var(--text);
-  overflow-x:hidden;
+.scan:after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+  background-image:linear-gradient(rgba(0,0,0,.25) 1px, transparent 1px);
+  background-size:100% 3px;mix-blend-mode:soft-light;opacity:.35;
 }
 
-header{
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  padding:20px 40px 10px 40px;
-  position:relative;
-}
-.logo-container{ display:flex; justify-content:center; align-items:center; margin-bottom:20px; max-width:100%; }
-.logo-container img{ max-width:480px; width:100%; height:auto; }
-
-nav{
-  display:flex;
-  gap:12px;
-  flex-wrap:wrap;
-  justify-content:center;
-  align-items:center;
-}
+/* Header */
+header{display:flex;flex-direction:column;align-items:center;padding:20px 40px 10px}
+.logo-container{display:flex;justify-content:center;align-items:center;margin-bottom:18px;max-width:100%}
+.logo-container img{max-width:440px;width:100%;height:auto;object-fit:contain}
+nav{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;align-items:center}
 nav a{
-  text-decoration:none;
-  color:var(--text);
-  padding:8px 12px;
-  border:1px solid var(--red);
-  border-radius:6px;
-  transition:0.3s;
+  text-decoration:none;color:var(--text);padding:8px 12px;border:1px solid var(--red);border-radius:6px;
+  transition:.25s;position:relative
 }
-nav a:hover{ background:var(--red); color:var(--bg); box-shadow:0 0 20px var(--red); }
-/* inline instagram icon sizing */
-nav .insta-link svg{ width:20px;height:20px; display:block; }
+nav a::after{content:"";position:absolute;inset:0;background:var(--accent);mix-blend-mode:screen;opacity:0;transition:.25s}
+nav a:hover{background:var(--red);color:#000;box-shadow:0 0 18px var(--red), inset 0 0 28px var(--red)}
+nav a:hover::after{opacity:1}
+nav .insta-link img{width:20px;height:20px;filter: invert(27%) sepia(100%) saturate(7000%) hue-rotate(340deg)}
 
-/* Collection titles */
-.collection-title{
-  text-align:center;
-  font-size:28px;
-  margin:40px 0 20px 0;
-  font-family:'UnifrakturCook',cursive;
-  color:var(--red);
+main{max-width:1400px;margin:10px auto 60px;padding:0 18px}
+
+/* Tabs */
+.tabs{display:flex;gap:12px;justify-content:center;align-items:center;margin:10px 0 24px}
+.tab{
+  padding:10px 16px;border:1px solid var(--red);border-radius:999px;background:transparent;color:var(--text);
+  cursor:pointer;min-width:90px;text-align:center;box-shadow:0 0 12px rgba(255,26,26,.25)
+}
+.tab.active{background:var(--red);color:#000;box-shadow:0 0 20px var(--red), inset 0 0 28px rgba(255,26,26,.5)}
+
+/* Collection cards */
+.collections{display:grid;grid-template-columns:repeat(5,1fr);gap:24px}
+@media(max-width:1200px){ .collections{grid-template-columns:repeat(3,1fr)} }
+@media(max-width:720px){ .collections{grid-template-columns:repeat(2,1fr)} }
+@media(max-width:520px){ .collections{grid-template-columns:1fr} }
+
+.col-card{
+  position:relative;border:1px solid rgba(255,26,26,.35);border-radius:14px;overflow:hidden;
+  background:#000;box-shadow:0 6px 24px rgba(0,0,0,.5); cursor:pointer;
+}
+.col-card .thumb{display:block;width:100%;height:180px;object-fit:cover;filter:contrast(1.02) brightness(.96);transition:.25s}
+.col-card:hover .thumb{transform:scale(1.03);filter:contrast(1.05) brightness(1.02)}
+.col-card .label{
+  position:absolute;left:12px;bottom:12px;background:rgba(0,0,0,.6);border:1px solid var(--red);
+  color:var(--text);padding:8px 12px;border-radius:12px;backdrop-filter:blur(2px)
+}
+.hide{display:none}
+
+/* Overlay viewer */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.92);backdrop-filter:blur(2px);display:none;z-index:1500}
+.overlay.show{display:block;animation:fade .16s ease both}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+
+.viewer{
+  position:absolute;inset:20px 20px 60px 20px; /* room for footer buttons */
+  display:grid;grid-template-columns:1fr auto;gap:16px;border:1px solid rgba(255,26,26,.35);
+  border-radius:14px;box-shadow:0 0 28px rgba(255,26,26,.25), 0 18px 60px rgba(0,0,0,.6);overflow:hidden
+}
+.viewer.full{grid-template-columns:1fr 0} /* info hidden (default) */
+
+.view-img-wrap{position:relative;display:flex;align-items:center;justify-content:center;background:#080000}
+.view-img{max-width:100%;max-height:100%;object-fit:contain;display:block}
+
+/* Info panel */
+.info{width:min(420px,30vw);background:linear-gradient(180deg, rgba(255,26,26,.06), rgba(0,0,0,.35));padding:16px 16px 24px;overflow:auto}
+.info h3{margin:6px 0 8px;font-family:'UnifrakturCook',cursive;font-size:22px}
+.info p{margin:0;color:var(--text);line-height:1.35}
+
+/* Controls */
+.closeX{
+  position:absolute;top:10px;right:14px;width:42px;height:42px;border-radius:10px;border:1px solid var(--red);
+  color:var(--text);display:flex;align-items:center;justify-content:center;cursor:pointer;background:rgba(0,0,0,.4)
+}
+.infobtn{
+  position:absolute;top:10px;left:14px;border:1px solid var(--red);border-radius:999px;background:rgba(0,0,0,.45);
+  color:var(--text);padding:8px 12px;cursor:pointer;box-shadow:0 0 10px rgba(255,26,26,.35)
+}
+.fsbtn{
+  position:absolute;left:50%;transform:translateX(-50%);
+  bottom:12px;border:1px solid var(--red);border-radius:999px;background:rgba(0,0,0,.45);
+  color:var(--text);padding:8px 12px;cursor:pointer
 }
 
-/* Present Polarity */
-.present-polarity{
-  display:grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap:20px;
-  max-width:1000px;
-  margin:0 auto 60px auto;
+/* Dagger arrows */
+.dagger{
+  position:absolute;top:50%;transform:translateY(-50%);width:46px;height:46px;border-radius:12px;
+  border:1px solid var(--red);background:rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;
+  cursor:pointer
 }
-.present-polarity .art-card{
-  background: rgba(0,0,0,0.6);
-  border:2px solid var(--red);
-  border-radius:12px;
-  overflow:hidden;
-  cursor:pointer;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  padding:10px;
-  position:relative;
-}
-.present-polarity .art-card img{ max-width:100%; height:auto; display:block; object-fit:contain; }
+.dagger svg{width:26px;height:26px;stroke:currentColor}
+.dagger.left{left:12px} .dagger.right{right:12px}
+.dagger:hover{box-shadow:0 0 16px var(--red)}
 
-/* Chaos Wizard 3x3 */
-.chaos-wizard{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:20px;
-  max-width:1200px;
-  margin:0 auto 60px auto;
-}
-.chaos-wizard .art-card{
-  background: rgba(0,0,0,0.6);
-  border:2px solid var(--red);
-  border-radius:12px;
-  overflow:hidden;
-  cursor:pointer;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  padding:10px;
-  position:relative;
-}
-.chaos-wizard .art-card img{ max-width:100%; height:auto; display:block; object-fit:contain; }
-
-/* Modal */
-.item-overlay{
-  display:none;
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,0.85);
-  z-index:1500;
-  justify-content:center;
-  align-items:center;
-  padding:20px;
-}
-.item-overlay.show{display:flex;}
-
-.modal-box{
-  position:relative;
-  background:var(--bg);
-  border:2px solid var(--red);
-  border-radius:12px;
-  max-width:90%;
-  max-height:90%;
-  overflow:hidden;
-  display:flex;
-  flex-direction:row;
-  align-items:center;
-}
-.modal-left{ position:relative; flex:1 1 55%; display:flex; justify-content:center; align-items:center; background:rgba(0,0,0,0.1); }
-.modal-left img{ max-width:100%; max-height:80vh; object-fit:contain; cursor:none; }
-.magnifier-lens{
-  position:absolute; border:3px solid var(--red); border-radius:50%;
-  width:120px; height:120px; pointer-events:none; display:none;
-  background-repeat:no-repeat; background-size:200% 200%; z-index:2000;
-}
-.modal-right{ flex:1 1 45%; padding:18px; color:var(--red); display:flex; flex-direction:column; justify-content:flex-start; }
-.modal-right h2{margin:0 0 8px 0;font-size:20px;}
-.modal-right p{margin:6px 0;line-height:1.35;}
-#modal-close{ position:absolute; top:8px; right:12px; font-size:28px; color:var(--red); cursor:pointer; }
-
-@media(max-width:800px){
-  .modal-box{flex-direction:column;}
-  .modal-left,.modal-right{max-width:100%;padding:12px;}
-  .modal-left img{max-height:50vh;}
-  .magnifier-lens{width:80px;height:80px;}
-}
-.hidden { display: none !important; }
+.title{font-family:'UnifrakturCook',cursive;font-size:22px;margin:18px 6px}
+.section{margin-bottom:32px}
+.grid{display:grid;gap:16px}
+.grid.two{grid-template-columns:repeat(2,1fr)}
+.grid.three{grid-template-columns:repeat(3,1fr)}
+.grid.four{grid-template-columns:repeat(4,1fr)}
+.tile{border:1px solid rgba(255,26,26,.35);border-radius:12px;overflow:hidden;background:#000;cursor:pointer}
+.tile img{width:100%;height:100%;object-fit:cover;display:block;transition:.25s}
+.tile:hover img{transform:scale(1.03)}
 </style>
 </head>
-<body>
+<body class="vignette scan">
+
+<canvas id="matrix"></canvas>
 
 <header>
-  <div class="logo-container">
-    <a href="index.html"><img src="images/logo.png" alt="CellOutz Logo"></a>
-  </div>
+  <div class="logo-container"><a href="index.html"><img src="images/logo.png" alt="CellOutz Logo"></a></div>
   <nav>
     <a href="index.html">Home</a>
     <a href="prints.html">Prints</a>
     <a href="clothes.html">Clothes</a>
-    <a class="insta-link" href="https://www.instagram.com/allusionstoograndeur/" target="_blank" rel="noopener" aria-label="Instagram">
-      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-        <rect x="3" y="3" width="18" height="18" rx="5" stroke="currentColor" stroke-width="2"/>
-        <circle cx="12" cy="12" r="4.2" stroke="currentColor" stroke-width="2"/>
-        <circle cx="17.3" cy="6.7" r="1.2" fill="currentColor"/>
-      </svg>
-    </a>
+    <a class="insta-link" href="https://www.instagram.com/allusionstoograndeur/" target="_blank" aria-label="Instagram"><img src="images/instagram.png" alt=""></a>
     <a href="blog.html">Blog</a>
     <a href="gallery.html">Gallery</a>
     <a href="contact.html">Contact</a>
   </nav>
 </header>
 
-<!-- Collections -->
-<div class="collection-title">Present Polarity</div>
-<div class="present-polarity">
-  <div class="art-card" data-name="Art 1" data-desc="Description for Art 1" data-src="images/art1.png"><img src="images/art1.png" alt="Art 1"></div>
-  <div class="art-card" data-name="Art 2" data-desc="Description for Art 2" data-src="images/art2.png"><img src="images/art2.png" alt="Art 2"></div>
-  <div class="art-card" data-name="Art 4" data-desc="Description for Art 4" data-src="images/art4.png"><img src="images/art4.png" alt="Art 4"></div>
-  <div class="art-card" data-name="Art 3" data-desc="Description for Art 3" data-src="images/art3.png"><img src="images/art3.png" alt="Art 3"></div>
-</div>
+<main>
+  <div class="tabs">
+    <button class="tab active" data-tab="grandeur">Grandeur</button>
+    <button class="tab" data-tab="misc">Misc</button>
+  </div>
 
-<div class="collection-title">Chaos Wizard</div>
-<div class="chaos-wizard">
-  <div class="art-card" data-name="Art 5" data-desc="Description 5" data-src="images/art5.png"><img src="images/art5.png" alt="Art 5"></div>
-  <div class="art-card" data-name="Art 6" data-desc="Description 6" data-src="images/art6.png"><img src="images/art6.png" alt="Art 6"></div>
-  <div class="art-card" data-name="Art 7" data-desc="Description 7" data-src="images/art7.png"><img src="images/art7.png" alt="Art 7"></div>
-  <div class="art-card" data-name="Art 8" data-desc="Description 8" data-src="images/art8.png"><img src="images/art8.png" alt="Art 8"></div>
-  <div class="art-card" data-name="Art 9" data-desc="Description 9" data-src="images/art9.png"><img src="images/art9.png" alt="Art 9"></div>
-  <div class="art-card" data-name="Art 10" data-desc="Description 10" data-src="images/art10.png"><img src="images/art10.png" alt="Art 10"></div>
-  <div class="art-card" data-name="Art 11" data-desc="Description 11" data-src="images/art11.png"><img src="images/art11.png" alt="Art 11"></div>
-  <div class="art-card" data-name="Art 12" data-desc="Description 12" data-src="images/art12.png"><img src="images/art12.png" alt="Art 12"></div>
-  <div class="art-card" data-name="Art 13" data-desc="Description 13" data-src="images/art13.png"><img src="images/art13.png" alt="Art 13"></div>
-</div>
+  <!-- collection choosers -->
+  <div id="deck" class="collections"></div>
 
-<!-- Modal -->
-<div id="lightbox" class="item-overlay" aria-hidden="true">
-  <div class="modal-box" role="dialog" aria-modal="true">
-    <div class="modal-left">
-      <img id="overlay-img" src="" alt="">
-      <div class="magnifier-lens" id="lens"></div>
+  <!-- per-collection sections (rendered dynamically) -->
+  <div id="sections"></div>
+</main>
+
+<!-- Overlay Viewer -->
+<div id="overlay" class="overlay" aria-hidden="true">
+  <div class="viewer full" id="viewer">
+    <div class="view-img-wrap">
+      <img id="bigImg" class="view-img" src="" alt="">
     </div>
-    <div class="modal-right">
-      <h2 id="overlay-name"></h2>
-      <p id="overlay-desc"></p>
-    </div>
-    <div id="modal-close" aria-label="Close modal">&times;</div>
+    <aside class="info" id="infoPanel">
+      <h3 id="infoTitle"></h3>
+      <p id="infoDesc"></p>
+    </aside>
+    <button class="infobtn" id="infoToggle">info</button>
+    <button class="fsbtn" id="fsBtn">fullscreen</button>
+    <button class="closeX" id="closeBtn">✕</button>
+    <button class="dagger left" id="prevBtn" aria-label="Previous">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+           stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 2v20M12 12L4 8M12 12L4 16"/>
+      </svg>
+    </button>
+    <button class="dagger right" id="nextBtn" aria-label="Next">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+           stroke-linecap="round" stroke-linejoin="round" style="transform: scaleX(-1);">
+        <path d="M12 2v20M12 12L4 8M12 12L4 16"/>
+      </svg>
+    </button>
   </div>
 </div>
 
 <script>
-const artCards = document.querySelectorAll('.art-card');
-const overlay = document.getElementById('lightbox');
-const overlayImg = document.getElementById('overlay-img');
-const lens = document.getElementById('lens');
-const ovName = document.getElementById('overlay-name');
-const ovDesc = document.getElementById('overlay-desc');
+/* ===== Matrix background (subtle) ===== */
+const canvas = document.getElementById('matrix');
+const ctx = canvas.getContext('2d');
+let letters = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ@#$%^&*",
+    fontSize = 16, cols, drops;
+function resizeCanvas(){
+  canvas.width = innerWidth; canvas.height = innerHeight;
+  cols = Math.floor(canvas.width / fontSize); drops = Array(cols).fill(0);
+}
+resizeCanvas(); addEventListener('resize', resizeCanvas);
+function drawMatrix(){
+  ctx.fillStyle = "rgba(11,0,0,0.09)"; ctx.fillRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle = "#FF1A1A"; ctx.font = fontSize + "px monospace";
+  for(let i=0;i<cols;i++){
+    const t = letters[(Math.random()*letters.length)|0];
+    ctx.fillText(t, i*fontSize, drops[i]); drops[i]+= fontSize;
+    if(drops[i] > canvas.height && Math.random() > 0.975) drops[i]=0;
+  }
+}
+setInterval(drawMatrix, 60);
 
-artCards.forEach(card=>{
-  card.addEventListener('click', ()=>{
-    const src = card.getAttribute('data-src');
-    const name = card.getAttribute('data-name');
-    const desc = card.getAttribute('data-desc');
-    overlay.classList.add('show');
-    overlay.setAttribute('aria-hidden','false');
-    overlayImg.src = src;
-    ovName.textContent = name;
-    ovDesc.textContent = desc;
+/* ===== Helpers ===== */
+const enc = s => encodeURIComponent(s);
+const joinSeg = (...segs) => segs.map(enc).join('/');
+
+/* Build an <img> that will try multiple folders until one works */
+function imgWithFallback(folderCandidates, file, className="", alt=""){
+  const img = document.createElement('img');
+  if (className) img.className = className;
+  img.alt = alt || "";
+  const folders = Array.isArray(folderCandidates) ? folderCandidates : [folderCandidates];
+  let i = 0;
+  const tryNext = () => {
+    if (i >= folders.length) return;              // give up silently
+    img.src = `images/${joinSeg(folders[i], file)}`;
+    i++;
+  };
+  img.addEventListener('error', tryNext, {once:false});
+  tryNext();
+  return img;
+}
+
+function range(n){ return Array.from({length:n}, (_,i)=> String(i+1)); }
+
+/* ===== Data (order + grids you asked for) ===== */
+const COLLECTIONS = {
+  grandeur: [
+    { title:"Present Polarity", folder:["Present Polarity"], grid:"two",
+      images: range(4).map(i=>({file:`art (${i}).webp`, name:`art (${i})`})) },
+    { title:"chaos wizard", folder:["chaos wizard"], grid:"three",
+      images: range(9).map(i=>({file:`chaos (${i}).webp`, name:`chaos (${i})`})) },
+    { title:"Selfish&UnSane", folder:["Selfish&UnSane"], grid:"four",
+      images: range(14).map(i=>({file:`self (${i}).webp`, name:`self (${i})`})) },
+    { title:"Sentience and calamity", folder:["Sentience and calamity"], grid:"three",
+      images: range(5).map(i=>({file:`war (${i}).webp`, name:`war (${i})`})) },
+    { title:"Unsane", folder:["Unsane"], grid:"three",
+      images: range(5).map(i=>({file:`unsane (${i}).webp`, name:`unsane (${i})`})) },
+    { title:"Wollongong Major", folder:["Wollongong Major"], grid:"three",
+      images: range(9).map(i=>({file:`bong (${i}).webp`, name:`bong (${i})`})) },
+    { title:"Wollongong minor", folder:["Wollongong minor"], grid:"four",
+      images: range(18).map(i=>({file:`minor (${i}).webp`, name:`minor (${i})`})) },
+    { title:"Genesis", folder:["Genesis"], grid:"two",
+      images: [{file:"latr.webp", name:"latr"}] },
+    { title:"SWAG#1", folder:["SWAG#1"], grid:"two",
+      images: [{file:"SWAG.webp", name:"SWAG"}] },
+  ],
+  misc: [
+    { title:"Before My Allusions", 
+      folder:["Before My Allusions","Before My Allusions (2023-2024)"], /* fallback with years */
+      grid:"four",
+      images: range(18).map(i=>({file:`old (${i}).webp`, name:`old (${i})`})) },
+    { title:"IngestNutmeg", 
+      folder:["IngestNutmeg","IngestNutmeg (2024)"], /* fallback with year */
+      grid:"three",
+      images: range(3).map(i=>({file:`nutmeg (${i}).webp`, name:`nutmeg (${i})`})) },
+  ]
+};
+
+/* ===== Build collection chooser (deck) + sections ===== */
+const deck = document.getElementById('deck');
+const sections = document.getElementById('sections');
+let currentTab = 'grandeur';
+
+function buildDeck(){
+  deck.innerHTML = '';
+  sections.innerHTML = '';
+
+  COLLECTIONS[currentTab].forEach((col, idx)=>{
+    // Card
+    const card = document.createElement('div');
+    card.className = 'col-card';
+    const thumb = imgWithFallback(col.folder, col.images[0].file, 'thumb', col.title);
+    const label = document.createElement('div'); label.className='label'; label.textContent = col.title;
+    card.appendChild(thumb); card.appendChild(label);
+    card.addEventListener('click', ()=> openSection(idx));
+    deck.appendChild(card);
+
+    // Section grid
+    const sec = document.createElement('section');
+    sec.className = 'section hide'; sec.dataset.index = idx;
+    const h = document.createElement('div'); h.className='title'; h.textContent = col.title;
+    const grid = document.createElement('div'); grid.className = `grid ${col.grid}`;
+    (col.images || []).forEach((img,i)=>{
+      const tile = document.createElement('div'); tile.className='tile'; tile.dataset.col=idx; tile.dataset.i=i;
+      tile.appendChild( imgWithFallback(col.folder, img.file, '', img.name) );
+      tile.addEventListener('click', ()=> openOverlay(idx, i));
+      grid.appendChild(tile);
+    });
+    sec.appendChild(h); sec.appendChild(grid); sections.appendChild(sec);
+  });
+}
+
+function openSection(idx){
+  sections.querySelectorAll('.section').forEach(s=> s.classList.add('hide'));
+  const target = sections.querySelector(`.section[data-index="${idx}"]`);
+  if(target){ target.classList.remove('hide'); target.scrollIntoView({behavior:'smooth', block:'start'}); }
+}
+
+document.querySelectorAll('.tab').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.tab').forEach(b=> b.classList.remove('active'));
+    btn.classList.add('active');
+    currentTab = btn.dataset.tab;
+    buildDeck();
+    sections.scrollIntoView({behavior:'smooth', block:'start'});
   });
 });
 
-overlay.addEventListener('click', e=>{
-  if(e.target === overlay || e.target.id==='modal-close'){
-    overlay.classList.remove('show');
-  }
-});
-document.addEventListener('keydown', e=>{
+buildDeck();
+
+/* ===== Overlay (opens full image view by default) ===== */
+const overlay = document.getElementById('overlay');
+const viewer  = document.getElementById('viewer');
+const bigImg  = document.getElementById('bigImg');
+const infoPanel = document.getElementById('infoPanel');
+const infoTitle = document.getElementById('infoTitle');
+const infoDesc  = document.getElementById('infoDesc');
+const infoToggle= document.getElementById('infoToggle');
+const fsBtn     = document.getElementById('fsBtn');
+
+let activeCol = 0, activeIdx = 0;
+
+function sourceFor(col, i){
+  const c = COLLECTIONS[currentTab][col];
+  const candidates = Array.isArray(c.folder) ? c.folder : [c.folder];
+  const file = c.images[i].file;
+  // return the first candidate; we also add onerror to fallback, below
+  return {candidates, file, title:c.title, name:c.images[i].name};
+}
+
+function setBigImg(candidates, file){
+  // install a one-off error handler to try alternates
+  let k = 0;
+  const tryNext = () => {
+    if (k >= candidates.length) return;
+    bigImg.src = `images/${joinSeg(candidates[k], file)}`;
+    k++;
+  };
+  bigImg.onerror = tryNext;
+  tryNext();
+}
+
+function openOverlay(colIdx, imgIdx){
+  activeCol = colIdx; activeIdx = imgIdx;
+  const s = sourceFor(activeCol, activeIdx);
+  setBigImg(s.candidates, s.file);
+  infoTitle.textContent = `${s.title} — ${s.name}`;
+  infoDesc.textContent  = '—'; // you can fill custom blurbs later
+  viewer.classList.add('full');            // start with info hidden (full image)
+  overlay.classList.add('show'); overlay.setAttribute('aria-hidden','false');
+}
+
+function nextImg(step){
+  const data = COLLECTIONS[currentTab][activeCol];
+  activeIdx = (activeIdx + step + data.images.length) % data.images.length;
+  const s = sourceFor(activeCol, activeIdx);
+  setBigImg(s.candidates, s.file);
+  infoTitle.textContent = `${s.title} — ${s.name}`;
+}
+
+document.getElementById('prevBtn').addEventListener('click', ()=> nextImg(-1));
+document.getElementById('nextBtn').addEventListener('click', ()=> nextImg(1));
+document.getElementById('closeBtn').addEventListener('click', ()=> overlay.classList.remove('show'));
+overlay.addEventListener('click', e=>{ if(e.target === overlay) overlay.classList.remove('show'); });
+addEventListener('keydown', e=>{
+  if(!overlay.classList.contains('show')) return;
   if(e.key==='Escape') overlay.classList.remove('show');
+  if(e.key==='ArrowLeft')  nextImg(-1);
+  if(e.key==='ArrowRight') nextImg(1);
 });
 
-// Magnifier
-overlayImg.addEventListener('mousemove', e=>{
-  lens.style.display='block';
-  const rect = overlayImg.getBoundingClientRect();
-  let x = e.clientX - rect.left;
-  let y = e.clientY - rect.top;
-  let lw = lens.offsetWidth/2, lh = lens.offsetHeight/2;
-  x = Math.max(lw, Math.min(x, rect.width-lw));
-  y = Math.max(lh, Math.min(y, rect.height-lh));
-  lens.style.left = (x-lw)+'px';
-  lens.style.top  = (y-lh)+'px';
-  lens.style.backgroundImage = `url('${overlayImg.src}')`;
-  lens.style.backgroundSize = (overlayImg.width*2)+'px '+(overlayImg.height*2)+'px';
-  lens.style.backgroundPosition = `-${x*2-lw}px -${y*2-lh}px`;
+infoToggle.addEventListener('click', ()=> viewer.classList.toggle('full'));
+
+fsBtn.addEventListener('click', ()=>{
+  const el = bigImg;
+  if(!document.fullscreenElement){ el.requestFullscreen?.(); }
+  else{ document.exitFullscreen?.(); }
 });
-overlayImg.addEventListener('mouseleave', ()=>lens.style.display='none');
 </script>
 </body>
 </html>
