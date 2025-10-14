@@ -20,9 +20,64 @@ body{
   color:var(--text);
   overflow-x:hidden;
 }
-footer{ text-align:center; margin:0 auto; width:100%; }
+footer { text-align:center; margin: 40px 0 20px; }
+/* Keep short phrases on one line, but let them wrap on very small screens */
+.nowrap { white-space: nowrap; }
+@media (max-width: 560px){
+  .nowrap { white-space: normal; }
+}
+/* matrix bg */
+#matrix{ position:fixed; inset:0; width:100%; height:100%; z-index:-1; background:var(--bg); }
 
-/* ========== HERO + EYES (inside, wide, matches text color) ========== */
+/* header / logo / nav */
+header{display:flex;flex-direction:column;align-items:center;padding:20px 40px 10px 40px;position:relative;}
+.logo-container{display:flex;justify-content:center;align-items:center;margin-bottom:15px;max-width:100%;max-height:20vh;}
+.logo-container img{
+  max-width:480px; width:auto; max-height:100%; height:auto; object-fit:contain; display:block;
+  animation:logo-glitch 3s infinite;
+  opacity:0; transform: translateY(-6px) scale(0.98);
+  transition: opacity 600ms ease, transform 600ms cubic-bezier(.2,.9,.2,1);
+}
+.logo-visible { opacity:1 !important; transform: translateY(0) scale(1) !important; }
+.logo-container img:hover { transform: scale(1.1); filter: brightness(1.3); transition: transform .3s ease, filter .3s ease; }
+
+@keyframes logo-glitch{
+  0%{transform:translate(0,0)}
+  20%{transform:translate(-1px,1px) rotate(-0.5deg)}
+  40%{transform:translate(1px,-1px) rotate(0.5deg)}
+  60%{transform:translate(-1px,1px) rotate(0)}
+  80%{transform:translate(1px,-1px) rotate(-0.5deg)}
+  100%{transform:translate(0,0)}
+}
+
+nav{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;align-items:center;}
+nav a{
+  text-decoration:none;color:var(--text);padding:8px 12px;border:1px solid var(--red);border-radius:6px;
+  transition:0.3s,text-shadow 0.3s,box-shadow 0.3s;position:relative;display:flex;align-items:center;gap:6px;
+}
+nav a::after{ content:''; position:absolute; inset:0; background:var(--accent); mix-blend-mode:screen; opacity:0; pointer-events:none; transition:opacity .25s}
+nav a:hover::after{opacity:1}
+nav a:hover{ background:var(--red); color:var(--bg); box-shadow:0 0 20px var(--red), inset 0 0 40px var(--red); text-shadow:0 0 10px var(--red) }
+nav .insta-link img{ width:20px;height:20px; object-fit:contain; filter: invert(27%) sepia(100%) saturate(7000%) hue-rotate(340deg) }
+
+/* floating cart button */
+#cart-button{
+  position:fixed; top:18px; right:24px;
+  width:64px; height:64px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+  border:3px solid var(--red); background:rgba(0,0,0,0.35); cursor:pointer; z-index:2000;
+  transition: transform .12s ease;
+}
+#cart-button:hover{ transform: scale(1.03) }
+#cart-button img{ width:34px; height:34px; object-fit:contain; filter: invert(27%) sepia(100%) saturate(7000%) hue-rotate(340deg) }
+#cart-count{ position:absolute; top:-8px; right:-8px; width:22px; height:22px; border-radius:50%; background:var(--red); color:#000; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:12px; }
+
+/* top marquee */
+.marquee{ overflow:hidden; white-space:nowrap; padding:10px; border-bottom:1px solid var(--red);}
+.marquee span{ display:inline-block; padding-left:100%; animation:marq 25s linear infinite, neon-glow 2s ease-in-out infinite alternate;}
+@keyframes marq{ from{transform:translateX(0)} to{transform:translateX(-100%)}}
+@keyframes neon-glow{ 0%{text-shadow:0 0 5px var(--red)} 50%{text-shadow:0 0 15px var(--red)} 100%{text-shadow:0 0 5px var(--red)}}
+
+/* ========== HERO + EYES (inside, wide, masked glow—no box) ========== */
 .hero{
   position:relative; overflow:visible;
   max-width:880px; margin:30px auto; padding:22px;
@@ -32,22 +87,19 @@ footer{ text-align:center; margin:0 auto; width:100%; }
 }
 @keyframes float{ from{transform:translateY(0)} to{transform:translateY(-8px)} }
 
-/* lay out eyes and copy as columns so eyes sit in the black gutters */
+/* lay out eyes + copy in 3 columns so eyes sit in the black gutters */
 .hero-grid{
   display:grid;
   grid-template-columns:auto 1fr auto;
   align-items:center;
   column-gap:clamp(12px,3vw,28px);
 }
+.hero-grid p{ margin:0 }
 
-/* eye component:
-   - <img> shows the crisp GIF (no tint)
-   - ::before adds a red halo masked to the eye shape (no squares)
-   - clip-path splits the same GIF into left/right halves
-*/
+/* eye component (GIF + masked red halo) */
 .eye{
-  --src: url('images/eyes-trans.gif');   /* change if your file name differs */
-  --size: clamp(120px, 22vw, 220px);     /* wider eyes; responsive */
+  --src: url('images/eyes-trans.gif');   /* path to your transparent GIF */
+  --size: clamp(120px, 22vw, 220px);     /* same size you liked */
   width:var(--size);
   height:auto;
   display:block;
@@ -81,55 +133,8 @@ footer{ text-align:center; margin:0 auto; width:100%; }
   .eye{ --size: clamp(88px, 28vw, 160px); }
 }
 
-/* ========== HEADER / NAV / MATRIX ========== */
-#matrix{ position:fixed; inset:0; width:100%; height:100%; z-index:-1; background:var(--bg); }
-
-header{display:flex;flex-direction:column;align-items:center;padding:20px 40px 10px;position:relative;}
-.logo-container{display:flex;justify-content:center;align-items:center;margin-bottom:15px;max-width:100%;max-height:20vh;}
-.logo-container img{
-  max-width:480px; width:auto; max-height:100%; height:auto; object-fit:contain; display:block;
-  animation:logo-glitch 3s infinite;
-  opacity:0; transform: translateY(-6px) scale(0.98);
-  transition: opacity 600ms ease, transform 600ms cubic-bezier(.2,.9,.2,1);
-}
-.logo-visible{ opacity:1 !important; transform: translateY(0) scale(1) !important; }
-.logo-container img:hover{ transform: scale(1.1); filter: brightness(1.3); transition: transform .3s ease, filter .3s ease; }
-@keyframes logo-glitch{
-  0%{transform:translate(0,0)}
-  20%{transform:translate(-1px,1px) rotate(-.5deg)}
-  40%{transform:translate(1px,-1px) rotate(.5deg)}
-  60%{transform:translate(-1px,1px) rotate(0)}
-  80%{transform:translate(1px,-1px) rotate(-.5deg)}
-  100%{transform:translate(0,0)}
-}
-
-nav{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;align-items:center;}
-nav a{
-  text-decoration:none;color:var(--text);padding:8px 12px;border:1px solid var(--red);border-radius:6px;
-  transition:0.3s,text-shadow 0.3s,box-shadow 0.3s;position:relative;display:flex;align-items:center;gap:6px;
-}
-nav a::after{ content:''; position:absolute; inset:0; background:var(--accent); mix-blend-mode:screen; opacity:0; pointer-events:none; transition:opacity .25s}
-nav a:hover::after{opacity:1}
-nav a:hover{ background:var(--red); color:var(--bg); box-shadow:0 0 20px var(--red), inset 0 0 40px var(--red); text-shadow:0 0 10px var(--red) }
-nav .insta-link img{ width:20px;height:20px; object-fit:contain; filter: invert(27%) sepia(100%) saturate(7000%) hue-rotate(340deg) }
-
-#cart-button{
-  position:fixed; top:18px; right:24px;
-  width:64px; height:64px; border-radius:50%; display:flex; align-items:center; justify-content:center;
-  border:3px solid var(--red); background:rgba(0,0,0,0.35); cursor:pointer; z-index:2000;
-  transition: transform .12s ease;
-}
-#cart-button:hover{ transform: scale(1.03) }
-#cart-button img{ width:34px; height:34px; object-fit:contain; filter: invert(27%) sepia(100%) saturate(7000%) hue-rotate(340deg) }
-#cart-count{ position:absolute; top:-8px; right:-8px; width:22px; height:22px; border-radius:50%; background:var(--red); color:#000; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:12px; }
-
-/* ========== MARQUEE ========== */
-.marquee{ overflow:hidden; white-space:nowrap; padding:10px; border-bottom:1px solid var(--red);}
-.marquee span{ display:inline-block; padding-left:100%; animation:marq 25s linear infinite, neon-glow 2s ease-in-out infinite alternate;}
-@keyframes marq{ from{transform:translateX(0)} to{transform:translateX(-100%)}}
-@keyframes neon-glow{ 0%{text-shadow:0 0 5px var(--red)} 50%{text-shadow:0 0 15px var(--red)} 100%{text-shadow:0 0 5px var(--red)}}
-
-/* ========== SCROLLING BELTS ========== */
+/* belts */
+h2{ text-align:center; margin-top:40px; }
 .scroll-section{ overflow:hidden; white-space:nowrap; margin:20px auto 40px; max-width:100%; position:relative; border-top:1px solid var(--red); border-bottom:1px solid var(--red); padding:10px 0; box-shadow:0 0 12px var(--red); transition:box-shadow 0.3s ease;}
 .scroll-section:hover{ box-shadow:0 0 25px var(--red); }
 .scroll-inner{ display:inline-flex; gap:20px; will-change:transform; align-items:center; }
@@ -140,7 +145,16 @@ nav .insta-link img{ width:20px;height:20px; object-fit:contain; filter: invert(
 .card:hover .info{ opacity:1; transform:translateY(-6px) }
 .card:hover{ transform: translateY(-6px) scale(1.02); }
 
-/* ========== MODAL ========== */
+/* pill link that rides the gallery belt */
+.gallery-pill{
+  display:inline-flex; align-items:center; justify-content:center;
+  padding:10px 14px; border:1px solid var(--red); border-radius:999px; text-decoration:none; color:var(--text);
+  text-shadow:0 0 8px var(--red); box-shadow:0 0 14px var(--red), inset 0 0 20px rgba(255,26,26,.25);
+  font-weight:700; letter-spacing:.5px;
+}
+.gallery-pill:hover{ background:var(--red); color:#000; }
+
+/* modal */
 .item-overlay{ display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:1500; justify-content:center; align-items:center; padding:20px; }
 .item-overlay.show{ display:flex; animation:fadeIn .2s ease both; }
 @keyframes fadeIn{ from{opacity:0} to{opacity:1} }
@@ -151,7 +165,7 @@ nav .insta-link img{ width:20px;height:20px; object-fit:contain; filter: invert(
   transform: scale(1); opacity:0; animation:popIn .26s cubic-bezier(.2,.9,.2,1) forwards;
   transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
-.modal-box:hover{ transform: scale(1.3); box-shadow: 0 0 60px rgba(255,26,26,0.6); }
+.modal-box:hover{ transform: scale(1.03); box-shadow: 0 0 60px rgba(255,26,26,0.6); }
 @keyframes popIn{ to{ transform:scale(1); opacity:1 } }
 
 .modal-left{ flex:1 1 54%; display:flex; justify-content:center; align-items:center; padding:12px; background:linear-gradient(180deg, rgba(255,26,26,0.04), rgba(0,0,0,0.15)); }
@@ -164,7 +178,7 @@ nav .insta-link img{ width:20px;height:20px; object-fit:contain; filter: invert(
 
 #modal-close{ position:absolute; top:10px; right:16px; font-size:28px; color:var(--red); cursor:pointer; }
 
-/* ========== RESPONSIVE ========== */
+/* responsive bits */
 @media(max-width:820px){
   .modal-box{ flex-direction:column; max-height:90vh; }
   .modal-left, .modal-right{ max-width:100%; padding:12px; }
@@ -191,7 +205,9 @@ nav .insta-link img{ width:20px;height:20px; object-fit:contain; filter: invert(
     <a href="index.html">HOME</a>
     <a href="prints.html">PRINTS</a>
     <a href="clothes.html">CLOTHES</a>
-    <a class="insta-link" href="https://www.instagram.com/allusionstoograndeur/" target="_blank"><img src="images/instagram.png" alt="Instagram"></a>
+    <a class="insta-link" href="https://www.instagram.com/allusionstoograndeur/" target="_blank" aria-label="Instagram">
+      <img src="images/instagram.png" alt="">
+    </a>
     <a href="blog.html">BLOG</a>
     <a href="gallery.html">GALLERY</a>
     <a href="contact.html">CONTACT</a>
@@ -204,32 +220,29 @@ nav .insta-link img{ width:20px;height:20px; object-fit:contain; filter: invert(
 
 <div class="marquee"><span>* CURRENT DROPS AVAILABLE NOW | FREE SHIPPING OVER $60 *</span></div>
 
-<!-- ===== HERO with eyes inside using grid ===== -->
+<!-- HERO with eyes INSIDE (left/text/right) -->
 <div class="hero">
   <div class="hero-grid">
-    <span class="eye left" style="--src: url('images/eyes-trans.gif');">
-      <img src="images/eyes-trans.gif" alt="">
-    </span>
+    <div class="eye left"><img src="images/eyes-trans.gif" alt=""></div>
 
-    <div class="hero-copy">
-      <p><strong>This is not a brand.</strong><br>
-       It’s the slow release of <em>Allusions&nbsp;Too&nbsp;Grandeur</em> —<br>
-        relics from a collapsing dream,<br>
-        rare fragments of an ongoing hallucination.</p>
-    </div>
+    <p>
+      <strong>This is not a brand.</strong><br>
+      It’s the slow release of
+<span class="nowrap"><em>Allusions&nbsp;Too&nbsp;Grandeur</em>&nbsp;—</span><br>
+      relics from a collapsing dream,<br>
+      rare fragments of an ongoing hallucination.
+    </p>
 
-    <span class="eye right" style="--src: url('images/eyes-trans.gif');">
-      <img src="images/eyes-trans.gif" alt="">
-    </span>
+    <div class="eye right"><img src="images/eyes-trans.gif" alt=""></div>
   </div>
 </div>
 
-<h2 style="text-align:center;margin-top:40px;">Current Drops</h2>
+<h2>Current Drops</h2>
 <div class="scroll-section" id="scroll-drops">
   <div class="scroll-inner" id="current-drops-inner"></div>
 </div>
 
-<h2 style="text-align:center;margin-top:40px;">Gallery</h2>
+<h2>Gallery</h2>
 <div class="scroll-section" id="scroll-gallery">
   <div class="scroll-inner" id="gallery-inner"></div>
 </div>
@@ -252,11 +265,12 @@ nav .insta-link img{ width:20px;height:20px; object-fit:contain; filter: invert(
 <footer>© 2025 CellOutz</footer>
 
 <script>
-/* matrix background */
+/* ===== Matrix background ===== */
 const canvas = document.getElementById('matrix');
 const ctx = canvas.getContext('2d');
 let letters = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ@#$%^&*",
-    fontSize = 16, cols, drops;
+    fontSize = 16,
+    cols, drops;
 
 function resizeCanvas(){
   canvas.width = window.innerWidth;
@@ -281,25 +295,25 @@ function drawMatrix(){
 }
 setInterval(drawMatrix, 50);
 
-/* demo data */
-const currentDropsImgs = [
-  { src: 'images/print1.png', name: 'Gothic Print Poster', price: 29.99, desc: 'High-quality limited edition print.' },
-  { src: 'images/hoodie1.png', name: 'Chrome Red Hoodie', price: 49.99, desc: 'Edgy gothic hoodie in red chrome.' },
-  { src: 'images/print2.png', name: 'Limited Edition Print', price: 39.99, desc: 'Signed limited print.' },
-  { src: 'images/hoodie2.png', name: 'Obsidian Hoodie', price: 52.99, desc: 'Dark themed hoodie.' },
-  { src: 'images/print3.png', name: 'Special Print', price: 34.99, desc: 'Limited release artwork.' },
-  { src: 'images/hoodie3.png', name: 'Blood Red Hoodie', price: 49.99, desc: 'Intense red hoodie.' }
-];
-const galleryImgs = [
-  { src: 'images/art1.png', name: 'Art Piece 1', desc: 'High-resolution artwork.' },
-  { src: 'images/art2.png', name: 'Art Piece 2', desc: 'High-resolution artwork.' },
-  { src: 'images/art3.png', name: 'Art Piece 3', desc: 'High-resolution artwork.' },
-  { src: 'images/art4.png', name: 'Art Piece 4', desc: 'High-resolution artwork.' },
-  { src: 'images/art5.png', name: 'Art Piece 5', desc: 'High-resolution artwork.' },
-  { src: 'images/art6.png', name: 'Art Piece 6', desc: 'High-resolution artwork.' }
+/* ===== DATA: Art only ===== */
+const ART_FILES = [
+  'images/art1.png','images/art2.png','images/art3.png','images/art4.png','images/art5.png',
+  'images/art6.png','images/art7.png','images/art8.png','images/art9.png','images/art10.png',
+  'images/art11.png','images/art12.png','images/art13.png'
 ];
 
-/* card helpers */
+/* Current Drops = subset with randomized AUD prices */
+function randPrice(min,max){ return (Math.random()*(max-min)+min).toFixed(2); }
+const currentDrops = ART_FILES
+  .slice() // keep original order intact
+  .sort(()=> Math.random()-0.5)
+  .slice(0,8)
+  .map((src,i)=>({ src, name:`Print ${i+1}`, price: randPrice(35,95), desc:'Limited edition print • A.U.D.' }));
+
+/* Gallery belt = all art */
+const galleryImgs = ART_FILES.map((src,i)=>({ src, name:`Gallery ${i+1}`, desc:'High-resolution artwork' }));
+
+/* ===== Card builders ===== */
 function createCard(obj, isDrop=false){
   const card = document.createElement('div');
   card.className = 'card';
@@ -313,69 +327,169 @@ function createCard(obj, isDrop=false){
   img.alt = obj.name || 'Art';
   card.appendChild(img);
 
-  if(isDrop && obj.name && obj.price !== undefined){
+  if(isDrop){
     const info = document.createElement('div');
     info.className = 'info';
-    info.innerHTML = `<p>${obj.name}</p><p>$${obj.price}</p>`;
+    info.innerHTML = `<p>${obj.name}</p><p>$${obj.price} AUD</p>`;
     card.appendChild(info);
   }
   return card;
 }
-function generateCards(containerId, arr, isDrop=false){
-  const container = document.getElementById(containerId);
-  arr.forEach(item => container.appendChild(createCard(item, isDrop)));
-  const originals = Array.from(container.children);
-  originals.forEach(n => container.appendChild(n.cloneNode(true)));
+
+function populateBelt(container, items, isDrop=false){
+  items.forEach(item => container.appendChild(createCard(item, isDrop)));
+  // duplicate once for seamless visual loop
+  Array.from(container.children).forEach(node => container.appendChild(node.cloneNode(true)));
 }
-generateCards('current-drops-inner', currentDropsImgs, true);
-generateCards('gallery-inner',  galleryImgs, false);
 
-/* infinite belts */
-const dropsContainer = document.getElementById('current-drops-inner');
+/* ===== Render both belts ===== */
+const dropsContainer   = document.getElementById('current-drops-inner');
 const galleryContainer = document.getElementById('gallery-inner');
-let dropsOffset = window.innerWidth;
-let galleryOffset = window.innerWidth;
-const baseSpeed = 0.65 * 1.2;
-let dropsSpeed = baseSpeed, gallerySpeed = baseSpeed;
-let pausedDrops = false, pausedGallery = false;
 
-document.getElementById('scroll-drops').addEventListener('mouseenter', ()=> pausedDrops = true);
-document.getElementById('scroll-drops').addEventListener('mouseleave', ()=> pausedDrops = false);
-document.getElementById('scroll-gallery').addEventListener('mouseenter', ()=> pausedGallery = true);
-document.getElementById('scroll-gallery').addEventListener('mouseleave', ()=> pausedGallery = false);
+/* Drops (left-moving) */
+populateBelt(dropsContainer, currentDrops, true);
 
-function recycleIfNeeded(container){
+/* Gallery (right-moving) + pill link first */
+const pill = document.createElement('a');
+pill.href = 'gallery.html';
+pill.className = 'gallery-pill';
+pill.textContent = 'Find more in the Gallery →';
+galleryContainer.appendChild(pill);
+populateBelt(galleryContainer, galleryImgs, false);
+
+/* ===== Infinite scroll + speed zones (no pause) ===== */
+let dropsOffset   = 0; // start on-screen
+let galleryOffset = 0;
+
+const BASE_SPEED  = 1.0;  // comfy cruise
+const BOOST_SPEED = 2.2;  // fast skim at matching edge
+const SLOW_SPEED  = 0.28; // gentle crawl at center
+
+let dropsSpeed   = BASE_SPEED;
+let gallerySpeed = BASE_SPEED;
+
+/* Compute speed factor based on mouse x inside a belt */
+function computeSpeedFactor(e, container, direction){
+  const rect = container.getBoundingClientRect();
+  const pct  = (e.clientX - rect.left) / rect.width; // 0..1
+  // Middle ~40–60% = slow
+  if (pct > 0.40 && pct < 0.60) return SLOW_SPEED;
+  // Matching edge = boost
+  if (direction === 'left'  && pct < 0.10) return BOOST_SPEED; // far left for left-moving
+  if (direction === 'right' && pct > 0.90) return BOOST_SPEED; // far right for right-moving
+  return 1;
+}
+
+/* Recyclers */
+function recycleLeft(container){
   const first = container.firstElementChild;
   if(!first) return 0;
   const rect = first.getBoundingClientRect();
   if(rect.right < -2){
-    const w = first.offsetWidth + parseInt(getComputedStyle(container).gap || 20);
+    const gap = parseInt(getComputedStyle(container).gap || 20);
+    const w   = first.offsetWidth + gap;
     container.appendChild(first);
     return w;
   }
   return 0;
 }
+function recycleRight(container){
+  const last = container.lastElementChild;
+  if(!last) return 0;
+  const rect = last.getBoundingClientRect();
+  if(rect.left > window.innerWidth + 2){
+    const gap = parseInt(getComputedStyle(container).gap || 20);
+    const w   = last.offsetWidth + gap;
+    container.insertBefore(last, container.firstElementChild);
+    return w;
+  }
+  return 0;
+}
+
+/* Animator */
 function animate(){
-  if(!pausedDrops){
-    dropsOffset -= dropsSpeed;
-    dropsContainer.style.transform = `translateX(${dropsOffset}px)`;
-    const adjust = recycleIfNeeded(dropsContainer);
-    if (adjust) dropsOffset += adjust;
-  }
-  if(!pausedGallery){
-    galleryOffset -= gallerySpeed;
-    galleryContainer.style.transform = `translateX(${galleryOffset}px)`;
-    const adjustG = recycleIfNeeded(galleryContainer);
-    if (adjustG) galleryOffset += adjustG;
-  }
+  // Drops: move left
+  dropsOffset -= dropsSpeed;
+  dropsContainer.style.transform = `translateX(${dropsOffset}px)`;
+  const adjL = recycleLeft(dropsContainer);
+  if (adjL) dropsOffset += adjL;
+
+  // Gallery: move right
+  galleryOffset += gallerySpeed;
+  galleryContainer.style.transform = `translateX(${galleryOffset}px)`;
+  const adjR = recycleRight(galleryContainer);
+  if (adjR) galleryOffset -= adjR;
+
   requestAnimationFrame(animate);
 }
-requestAnimationFrame(()=>{ 
-  dropsOffset = galleryOffset = window.innerWidth; 
-  animate(); 
+requestAnimationFrame(animate);
+
+/* Speed-zone listeners */
+const dropsSection   = document.getElementById('scroll-drops');
+const gallerySection = document.getElementById('scroll-gallery');
+
+dropsSection.addEventListener('mousemove', (e)=>{
+  dropsSpeed = BASE_SPEED * computeSpeedFactor(e, dropsSection, 'left');
+});
+dropsSection.addEventListener('mouseleave', ()=>{ dropsSpeed = BASE_SPEED; });
+
+gallerySection.addEventListener('mousemove', (e)=>{
+  gallerySpeed = BASE_SPEED * computeSpeedFactor(e, gallerySection, 'right');
+});
+gallerySection.addEventListener('mouseleave', ()=>{ gallerySpeed = BASE_SPEED; });
+
+/* ===== Modal / Cart ===== */
+const overlay = document.getElementById('lightbox');
+const ovImg = document.getElementById('overlay-img');
+const ovName = document.getElementById('overlay-name');
+const ovPrice = document.getElementById('overlay-price');
+const ovDesc = document.getElementById('overlay-desc');
+const addBtn = document.getElementById('add-cart-btn');
+const closeBtn = document.getElementById('modal-close');
+let selectedItem = null;
+
+function wireCards(){
+  document.querySelectorAll('.card').forEach(card=>{
+    card.addEventListener('click', ()=>{
+      ovImg.src = card.dataset.src || '';
+      ovName.textContent = card.dataset.name || '';
+      ovPrice.textContent = card.dataset.price ? `$${Number(card.dataset.price).toFixed(2)} AUD` : '';
+      ovDesc.textContent = card.dataset.desc || '';
+      selectedItem = card.dataset.price ? { name: card.dataset.name, price: parseFloat(card.dataset.price)} : null;
+      addBtn.style.display = selectedItem ? 'block' : 'none';
+      overlay.classList.add('show');
+      overlay.setAttribute('aria-hidden','false');
+      setTimeout(()=> { if(addBtn.style.display !== 'none') addBtn.focus(); }, 200);
+    });
+  });
+}
+wireCards();
+
+closeBtn.addEventListener('click', ()=> overlay.classList.remove('show'));
+overlay.addEventListener('click', (e)=> { if(e.target === overlay) overlay.classList.remove('show'); });
+document.addEventListener('keydown', (e)=> { if(e.key === 'Escape') overlay.classList.remove('show'); });
+
+const cartButton = document.getElementById('cart-button');
+const cartCount = document.getElementById('cart-count');
+let cart = [];
+function renderCart(){
+  if(cart.length > 0){ cartCount.textContent = cart.length; cartCount.classList.remove('hidden'); }
+  else { cartCount.classList.add('hidden'); }
+}
+document.getElementById('add-cart-btn').addEventListener('click', ()=>{
+  if(selectedItem){ cart.push(selectedItem); renderCart(); overlay.classList.remove('show'); }
+});
+cartButton.addEventListener('click', ()=>{
+  if(cart.length === 0){ alert('Your cart is empty.'); }
+  else{
+    let txt = 'Cart:\n';
+    cart.forEach((it, idx)=> txt += `${idx+1}. ${it.name} — $${it.price.toFixed(2)} AUD\n`);
+    txt += `\nTotal: $${cart.reduce((s,i)=>s+i.price,0).toFixed(2)} AUD\n\n(Checkout not configured in this demo.)`;
+    alert(txt);
+  }
 });
 
-/* logo fade-in */
+/* Logo intro */
 const logo = document.getElementById('site-logo');
 const seen = sessionStorage.getItem('celloutz_logo_seen');
 if(!seen){
@@ -384,12 +498,6 @@ if(!seen){
 } else {
   logo.classList.add('logo-visible');
 }
-
-/* keep offsets sensible on resize */
-window.addEventListener('resize', ()=>{
-  if(dropsOffset   > window.innerWidth) dropsOffset   = window.innerWidth;
-  if(galleryOffset > window.innerWidth) galleryOffset = window.innerWidth;
-});
 </script>
 </body>
 </html>
