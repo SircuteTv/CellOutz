@@ -40,14 +40,17 @@ nav a{
   border:1px solid var(--red);
   border-radius:6px;
   transition:0.3s;
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
 }
 nav a:hover{ 
   background:var(--red); 
   color:var(--bg); 
   box-shadow:0 0 20px var(--red);
 }
-/* inline instagram icon sizing */
-nav .insta-link svg{ width:20px;height:20px; display:block; }
+/* inline Instagram icon sizing */
+nav .insta-link svg{ width:20px; height:20px; display:block; }
 
 h1{text-align:center;margin:20px 0;}
 .section{
@@ -61,11 +64,23 @@ h1{text-align:center;margin:20px 0;}
 }
 .section h2{ margin-top:0; font-size:24px; }
 .section p{ line-height:1.5; }
+.contact-info{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  margin-top:12px;
+}
+.contact-info a{
+  color:var(--red);
+  text-decoration:none;
+  border-bottom:1px dashed var(--red);
+}
+.contact-info a:hover{
+  color:#fff;
+  border-bottom:1px solid var(--red);
+}
 
-.contact-info{ display:flex; flex-direction:column; gap:12px; margin-top:12px; }
-.contact-info a{ color:var(--red); text-decoration:none; border-bottom:1px dashed var(--red); }
-.contact-info a:hover{ color:#fff; border-bottom:1px solid var(--red); }
-
+/* cart button */
 #cart-button{
   position:fixed; top:18px; right:24px;
   width:64px; height:64px; border-radius:50%; display:flex; align-items:center; justify-content:center;
@@ -75,7 +90,8 @@ h1{text-align:center;margin:20px 0;}
 #cart-button:hover{ transform: scale(1.03) }
 #cart-button img{ width:34px; height:34px; object-fit:contain; filter: invert(27%) sepia(100%) saturate(7000%) hue-rotate(340deg) }
 #cart-count{ position:absolute; top:-8px; right:-8px; width:22px; height:22px; border-radius:50%; background:var(--red); color:#000; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:12px; }
-.hidden { display: none !important; }
+/* utility */
+.hidden{ display:none !important; }
 </style>
 </head>
 <body>
@@ -86,6 +102,7 @@ h1{text-align:center;margin:20px 0;}
     <a href="index.html">Home</a>
     <a href="prints.html">Prints</a>
     <a href="clothes.html">Clothes</a>
+    <!-- Instagram button -->
     <a class="insta-link" href="https://www.instagram.com/allusionstoograndeur/" target="_blank" rel="noopener" aria-label="Instagram">
       <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
         <rect x="3" y="3" width="18" height="18" rx="5" stroke="currentColor" stroke-width="2"/>
@@ -93,6 +110,8 @@ h1{text-align:center;margin:20px 0;}
         <circle cx="17.3" cy="6.7" r="1.2" fill="currentColor"/>
       </svg>
     </a>
+    <!-- Blog placed immediately left of Gallery -->
+    <a href="blog.html">Blog</a>
     <a href="gallery.html">Gallery</a>
     <a href="contact.html">Contact</a>
   </nav>
@@ -137,5 +156,6 @@ document.getElementById('cart-button').addEventListener('click', ()=>{
   }
 });
 </script>
+
 </body>
 </html>

@@ -1,125 +1,138 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>CellOutz Prints</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1.0" />
+<title>CellOutz — Prints</title>
 <link href="https://fonts.googleapis.com/css2?family=UnifrakturCook:wght@700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
 :root{
-  --red:#FF1A1A;
-  --bg:#0B0000;
-  --text:#FF1A1A;
-  --accent: rgba(255,26,26,0.15);
+  --red:#FF1A1A; --bg:#0B0000; --text:#FF1A1A; --accent: rgba(255,26,26,.15);
 }
-.hidden { display: none !important; }
-*{box-sizing:border-box;}
+*{box-sizing:border-box}
+html,body{height:100%}
 body{
-  margin:0;
-  font-family:'Share Tech Mono',monospace;
-  background:var(--bg);
-  color:var(--text);
-  overflow-x:hidden;
+  margin:0; font-family:'Share Tech Mono',monospace;
+  background:var(--bg); color:var(--text); overflow-x:hidden;
 }
 
-header{
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  padding:20px 40px 10px 40px;
-  position:relative;
+/* Matrix background */
+#matrix{ position:fixed; inset:0; width:100%; height:100%; z-index:-2; background:var(--bg); }
+.vignette:before{
+  content:""; position:fixed; inset:0; z-index:-1; pointer-events:none;
+  background:
+    radial-gradient(1200px 800px at 50% 18%, rgba(255,26,26,.12), transparent 55%),
+    radial-gradient(1800px 1200px at 50% 110%, rgba(255,26,26,.08), transparent 60%);
 }
-.logo-container{ display:flex; justify-content:center; align-items:center; margin-bottom:20px; max-width:100%; }
-.logo-container img{ max-width:480px; width:100%; height:auto; }
+.scan:after{
+  content:""; position:fixed; inset:0; z-index:-1; pointer-events:none;
+  background-image: linear-gradient(rgba(0,0,0,.25) 1px, transparent 1px);
+  background-size:100% 3px; mix-blend-mode:soft-light; opacity:.35;
+}
 
-nav{
-  display:flex;
-  gap:12px;
-  flex-wrap:wrap;
-  justify-content:center;
-  align-items:center;
-}
+/* Header / Nav */
+header{display:flex;flex-direction:column;align-items:center;padding:20px 40px 10px}
+.logo-container{display:flex;justify-content:center;align-items:center;margin-bottom:18px;max-width:100%}
+.logo-container img{max-width:440px;width:100%;height:auto;object-fit:contain}
+nav{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;align-items:center}
 nav a{
-  text-decoration:none;
-  color:var(--text);
-  padding:8px 12px;
-  border:1px solid var(--red);
-  border-radius:6px;
-  transition:0.3s;
+  text-decoration:none;color:var(--text);padding:8px 12px;border:1px solid var(--red);border-radius:6px;
+  transition:.25s;position:relative;display:inline-flex;align-items:center;gap:6px;
 }
-nav a:hover{ background:var(--red); color:var(--bg); box-shadow:0 0 20px var(--red); }
-/* inline instagram icon sizing */
-nav .insta-link svg{ width:20px;height:20px; display:block; }
+nav a::after{ content:''; position:absolute; inset:0; background:var(--accent); mix-blend-mode:screen; opacity:0; transition:.25s }
+nav a:hover::after{opacity:1}
+nav a:hover{ background:var(--red); color:#000; box-shadow:0 0 18px var(--red), inset 0 0 28px var(--red) }
+nav .insta-link svg{ width:20px; height:20px; display:block; }
 
-.prints-grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
-  gap:20px;
-  padding:20px;
-  max-width:1200px;
-  margin:0 auto;
-}
-.print-card{
-  background:rgba(0,0,0,0.6);
-  border:2px solid var(--red);
-  border-radius:12px;
-  overflow:hidden;
-  cursor:pointer;
-  position:relative;
-  transition:transform 0.2s;
-}
-.print-card img{ width:100%; display:block; object-fit:contain; }
-.print-card:hover{transform:scale(1.02);}
-
+/* Floating cart bubble */
 #cart-button{
   position:fixed; top:18px; right:24px;
-  width:64px; height:64px; border-radius:50%;
-  display:flex; align-items:center; justify-content:center;
-  border:3px solid var(--red);
-  background:rgba(0,0,0,0.35);
-  cursor:pointer;
-  z-index:2000;
+  width:64px; height:64px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+  border:3px solid var(--red); background:rgba(0,0,0,.35); cursor:pointer; z-index:2000;
   transition: transform .12s ease;
 }
 #cart-button:hover{ transform: scale(1.03) }
 #cart-button img{ width:34px; height:34px; object-fit:contain; filter: invert(27%) sepia(100%) saturate(7000%) hue-rotate(340deg) }
-#cart-count{ position:absolute; top:-8px; right:-8px; width:22px; height:22px; border-radius:50%; background:var(--red); color:#000; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:12px; }
+#cart-count{
+  position:absolute; top:-8px; right:-8px; width:22px; height:22px; border-radius:50%;
+  background:var(--red); color:#000; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:12px;
+}
+.hidden{ display:none !important; }
 
-.item-overlay{
-  display:none;
-  position:fixed; inset:0;
-  background:rgba(0,0,0,0.85);
-  z-index:1500;
-  justify-content:center; align-items:center; padding:20px;
-}
-.item-overlay.show{display:flex;}
+main{ max-width:1300px; margin:12px auto 80px; padding:0 18px; }
 
-.modal-box{
-  position:relative; background:var(--bg); border:2px solid var(--red); border-radius:12px;
-  max-width:90%; max-height:90%; overflow:hidden; display:flex; flex-direction:row; align-items:center;
+/* Section titles */
+h2.section-title{
+  font-family:'UnifrakturCook',cursive; text-align:center; margin:34px 0 14px;
+  text-shadow:0 0 10px var(--red), 0 0 24px rgba(255,26,26,.6);
 }
-.modal-left{ position:relative; flex:1 1 55%; display:flex; justify-content:center; align-items:center; background:rgba(0,0,0,0.1); }
-.modal-left img{ max-width:100%; max-height:80vh; object-fit:contain; cursor:none; }
-.magnifier-lens{
-  position:absolute; border:3px solid var(--red); border-radius:50%;
-  width:120px; height:120px; pointer-events:none; display:none;
-  background-repeat:no-repeat; background-size:200% 200%; z-index:2000;
-}
-.modal-right{ flex:1 1 45%; padding:18px; color:var(--red); display:flex; flex-direction:column; justify-content:flex-start; }
-.modal-right h2{margin:0 0 8px 0;font-size:20px;}
-.modal-right p{margin:6px 0;line-height:1.35;}
-#add-cart-btn{ margin-top:auto; padding:12px; border-radius:8px; border:none; background:var(--red); color:#000; font-weight:700; cursor:pointer; }
-#modal-close{ position:absolute; top:8px; right:12px; font-size:28px; color:var(--red); cursor:pointer; }
 
-@media(max-width:800px){
-  .modal-box{flex-direction:column;}
-  .modal-left,.modal-right{max-width:100%;padding:12px;}
-  .modal-left img{max-height:50vh;}
-  .magnifier-lens{width:80px;height:80px;}
+/* Product grid */
+.grid{ display:grid; gap:18px; }
+.grid.four{ grid-template-columns: repeat(4, 1fr); }
+.grid.three{ grid-template-columns: repeat(3, 1fr); }
+
+@media(max-width:1100px){ .grid.four{ grid-template-columns: repeat(3, 1fr) } }
+@media(max-width:820px){ .grid.four,.grid.three{ grid-template-columns: repeat(2, 1fr) } }
+@media(max-width:540px){ .grid.four,.grid.three{ grid-template-columns: 1fr } }
+
+/* Product card */
+.card{
+  border:1px solid rgba(255,26,26,.35); border-radius:14px; overflow:hidden; background:#000;
+  box-shadow:0 6px 24px rgba(0,0,0,.5); display:flex; flex-direction:column;
 }
+.thumb-wrap{ position:relative; background:#080000; display:flex; align-items:center; justify-content:center; }
+.thumb{ width:100%; height:100%; object-fit:cover; display:block; aspect-ratio: 4/5; } /* safe default aspect */
+.card:hover .thumb{ filter:contrast(1.05) brightness(1.02) }
+.card-body{ padding:12px 12px 14px; display:flex; flex-direction:column; gap:10px; }
+.card-title{ font-weight:700; font-size:14px; }
+.card-collection{ font-size:12px; opacity:.75; }
+
+.row{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+.select, .qty{
+  background:rgba(0,0,0,.5); color:var(--text); border:1px solid var(--red); border-radius:8px; padding:8px;
+}
+.price{ margin-left:auto; font-weight:700; }
+.btn{
+  width:100%; padding:10px; border-radius:10px; border:1px solid var(--red);
+  background:var(--red); color:#000; font-weight:700; cursor:pointer;
+  box-shadow:0 0 12px var(--red), inset 0 0 24px rgba(255,26,26,.5); transition:transform .12s ease;
+}
+.btn:hover{ transform:translateY(-2px) }
+
+/* Modal viewer */
+.overlay{ position:fixed; inset:0; background:rgba(0,0,0,.92); backdrop-filter:blur(2px); display:none; z-index:1500; }
+.overlay.show{ display:block; animation:fade .16s ease both }
+@keyframes fade{ from{opacity:0} to{opacity:1} }
+
+.viewer{
+  position:absolute; inset:20px 20px 60px 20px; display:grid; grid-template-columns:1fr auto; gap:16px;
+  border:1px solid rgba(255,26,26,.35); border-radius:14px; overflow:hidden;
+  box-shadow:0 0 28px rgba(255,26,26,.25), 0 18px 60px rgba(0,0,0,.6); background:rgba(11,0,0,.85);
+  max-width:1220px; width:92vw; max-height:90vh; margin:auto; left:0; right:0; top:0; bottom:0;
+}
+.viewer.full{ grid-template-columns:1fr 0 }
+.view-img-wrap{ display:flex; align-items:center; justify-content:center; background:#080000; }
+.view-img{ max-width:100%; max-height:88vh; object-fit:contain; display:block }
+.side{ min-width:280px; padding:16px; background:linear-gradient(180deg, rgba(255,26,26,.06), rgba(0,0,0,.35)) }
+.side h3{ margin:6px 0 10px; font-family:'UnifrakturCook',cursive; }
+.side p{ margin:0; line-height:1.35 }
+
+.infobtn, .fsbtn, .closeX{
+  position:absolute; border:1px solid var(--red); border-radius:999px; background:rgba(0,0,0,.45);
+  color:var(--text); padding:8px 12px; cursor:pointer;
+}
+.infobtn{ top:10px; left:14px }
+.fsbtn{ left:50%; transform:translateX(-50%); bottom:12px }
+.closeX{ top:10px; right:14px; border-radius:10px }
+
+/* Small helper */
+.note{ font-size:12px; opacity:.7 }
 </style>
 </head>
-<body>
+<body class="vignette scan">
+
+<canvas id="matrix"></canvas>
 
 <header>
   <div class="logo-container">
@@ -140,124 +153,251 @@ nav .insta-link svg{ width:20px;height:20px; display:block; }
     <a href="gallery.html">Gallery</a>
     <a href="contact.html">Contact</a>
   </nav>
+
   <div id="cart-button" aria-label="Cart" title="Cart">
     <img src="images/cart.png" alt="Cart">
     <div id="cart-count" class="hidden">0</div>
   </div>
 </header>
 
-<div class="prints-grid" id="prints-container"></div>
+<main>
+  <p class="note" style="text-align:center;margin:0 0 10px;">
+    All prints are archival. Sizes match the artwork’s aspect ratio. Prices in AUD.
+  </p>
 
-<div id="lightbox" class="item-overlay" aria-hidden="true">
-  <div class="modal-box" role="dialog" aria-modal="true">
-    <div class="modal-left">
-      <img id="overlay-img" src="" alt="">
-      <div class="magnifier-lens" id="lens"></div>
+  <h2 class="section-title">Present Polarity</h2>
+  <div class="grid four" id="grid-present"></div>
+
+  <h2 class="section-title">Chaos Wizard</h2>
+  <div class="grid three" id="grid-chaos"></div>
+
+  <h2 class="section-title">Genesis</h2>
+  <div class="grid three" id="grid-genesis"></div>
+</main>
+
+<!-- Modal -->
+<div id="overlay" class="overlay" aria-hidden="true">
+  <div class="viewer full" id="viewer">
+    <div class="view-img-wrap">
+      <img id="bigImg" class="view-img" src="" alt="">
     </div>
-    <div class="modal-right">
-      <h2 id="overlay-name"></h2>
-      <p id="overlay-price"></p>
-      <p id="overlay-desc"></p>
-      <button id="add-cart-btn">Add to Cart</button>
-    </div>
-    <div id="modal-close" aria-label="Close modal">&times;</div>
+    <aside class="side" id="side">
+      <h3 id="sideTitle"></h3>
+      <p id="sideDesc"></p>
+      <p class="note" id="dpiNote"></p>
+    </aside>
+    <button class="infobtn" id="infoToggle">info</button>
+    <button class="fsbtn" id="fsBtn">fullscreen</button>
+    <button class="closeX" id="closeBtn">✕</button>
   </div>
 </div>
 
 <script>
-const prints = [
-  { src: 'images/print1.png', name: 'Gothic Print Poster', price: 29.99, desc: 'High-quality limited edition print.' },
-  { src: 'images/print2.png', name: 'Limited Edition Print', price: 39.99, desc: 'Signed limited print.' },
-  { src: 'images/print3.png', name: 'Special Print', price: 34.99, desc: 'Limited release artwork.' }
-];
-
-const container = document.getElementById('prints-container');
-const overlay = document.getElementById('lightbox');
-const overlayImg = document.getElementById('overlay-img');
-const lens = document.getElementById('lens');
-const ovName = document.getElementById('overlay-name');
-const ovPrice = document.getElementById('overlay-price');
-const ovDesc = document.getElementById('overlay-desc');
-const addBtn = document.getElementById('add-cart-btn');
-const closeBtn = document.getElementById('modal-close');
-
-let selectedItem = null;
-let cart = [];
-
-// Create print cards
-prints.forEach(print => {
-  const card = document.createElement('div');
-  card.className = 'print-card';
-  card.innerHTML = `<img src="${print.src}" alt="${print.name}"><div class="print-info"><h3>${print.name}</h3><p>$${print.price}</p></div>`;
-  container.appendChild(card);
-
-  card.addEventListener('click', ()=>{
-    overlay.classList.add('show');
-    overlay.setAttribute('aria-hidden','false');
-    overlayImg.src = print.src;
-    ovName.textContent = print.name;
-    ovPrice.textContent = `$${print.price}`;
-    ovDesc.textContent = print.desc;
-    selectedItem = {name: print.name, price: print.price};
-    addBtn.style.display = 'block';
-  });
-});
-
-// Close modal on click outside or ESC
-overlay.addEventListener('click', e=>{
-  if(e.target === overlay || e.target === closeBtn){
-    overlay.classList.remove('show');
-  }
-});
-document.addEventListener('keydown', e=>{
-  if(e.key === 'Escape') overlay.classList.remove('show');
-});
-
-// Magnifying lens
-overlayImg.addEventListener('mousemove', e=>{
-  lens.style.display = 'block';
-  const rect = overlayImg.getBoundingClientRect();
-  let x = e.clientX - rect.left;
-  let y = e.clientY - rect.top;
-  let lw = lens.offsetWidth / 2;
-  let lh = lens.offsetHeight / 2;
-  x = Math.max(lw, Math.min(x, rect.width - lw));
-  y = Math.max(lh, Math.min(y, rect.height - lh));
-  lens.style.left = (x - lw) + 'px';
-  lens.style.top = (y - lh) + 'px';
-  lens.style.backgroundImage = `url('${overlayImg.src}')`;
-  lens.style.backgroundSize = (overlayImg.width * 2) + 'px ' + (overlayImg.height * 2) + 'px';
-  lens.style.backgroundPosition = `-${x*2 - lw}px -${y*2 - lh}px`;
-});
-overlayImg.addEventListener('mouseleave', ()=>lens.style.display='none');
-
-// Cart logic
-function renderCart(){
-  const cartCount = document.getElementById('cart-count');
-  if(cart.length>0){
-    cartCount.textContent = cart.length;
-    cartCount.classList.remove('hidden');
-  } else {
-    cartCount.classList.add('hidden');
+/* ===== Matrix background ===== */
+const canvas = document.getElementById('matrix');
+const ctx = canvas.getContext('2d');
+let letters = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ@#$%^&*",
+    fontSize = 16, cols, drops;
+function resizeCanvas(){
+  canvas.width = innerWidth; canvas.height = innerHeight;
+  cols = Math.floor(canvas.width / fontSize); drops = Array(cols).fill(0);
+}
+resizeCanvas(); addEventListener('resize', resizeCanvas);
+function drawMatrix(){
+  ctx.fillStyle = "rgba(11,0,0,0.09)"; ctx.fillRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle = "#FF1A1A"; ctx.font = fontSize + "px monospace";
+  for(let i=0;i<cols;i++){
+    const t = letters[(Math.random()*letters.length)|0];
+    ctx.fillText(t, i*fontSize, drops[i]);
+    drops[i]+= fontSize; if(drops[i] > canvas.height && Math.random()>0.975) drops[i]=0;
   }
 }
-addBtn.addEventListener('click', ()=>{
-  if(selectedItem){
-    cart.push(selectedItem);
-    renderCart();
-    overlay.classList.remove('show');
+setInterval(drawMatrix, 60);
+
+/* ===== CONFIG ===== */
+
+/* Price table (AUD) by size label */
+const PRICING_AUD = {
+  "A4": 45, "A3": 75, "A2": 140,
+  "12×12\"": 65, "16×16\"": 120, "20×20\"": 180,
+  "12×18\"": 95, "16×24\"": 165, "24×36\"": 280,
+  "12×15\"": 90, "16×20\"": 150, "20×25\"": 210
+};
+
+/* Size sets by aspect “family” */
+const SIZE_SETS = {
+  square:   ["12×12\"", "16×16\"", "20×20\""],
+  sqrt2:    ["A4","A3","A2"],                       // A-series (ratio ~1.414)
+  threeTwo: ["12×18\"","16×24\"","24×36\""],        // ~1.5
+  fourFive: ["12×15\"","16×20\"","20×25\""]         // 4:5 = 0.8 (portrait) or 1.25 landscape
+};
+
+/* Aspect categorizer */
+function aspectFamily(w,h){
+  const r = w/h; const inv = h/w;
+  const close = (a,b)=> Math.abs(a-b) < 0.06;
+  if (close(r,1)) return "square";
+  if (close(r,1.414) || close(inv,1.414)) return "sqrt2";
+  if (close(r,1.5)   || close(inv,1.5))   return "threeTwo";
+  if (close(r,1.25)  || close(inv,1.25))  return "fourFive";
+  // default to sqrt2 (A sizes) so there’s always something reasonable
+  return "sqrt2";
+}
+
+/* Catalog: paths exactly as you named them */
+const PRODUCTS = [
+  // Present Polarity (4)
+  ...[1,2,3,4].map(i => ({
+    title:`Present Polarity — art (${i})`,
+    collection:"Present Polarity",
+    src:`images/${encodeURIComponent('Present Polarity')}/art (${i}).webp`,
+    desc:"Limited edition fine art print."
+  })),
+  // Chaos Wizard (9)
+  ...Array.from({length:9}, (_,i)=>i+1).map(i => ({
+    title:`Chaos Wizard — chaos (${i})`,
+    collection:"Chaos Wizard",
+    src:`images/${encodeURIComponent('chaos wizard')}/chaos (${i}).webp`,
+    desc:"Limited edition fine art print."
+  })),
+  // Genesis (1)
+  {
+    title:"Genesis — latr",
+    collection:"Genesis",
+    src:`images/Genesis/latr.webp`,
+    desc:"Limited edition fine art print."
   }
+];
+
+/* ===== DOM build ===== */
+function makeCard(p){
+  const card = document.createElement('div');
+  card.className = 'card';
+
+  const wrap = document.createElement('div');
+  wrap.className = 'thumb-wrap';
+  const img = document.createElement('img');
+  img.className = 'thumb';
+  img.src = p.src; img.alt = p.title; img.loading="lazy"; img.decoding="async";
+  wrap.appendChild(img);
+  card.appendChild(wrap);
+
+  const body = document.createElement('div');
+  body.className = 'card-body';
+  body.innerHTML = `
+    <div class="card-title">${p.title}</div>
+    <div class="card-collection">${p.collection}</div>
+    <div class="row">
+      <select class="select sizeSel"><option>Loading sizes…</option></select>
+      <input class="qty" type="number" min="1" value="1" style="width:72px">
+      <div class="price">$— AUD</div>
+    </div>
+    <button class="btn">Add to Cart</button>
+  `;
+  card.appendChild(body);
+
+  // When image loads, decide aspect & sizes
+  img.addEventListener('load', ()=>{
+    const fam = aspectFamily(img.naturalWidth, img.naturalHeight);
+    const sizes = SIZE_SETS[fam] || SIZE_SETS.sqrt2;
+    const sel = body.querySelector('.sizeSel');
+    sel.innerHTML = sizes.map(s=>`<option value="${s}">${s}</option>`).join('');
+    updatePrice(body);
+  });
+
+  // Hide card if image fails (missing file etc.)
+  img.addEventListener('error', ()=> card.style.display='none');
+
+  // Price update on change
+  body.querySelector('.sizeSel').addEventListener('change', ()=> updatePrice(body));
+  body.querySelector('.qty').addEventListener('input', ()=> updatePrice(body));
+
+  // Open modal on image click
+  wrap.addEventListener('click', ()=> openModal(p, img));
+
+  // Add to cart
+  body.querySelector('.btn').addEventListener('click', ()=>{
+    const size = body.querySelector('.sizeSel').value;
+    const qty  = Math.max(1, parseInt(body.querySelector('.qty').value||'1',10));
+    const unit = PRICING_AUD[size] || 0;
+    addToCart({ title:p.title, collection:p.collection, size, qty, price:unit*qty });
+  });
+
+  return card;
+}
+
+function updatePrice(body){
+  const size = body.querySelector('.sizeSel').value;
+  const qty  = Math.max(1, parseInt(body.querySelector('.qty').value||'1',10));
+  const unit = PRICING_AUD[size] || 0;
+  body.querySelector('.price').textContent = `$${(unit*qty).toFixed(2)} AUD`;
+}
+
+/* Sections */
+const gridPresent = document.getElementById('grid-present');
+const gridChaos   = document.getElementById('grid-chaos');
+const gridGenesis = document.getElementById('grid-genesis');
+
+PRODUCTS.forEach(p=>{
+  const card = makeCard(p);
+  if (p.collection === "Present Polarity") gridPresent.appendChild(card);
+  else if (p.collection === "Chaos Wizard") gridChaos.appendChild(card);
+  else if (p.collection === "Genesis") gridGenesis.appendChild(card);
 });
-document.getElementById('cart-button').addEventListener('click', ()=>{
-  if(cart.length===0){
-    alert('Your cart is empty.');
-  } else {
-    let txt='Cart:\n';
-    cart.forEach((it,idx)=>txt+=`${idx+1}. ${it.name} — $${it.price}\n`);
-    txt+=`Total: $${cart.reduce((s,i)=>s+i.price,0).toFixed(2)}\n\n(Checkout integration not configured)`;
-    alert(txt);
-  }
+
+/* ===== Modal viewer ===== */
+const overlay = document.getElementById('overlay');
+const viewer  = document.getElementById('viewer');
+const bigImg  = document.getElementById('bigImg');
+const side    = document.getElementById('side');
+const sideTitle = document.getElementById('sideTitle');
+const sideDesc  = document.getElementById('sideDesc');
+const dpiNote   = document.getElementById('dpiNote');
+
+function openModal(p, imgEl){
+  bigImg.src = p.src;
+  sideTitle.textContent = p.title;
+  sideDesc.textContent  = p.desc || '';
+  // compute max recommended size from source pixels
+  const w = imgEl.naturalWidth, h = imgEl.naturalHeight;
+  const maxSide300 = Math.floor(Math.max(w,h) / 300);
+  const maxSide240 = Math.floor(Math.max(w,h) / 240);
+  dpiNote.textContent = `Source: ${w}×${h}px — approx max at 300DPI: ${maxSide300}" on long edge (240DPI: ${maxSide240}").`;
+  viewer.classList.add('full'); // hide info by default
+  overlay.classList.add('show'); overlay.setAttribute('aria-hidden','false');
+}
+document.getElementById('infoToggle').addEventListener('click', ()=> viewer.classList.toggle('full'));
+document.getElementById('fsBtn').addEventListener('click', ()=>{
+  if(!document.fullscreenElement) viewer.requestFullscreen?.(); else document.exitFullscreen?.();
 });
+document.getElementById('closeBtn').addEventListener('click', ()=> overlay.classList.remove('show'));
+overlay.addEventListener('click', e=>{ if(e.target === overlay) overlay.classList.remove('show'); });
+
+/* ===== Cart (demo) ===== */
+const cartButton = document.getElementById('cart-button');
+const cartCount  = document.getElementById('cart-count');
+let CART = [];
+function addToCart(item){
+  CART.push(item); renderCart();
+  alert(`Added:\n${item.title}\nSize: ${item.size}\nQty: ${item.qty}\nSubtotal: $${item.price.toFixed(2)} AUD`);
+}
+function renderCart(){
+  if(CART.length>0){ cartCount.textContent = CART.length; cartCount.classList.remove('hidden'); }
+  else cartCount.classList.add('hidden');
+}
+cartButton.addEventListener('click', ()=>{
+  if(CART.length===0){ alert('Your cart is empty.'); return; }
+  let txt = 'Cart:\n';
+  CART.forEach((it,i)=> txt+= `${i+1}. ${it.title} — ${it.size} × ${it.qty} — $${it.price.toFixed(2)} AUD\n`);
+  const total = CART.reduce((s,i)=> s+i.price, 0);
+  txt += `\nTotal: $${total.toFixed(2)} AUD\n\n(Checkout not configured in this demo.)`;
+  alert(txt);
+});
+
+/* ===== Little tip: A-series conversion =====
+A4 ≈ 210×297mm, A3 ≈ 297×420mm, A2 ≈ 420×594mm (ratio ~1.414).
+We auto-pick A-sizes only for sqrt(2) images; squares/3:2/4:5 get better-fitting inch sizes.
+*/
 </script>
 </body>
 </html>
