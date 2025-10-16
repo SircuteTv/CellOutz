@@ -10,17 +10,15 @@
 *{box-sizing:border-box}
 html,body{height:100%}
 body{margin:0;font-family:'Share Tech Mono',monospace;background:var(--bg);color:var(--text);overflow-x:hidden}
-
 /* Matrix bg */
 #matrix{position:fixed;inset:0;width:100%;height:100%;z-index:-2;background:var(--bg)}
 .vignette:before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
   background:
     radial-gradient(1200px 800px at 50% 18%, rgba(255,26,26,.12), transparent 55%),
-    radial-gradient(1800px 1200px at 50% 110%, rgba(255,26,26,.08), transparent 60%);}
+    radial-gradient(1800px 1200px at 50% 110%, rgba(255,26,26,.08), transparent 60%)}
 .scan:after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
   background-image:linear-gradient(rgba(0,0,0,.25) 1px, transparent 1px);
   background-size:100% 3px;mix-blend-mode:soft-light;opacity:.35}
-
 /* Header */
 header{display:flex;flex-direction:column;align-items:center;padding:20px 40px 10px}
 .logo-container{display:flex;justify-content:center;align-items:center;margin-bottom:18px;max-width:100%}
@@ -33,22 +31,18 @@ nav a::after{content:"";position:absolute;inset:0;background:var(--accent);mix-b
 nav a:hover{background:var(--red);color:#000;box-shadow:0 0 18px var(--red), inset 0 0 28px var(--red)}
 nav a:hover::after{opacity:1}
 nav .insta-link img{width:20px;height:20px;filter: invert(27%) sepia(100%) saturate(7000%) hue-rotate(340deg)}
-
 main{max-width:1400px;margin:10px auto 60px;padding:0 18px}
-
 /* Tabs */
 .tabs{display:flex;gap:12px;justify-content:center;align-items:center;margin:10px 0 24px}
 .tab{
   padding:10px 16px;border:1px solid var(--red);border-radius:999px;background:transparent;color:var(--text);
   cursor:pointer;min-width:90px;text-align:center;box-shadow:0 0 12px rgba(255,26,26,.25)}
 .tab.active{background:var(--red);color:#000;box-shadow:0 0 20px var(--red), inset 0 0 28px rgba(255,26,26,.5)}
-
 /* Collection cards */
 .collections{display:grid;grid-template-columns:repeat(5,1fr);gap:24px}
 @media(max-width:1200px){ .collections{grid-template-columns:repeat(3,1fr)} }
 @media(max-width:720px){ .collections{grid-template-columns:repeat(2,1fr)} }
 @media(max-width:520px){ .collections{grid-template-columns:1fr} }
-
 .col-card{
   position:relative;border:1px solid rgba(255,26,26,.35);border-radius:14px;overflow:hidden;
   background:#000;box-shadow:0 6px 24px rgba(0,0,0,.5); cursor:pointer}
@@ -58,26 +52,21 @@ main{max-width:1400px;margin:10px auto 60px;padding:0 18px}
   position:absolute;left:12px;bottom:12px;background:rgba(0,0,0,.6);border:1px solid var(--red);
   color:var(--text);padding:8px 12px;border-radius:12px;backdrop-filter:blur(2px)}
 .hide{display:none}
-
 /* Overlay viewer */
 .overlay{position:fixed;inset:0;background:rgba(0,0,0,.92);backdrop-filter:blur(2px);display:none;z-index:1500}
 .overlay.show{display:block;animation:fade .16s ease both}
 @keyframes fade{from{opacity:0}to{opacity:1}}
-
 .viewer{
   position:absolute;inset:20px 20px 60px 20px;
   display:grid;grid-template-columns:1fr auto;gap:16px;border:1px solid rgba(255,26,26,.35);
   border-radius:14px;box-shadow:0 0 28px rgba(255,26,26,.25), 0 18px 60px rgba(0,0,0,.6);overflow:hidden}
 .viewer.full{grid-template-columns:1fr 0}
-
 .view-img-wrap{position:relative;display:flex;align-items:center;justify-content:center;background:#080000}
 .view-img{max-width:100%;max-height:100%;object-fit:contain;display:block}
-
 /* Info panel */
 .info{width:min(420px,30vw);background:linear-gradient(180deg, rgba(255,26,26,.06), rgba(0,0,0,.35));padding:16px 16px 24px;overflow:auto}
 .info h3{margin:6px 0 8px;font-family:'UnifrakturCook',cursive;font-size:22px}
 .info p{margin:0;color:var(--text);line-height:1.35}
-
 /* Controls */
 .closeX{
   position:absolute;top:10px;right:14px;width:42px;height:42px;border-radius:10px;border:1px solid var(--red);
@@ -89,7 +78,6 @@ main{max-width:1400px;margin:10px auto 60px;padding:0 18px}
   position:absolute;left:50%;transform:translateX(-50%);
   bottom:12px;border:1px solid var(--red);border-radius:999px;background:rgba(0,0,0,.45);
   color:var(--text);padding:8px 12px;cursor:pointer}
-
 /* Dagger arrows */
 .dagger{
   position:absolute;top:50%;transform:translateY(-50%);width:46px;height:46px;border-radius:12px;
@@ -97,7 +85,6 @@ main{max-width:1400px;margin:10px auto 60px;padding:0 18px}
 .dagger svg{width:26px;height:26px;stroke:currentColor}
 .dagger.left{left:12px} .dagger.right{right:12px}
 .dagger:hover{box-shadow:0 0 16px var(--red)}
-
 .title{font-family:'UnifrakturCook',cursive;font-size:22px;margin:18px 6px}
 .section{margin-bottom:32px}
 .grid{display:grid;gap:16px}
@@ -163,235 +150,118 @@ main{max-width:1400px;margin:10px auto 60px;padding:0 18px}
 </div>
 
 <script>
-/* ===== Matrix background (subtle) ===== */
+/* ===== Matrix background ===== */
 const canvas = document.getElementById('matrix');
 const ctx = canvas.getContext('2d');
 let letters = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ@#$%^&*",
     fontSize = 16, cols, drops;
-function resizeCanvas(){
-  canvas.width = innerWidth; canvas.height = innerHeight;
-  cols = Math.floor(canvas.width / fontSize); drops = Array(cols).fill(0);
-}
+function resizeCanvas(){ canvas.width=innerWidth; canvas.height=innerHeight; cols=Math.floor(canvas.width/fontSize); drops=Array(cols).fill(0); }
 resizeCanvas(); addEventListener('resize', resizeCanvas);
 function drawMatrix(){
-  ctx.fillStyle = "rgba(11,0,0,0.09)"; ctx.fillRect(0,0,canvas.width,canvas.height);
-  ctx.fillStyle = "#FF1A1A"; ctx.font = fontSize + "px monospace";
-  for(let i=0;i<cols;i++){
-    const t = letters[(Math.random()*letters.length)|0];
-    ctx.fillText(t, i*fontSize, drops[i]); drops[i]+= fontSize;
-    if(drops[i] > canvas.height && Math.random() > 0.975) drops[i]=0;
-  }
+  ctx.fillStyle="rgba(11,0,0,0.09)"; ctx.fillRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle="#FF1A1A"; ctx.font=fontSize+"px monospace";
+  for(let i=0;i<cols;i++){ const t=letters[(Math.random()*letters.length)|0]; ctx.fillText(t,i*fontSize,drops[i]); drops[i]+=fontSize; if(drops[i]>canvas.height && Math.random()>0.975) drops[i]=0; }
 }
-setInterval(drawMatrix, 60);
+setInterval(drawMatrix,60);
 
 /* ===== Helpers ===== */
 const enc = s => encodeURIComponent(s);
 const joinSeg = (...segs) => segs.map(enc).join('/');
 
-/* Build an <img> that will try multiple folders until one works */
 function imgWithFallback(folderCandidates, file, className="", alt=""){
-  const img = document.createElement('img');
-  if (className) img.className = className;
-  img.alt = alt || "";
+  const img=document.createElement('img'); if(className) img.className=className; img.alt=alt||"";
   const folders = Array.isArray(folderCandidates) ? folderCandidates : [folderCandidates];
-  let i = 0;
-  const tryNext = () => {
-    if (i >= folders.length) return;              // give up silently
-    img.src = `images/${joinSeg(folders[i], file)}`;
-    i++;
-  };
-  img.addEventListener('error', tryNext, {once:false});
-  tryNext();
-  return img;
+  let i=0; const tryNext=()=>{ if(i>=folders.length) return; img.src=`images/${joinSeg(folders[i], file)}`; i++; };
+  img.addEventListener('error', tryNext); tryNext(); return img;
 }
-const range = n => Array.from({length:n}, (_,i)=> String(i+1));
+const range = n => Array.from({length:n},(_,i)=>String(i+1));
 
-/* ===== Collections with robust folder fallbacks (case/spacing variants) ===== */
+/* ===== Collections (Selfish and Unsane without & ) ===== */
 const COLLECTIONS = {
   grandeur: [
-    { title:"Present Polarity",
-      folder:["Present Polarity","present polarity","Present%20Polarity"],
-      grid:"two",
+    { title:"Present Polarity", folder:["Present Polarity"], grid:"two",
       images: range(4).map(i=>({file:`art (${i}).webp`, name:`art (${i})`})) },
 
-    { title:"chaos wizard",
-      folder:["chaos wizard","Chaos Wizard","chaos%20wizard"],
-      grid:"three",
+    { title:"chaos wizard", folder:["chaos wizard"], grid:"three",
       images: range(9).map(i=>({file:`chaos (${i}).webp`, name:`chaos (${i})`})) },
 
-    { title:"Selfish&UnSane",
-      folder:["Selfish&UnSane","Selfish&Unsane","selfish&unsane","Selfish&UNSANE"],
-      grid:"four",
+    { title:"Selfish and Unsane", folder:["Selfish and Unsane","selfish and unsane"], grid:"four",
       images: range(14).map(i=>({file:`self (${i}).webp`, name:`self (${i})`})) },
 
-    { title:"Sentience and calamity",
-      folder:["Sentience and calamity","sentience and calamity","Sentience%20and%20calamity"],
-      grid:"three",
+    { title:"Sentience and calamity", folder:["Sentience and calamity"], grid:"three",
       images: range(5).map(i=>({file:`war (${i}).webp`, name:`war (${i})`})) },
 
-    { title:"Unsane",
-      folder:["Unsane","unsane","UNSANE"],
-      grid:"three",
+    { title:"Unsane", folder:["Unsane"], grid:"three",
       images: range(5).map(i=>({file:`unsane (${i}).webp`, name:`unsane (${i})`})) },
 
-    { title:"Wollongong Major",
-      folder:["Wollongong Major","Wollongong major","wollongong major","Wollongong%20Major"],
-      grid:"three",
+    { title:"Wollongong Major", folder:["Wollongong Major"], grid:"three",
       images: range(9).map(i=>({file:`bong (${i}).webp`, name:`bong (${i})`})) },
 
-    { title:"Wollongong minor",
-      folder:["Wollongong minor","Wollongong Minor","wollongong minor","Wollongong%20minor"],
-      grid:"four",
+    { title:"Wollongong minor", folder:["Wollongong minor"], grid:"four",
       images: range(18).map(i=>({file:`minor (${i}).webp`, name:`minor (${i})`})) },
 
-    { title:"Genesis",
-      folder:["Genesis","genesis"],
-      grid:"two",
+    { title:"Genesis", folder:["Genesis"], grid:"two",
       images: [{file:"latr.webp", name:"latr"}] },
 
-    { title:"I LOVE MKULTRA",
-      folder:["I LOVE MKULTRA","I Love MKULTRA","I%20LOVE%20MKULTRA","I LOVE MKULTRA (2024)"],
-      grid:"two",
-      images: [
-        { file:"mkultra (1).webp", name:"mkultra (1)" },
-        { file:"mkultra (2).webp", name:"mkultra (2)" }
-      ]},
+    { title:"I LOVE MKULTRA", folder:["I LOVE MKULTRA"], grid:"two",
+      images: [{file:"mkultra (1).webp", name:"mkultra (1)"},
+               {file:"mkultra (2).webp", name:"mkultra (2)"}] },
 
-    { title:"SWAG#1",
-      folder:["SWAG#1","SWAG%231"],
-      grid:"two",
+    { title:"SWAG#1", folder:["SWAG#1"], grid:"two",
       images: [{file:"SWAG.webp", name:"SWAG"}] },
   ],
-
   misc: [
-    { title:"Before My Allusions",
-      folder:["Before My Allusions","Before My Allusions (2023-2024)","Before%20My%20Allusions"],
-      grid:"four",
+    { title:"Before My Allusions", folder:["Before My Allusions","Before My Allusions (2023-2024)"], grid:"four",
       images: range(18).map(i=>({file:`old (${i}).webp`, name:`old (${i})`})) },
-
-    { title:"IngestNutmeg",
-      folder:["IngestNutmeg","IngestNutmeg (2024)","ingestnutmeg","IngestNutmeg%20(2024)"],
-      grid:"three",
+    { title:"IngestNutmeg", folder:["IngestNutmeg","IngestNutmeg (2024)"], grid:"three",
       images: range(3).map(i=>({file:`nutmeg (${i}).webp`, name:`nutmeg (${i})`})) },
   ]
 };
 
-/* ===== Build collection chooser (deck) + sections ===== */
-const deck = document.getElementById('deck');
-const sections = document.getElementById('sections');
-let currentTab = 'grandeur';
-
+/* ===== Build deck + sections ===== */
+const deck=document.getElementById('deck'); const sections=document.getElementById('sections'); let currentTab='grandeur';
 function buildDeck(){
-  deck.innerHTML = '';
-  sections.innerHTML = '';
-
+  deck.innerHTML=''; sections.innerHTML='';
   COLLECTIONS[currentTab].forEach((col, idx)=>{
-    // Card
-    const card = document.createElement('div');
-    card.className = 'col-card';
-    const thumb = imgWithFallback(col.folder, col.images[0].file, 'thumb', col.title);
-    const label = document.createElement('div'); label.className='label'; label.textContent = col.title;
-    card.appendChild(thumb); card.appendChild(label);
-    card.addEventListener('click', ()=> openSection(idx));
-    deck.appendChild(card);
+    const card=document.createElement('div'); card.className='col-card';
+    const thumb=imgWithFallback(col.folder, col.images[0].file,'thumb',col.title);
+    const label=document.createElement('div'); label.className='label'; label.textContent=col.title;
+    card.appendChild(thumb); card.appendChild(label); card.addEventListener('click',()=>openSection(idx)); deck.appendChild(card);
 
-    // Section grid
-    const sec = document.createElement('section');
-    sec.className = 'section hide'; sec.dataset.index = idx;
-    const h = document.createElement('div'); h.className='title'; h.textContent = col.title;
-    const grid = document.createElement('div'); grid.className = `grid ${col.grid}`;
-    (col.images || []).forEach((img,i)=>{
-      const tile = document.createElement('div'); tile.className='tile'; tile.dataset.col=idx; tile.dataset.i=i;
-      tile.appendChild( imgWithFallback(col.folder, img.file, '', img.name) );
-      tile.addEventListener('click', ()=> openOverlay(idx, i));
-      grid.appendChild(tile);
-    });
+    const sec=document.createElement('section'); sec.className='section hide'; sec.dataset.index=idx;
+    const h=document.createElement('div'); h.className='title'; h.textContent=col.title;
+    const grid=document.createElement('div'); grid.className=`grid ${col.grid}`;
+    (col.images||[]).forEach((img,i)=>{ const tile=document.createElement('div'); tile.className='tile'; tile.dataset.col=idx; tile.dataset.i=i;
+      tile.appendChild(imgWithFallback(col.folder,img.file,'',img.name)); tile.addEventListener('click',()=>openOverlay(idx,i)); grid.appendChild(tile); });
     sec.appendChild(h); sec.appendChild(grid); sections.appendChild(sec);
   });
 }
-
 function openSection(idx){
-  sections.querySelectorAll('.section').forEach(s=> s.classList.add('hide'));
-  const target = sections.querySelector(`.section[data-index="${idx}"]`);
+  sections.querySelectorAll('.section').forEach(s=>s.classList.add('hide'));
+  const target=sections.querySelector(`.section[data-index="${idx}"]`);
   if(target){ target.classList.remove('hide'); target.scrollIntoView({behavior:'smooth', block:'start'}); }
 }
-
 document.querySelectorAll('.tab').forEach(btn=>{
-  btn.addEventListener('click', ()=>{
-    document.querySelectorAll('.tab').forEach(b=> b.classList.remove('active'));
-    btn.classList.add('active');
-    currentTab = btn.dataset.tab;
-    buildDeck();
-    sections.scrollIntoView({behavior:'smooth', block:'start'});
-  });
+  btn.addEventListener('click', ()=>{ document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active'); currentTab=btn.dataset.tab; buildDeck(); sections.scrollIntoView({behavior:'smooth', block:'start'}); });
 });
-
 buildDeck();
 
-/* ===== Overlay (opens full image view by default) ===== */
-const overlay = document.getElementById('overlay');
-const viewer  = document.getElementById('viewer');
-const bigImg  = document.getElementById('bigImg');
-const infoTitle = document.getElementById('infoTitle');
-const infoDesc  = document.getElementById('infoDesc');
-const infoToggle= document.getElementById('infoToggle');
-const fsBtn     = document.getElementById('fsBtn');
-
-let activeCol = 0, activeIdx = 0;
-
-function sourceFor(col, i){
-  const c = COLLECTIONS[currentTab][col];
-  const candidates = Array.isArray(c.folder) ? c.folder : [c.folder];
-  const file = c.images[i].file;
-  return {candidates, file, title:c.title, name:c.images[i].name};
-}
-function setBigImg(candidates, file){
-  let k = 0;
-  const tryNext = () => {
-    if (k >= candidates.length) return;
-    bigImg.src = `images/${joinSeg(candidates[k], file)}`;
-    k++;
-  };
-  bigImg.onerror = tryNext;
-  tryNext();
-}
-
-function openOverlay(colIdx, imgIdx){
-  activeCol = colIdx; activeIdx = imgIdx;
-  const s = sourceFor(activeCol, activeIdx);
-  setBigImg(s.candidates, s.file);
-  infoTitle.textContent = `${s.title} — ${s.name}`;
-  infoDesc.textContent  = '—';
-  viewer.classList.add('full');            // start full-image
-  overlay.classList.add('show'); overlay.setAttribute('aria-hidden','false');
-}
-
-function nextImg(step){
-  const data = COLLECTIONS[currentTab][activeCol];
-  activeIdx = (activeIdx + step + data.images.length) % data.images.length;
-  const s = sourceFor(activeCol, activeIdx);
-  setBigImg(s.candidates, s.file);
-  infoTitle.textContent = `${s.title} — ${s.name}`;
-}
-
-document.getElementById('prevBtn').addEventListener('click', ()=> nextImg(-1));
-document.getElementById('nextBtn').addEventListener('click', ()=> nextImg(1));
-document.getElementById('closeBtn').addEventListener('click', ()=> overlay.classList.remove('show'));
-overlay.addEventListener('click', e=>{ if(e.target === overlay) overlay.classList.remove('show'); });
-addEventListener('keydown', e=>{
-  if(!overlay.classList.contains('show')) return;
-  if(e.key==='Escape') overlay.classList.remove('show');
-  if(e.key==='ArrowLeft')  nextImg(-1);
-  if(e.key==='ArrowRight') nextImg(1);
-});
-
-infoToggle.addEventListener('click', ()=> viewer.classList.toggle('full'));
-
-fsBtn.addEventListener('click', ()=>{
-  const el = bigImg;
-  if(!document.fullscreenElement){ el.requestFullscreen?.(); }
-  else{ document.exitFullscreen?.(); }
-});
+/* ===== Overlay ===== */
+const overlay=document.getElementById('overlay'); const viewer=document.getElementById('viewer'); const bigImg=document.getElementById('bigImg');
+const infoTitle=document.getElementById('infoTitle'); const infoDesc=document.getElementById('infoDesc'); const infoToggle=document.getElementById('infoToggle'); const fsBtn=document.getElementById('fsBtn');
+let activeCol=0, activeIdx=0;
+function sourceFor(col,i){ const c=COLLECTIONS[currentTab][col]; const candidates=Array.isArray(c.folder)?c.folder:[c.folder]; const file=c.images[i].file; return {candidates,file,title:c.title,name:c.images[i].name}; }
+function setBigImg(candidates,file){ let k=0; const tryNext=()=>{ if(k>=candidates.length) return; bigImg.src=`images/${joinSeg(candidates[k],file)}`; k++; }; bigImg.onerror=tryNext; tryNext(); }
+function openOverlay(colIdx,imgIdx){ activeCol=colIdx; activeIdx=imgIdx; const s=sourceFor(activeCol,activeIdx); setBigImg(s.candidates,s.file); infoTitle.textContent=`${s.title} — ${s.name}`; infoDesc.textContent='—'; viewer.classList.add('full'); overlay.classList.add('show'); overlay.setAttribute('aria-hidden','false'); }
+function nextImg(step){ const data=COLLECTIONS[currentTab][activeCol]; activeIdx=(activeIdx+step+data.images.length)%data.images.length; const s=sourceFor(activeCol,activeIdx); setBigImg(s.candidates,s.file); infoTitle.textContent=`${s.title} — ${s.name}`; }
+document.getElementById('prevBtn').addEventListener('click',()=>nextImg(-1));
+document.getElementById('nextBtn').addEventListener('click',()=>nextImg(1));
+document.getElementById('closeBtn').addEventListener('click',()=>overlay.classList.remove('show'));
+overlay.addEventListener('click',e=>{ if(e.target===overlay) overlay.classList.remove('show'); });
+addEventListener('keydown',e=>{ if(!overlay.classList.contains('show')) return; if(e.key==='Escape') overlay.classList.remove('show'); if(e.key==='ArrowLeft') nextImg(-1); if(e.key==='ArrowRight') nextImg(1); });
+infoToggle.addEventListener('click',()=>viewer.classList.toggle('full'));
+fsBtn.addEventListener('click',()=>{ const el=bigImg; if(!document.fullscreenElement){ el.requestFullscreen?.(); } else { document.exitFullscreen?.(); } });
 </script>
 </body>
 </html>
