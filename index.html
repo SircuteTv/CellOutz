@@ -11,29 +11,52 @@
 body{ margin:0; font-family:'Share Tech Mono',monospace; background:var(--bg); color:var(--text); overflow-x:hidden }
 footer{ text-align:center; margin:40px 0 20px }
 .nowrap{ white-space:nowrap } @media(max-width:560px){ .nowrap{ white-space:normal } }
+
+/* Matrix bg */
 #matrix{ position:fixed; inset:0; width:100%; height:100%; z-index:-1; background:var(--bg) }
+
+/* Header / nav */
 header{display:flex;flex-direction:column;align-items:center;padding:20px 40px 10px 40px;position:relative}
 .logo-container{display:flex;justify-content:center;align-items:center;margin-bottom:15px;max-width:100%;max-height:20vh}
 .logo-container img{ max-width:480px; width:auto; max-height:100%; height:auto; object-fit:contain; display:block; animation:logo-glitch 3s infinite; opacity:0; transform: translateY(-6px) scale(0.98); transition: opacity .6s ease, transform .6s cubic-bezier(.2,.9,.2,1) }
 .logo-visible{ opacity:1 !important; transform: translateY(0) scale(1) !important }
 .logo-container img:hover{ transform: scale(1.1); filter: brightness(1.3); transition: transform .3s ease, filter .3s ease }
-@keyframes logo-glitch{ 0%{transform:translate(0,0)}20%{transform:translate(-1px,1px) rotate(-.5deg)}40%{transform:translate(1px,-1px) rotate(.5deg)}60%{transform:translate(-1px,1px)}80%{transform:translate(1px,-1px) rotate(-.5deg)}100%{transform:translate(0,0)} }
+
+@keyframes logo-glitch{
+  0%{transform:translate(0,0)}
+  20%{transform:translate(-1px,1px) rotate(-.5deg)}
+  40%{transform:translate(1px,-1px) rotate(.5deg)}
+  60%{transform:translate(-1px,1px)}
+  80%{transform:translate(1px,-1px) rotate(-.5deg)}
+  100%{transform:translate(0,0)}
+}
+
 nav{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;align-items:center}
-nav a{ text-decoration:none;color:var(--text);padding:8px 12px;border:1px solid var(--red);border-radius:6px;transition:.3s,text-shadow .3s,box-shadow .3s;position:relative;display:flex;align-items:center;gap:6px }
+nav a{
+  text-decoration:none;color:var(--text);padding:8px 12px;border:1px solid var(--red);border-radius:6px;
+  transition:.3s,text-shadow .3s,box-shadow .3s;position:relative;display:flex;align-items:center;gap:6px
+}
 nav a::after{ content:''; position:absolute; inset:0; background:var(--accent); mix-blend-mode:screen; opacity:0; pointer-events:none; transition:opacity .25s}
 nav a:hover::after{opacity:1}
 nav a:hover{ background:var(--red); color:var(--bg); box-shadow:0 0 20px var(--red), inset 0 0 40px var(--red); text-shadow:0 0 10px var(--red) }
-nav .insta-link img{ width:20px; height:20px; object-fit:contain; filter: invert(27%) sepia(100%) saturate(7000%) hue-rotate(340deg) }
+
+/* 👇 ensure the inline SVG icon matches other pages */
+nav .insta-link svg{ width:20px; height:20px; display:block; }
+
+ /* Cart button */
 #cart-button{ position:fixed; top:18px; right:24px; width:64px; height:64px; border-radius:50%; display:flex; align-items:center; justify-content:center; border:3px solid var(--red); background:rgba(0,0,0,.35); cursor:pointer; z-index:2000; transition: transform .12s ease }
 #cart-button:hover{ transform: scale(1.03) }
 #cart-button img{ width:34px; height:34px; object-fit:contain; filter: invert(27%) sepia(100%) saturate(7000%) hue-rotate(340deg) }
 #cart-count{ position:absolute; top:-8px; right:-8px; width:22px; height:22px; border-radius:50%; background:var(--red); color:#000; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:12px }
 .hidden{ display:none !important }
+
+/* Marquee */
 .marquee{ overflow:hidden; white-space:nowrap; padding:10px; border-bottom:1px solid var(--red)}
 .marquee span{ display:inline-block; padding-left:100%; animation:marq 25s linear infinite, neon-glow 2s ease-in-out infinite alternate}
 @keyframes marq{ from{transform:translateX(0)} to{transform:translateX(-100%)}}
 @keyframes neon-glow{ 0%{text-shadow:0 0 5px var(--red)} 50%{text-shadow:0 0 15px var(--red)} 100%{text-shadow:0 0 5px var(--red)} }
-/* hero */
+
+/* Hero */
 .hero{ position:relative; overflow:visible; max-width:880px; margin:30px auto; padding:22px; background:rgba(0,0,0,.6); border:2px solid var(--red); border-radius:12px; box-shadow:0 0 20px var(--red); text-align:center; animation:float 3s ease-in-out infinite alternate }
 @keyframes float{ from{transform:translateY(0)} to{transform:translateY(-8px)} }
 .hero-grid{ display:grid; grid-template-columns:auto 1fr auto; align-items:center; column-gap:clamp(12px,3vw,28px) }
@@ -44,19 +67,29 @@ nav .insta-link img{ width:20px; height:20px; object-fit:contain; filter: invert
 .eye.left{ clip-path:inset(0 50% 0 0) } .eye.right{ clip-path:inset(0 0 0 50%) }
 @media(max-width:900px){ .hero{ padding:18px } .eye{ --size:clamp(100px,26vw,190px) } }
 @media(max-width:600px){ .hero{ width:90%; padding:14px } .eye{ --size:clamp(88px,28vw,160px) } }
-/* belts */
+
+/* Belts */
 h2{text-align:center;margin-top:40px}
 .scroll-section{ overflow:hidden; white-space:nowrap; margin:20px auto 40px; max-width:100%; position:relative; border-top:1px solid var(--red); border-bottom:1px solid var(--red); padding:10px 0; box-shadow:0 0 12px var(--red); transition:box-shadow .3s ease}
 .scroll-section:hover{ box-shadow:0 0 25px var(--red) }
 .scroll-inner{ display:inline-flex; gap:20px; will-change:transform; align-items:center }
+
 .card{ display:inline-block; vertical-align:top; max-height:300px; position:relative; cursor:pointer; transition: transform .25s ease }
 .card img{ display:block; max-height:300px; height:auto; border-radius:8px }
 .card .info{ position:absolute; bottom:0; left:0; right:0; background:rgba(0,0,0,.8); color:var(--red); padding:8px 10px; font-size:14px; opacity:0; transition:opacity .25s, transform .25s; text-align:center; border-top:1px solid var(--red) }
 .card:hover .info{ opacity:1; transform:translateY(-6px) }
 .card:hover{ transform: translateY(-6px) scale(1.02) }
-.gallery-pill{ display:inline-flex; align-items:center; justify-content:center; padding:10px 14px; border:1px solid var(--red); border-radius:999px; text-decoration:none; color:var(--text); text-shadow:0 0 8px var(--red); box-shadow:0 0 14px var(--red), inset 0 0 20px rgba(255,26,26,.25); font-weight:700; letter-spacing:.5px }
+
+/* Pills */
+.gallery-pill{
+  display:inline-flex; align-items:center; justify-content:center;
+  padding:10px 14px; border:1px solid var(--red); border-radius:999px; text-decoration:none; color:var(--text);
+  text-shadow:0 0 8px var(--red); box-shadow:0 0 14px var(--red), inset 0 0 20px rgba(255,26,26,.25);
+  font-weight:700; letter-spacing:.5px
+}
 .gallery-pill:hover{ background:var(--red); color:#000 }
-/* modal (kept for gallery items only) */
+
+/* Modal (gallery only) */
 .item-overlay{ display:none; position:fixed; inset:0; background:rgba(0,0,0,.85); z-index:1500; justify-content:center; align-items:center; padding:20px }
 .item-overlay.show{ display:flex; animation:fadeIn .2s ease both }
 @keyframes fadeIn{ from{opacity:0} to{opacity:1} }
@@ -70,6 +103,7 @@ h2{text-align:center;margin-top:40px}
 .modal-right p{ margin:6px 0; line-height:1.35 }
 #add-cart-btn{ margin-top:auto; padding:12px; border-radius:8px; border:none; background:var(--red); color:#000; font-weight:700; cursor:pointer; display:none }
 #modal-close{ position:absolute; top:10px; right:16px; font-size:28px; color:var(--red); cursor:pointer }
+
 @media(max-width:820px){ .modal-box{ flex-direction:column; max-height:90vh } .modal-left img{ max-height:50vh } }
 @media(max-width:600px){ .hero{ width:90%; padding:15px} .card img{ max-height:150px } #cart-button{ width:56px; height:56px } #cart-button img{ width:28px; height:28px } }
 </style>
@@ -86,7 +120,16 @@ h2{text-align:center;margin-top:40px}
     <a href="index.html">HOME</a>
     <a href="prints.html">PRINTS</a>
     <a href="clothes.html">CLOTHES</a>
-    <a class="insta-link" href="https://www.instagram.com/allusionstoograndeur/" target="_blank" aria-label="Instagram"><img src="images/instagram.png" alt=""></a>
+
+    <!-- ✅ Inline SVG Instagram icon (matches other pages) -->
+    <a class="insta-link" href="https://www.instagram.com/allusionstoograndeur/" target="_blank" aria-label="Instagram">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <rect x="3" y="3" width="18" height="18" rx="5" stroke="currentColor" stroke-width="2"/>
+        <circle cx="12" cy="12" r="4.2" stroke="currentColor" stroke-width="2"/>
+        <circle cx="17.3" cy="6.7" r="1.2" fill="currentColor"/>
+      </svg>
+    </a>
+
     <a href="blog.html">BLOG</a>
     <a href="gallery.html">GALLERY</a>
     <a href="contact.html">CONTACT</a>
@@ -99,12 +142,17 @@ h2{text-align:center;margin-top:40px}
 
 <div class="marquee"><span>* CURRENT DROPS — Limited prints from Present Polarity / Chaos Wizard / Genesis *</span></div>
 
+<!-- HERO -->
 <div class="hero">
   <div class="hero-grid">
     <div class="eye left"><img src="images/eyes-trans.gif" alt=""></div>
-    <p><strong>This is not a brand.</strong><br>It’s the slow release of
+    <p>
+      <strong>This is not a brand.</strong><br>
+      It’s the slow release of
       <span class="nowrap"><em>Allusions&nbsp;Too&nbsp;Grandeur</em>&nbsp;—</span><br>
-      relics from a collapsing dream,<br>rare fragments of an ongoing hallucination.</p>
+      relics from a collapsing dream,<br>
+      rare fragments of an ongoing hallucination.
+    </p>
     <div class="eye right"><img src="images/eyes-trans.gif" alt=""></div>
   </div>
 </div>
@@ -119,7 +167,7 @@ h2{text-align:center;margin-top:40px}
   <div class="scroll-inner" id="gallery-inner"></div>
 </div>
 
-<!-- Modal (only used for gallery belt items, not for drops) -->
+<!-- Modal (gallery only) -->
 <div id="lightbox" class="item-overlay" aria-hidden="true">
   <div class="modal-box" role="dialog" aria-modal="true">
     <div class="modal-left"><img id="overlay-img" src="" alt=""></div>
@@ -135,77 +183,194 @@ h2{text-align:center;margin-top:40px}
 <footer>© 2025 CellOutz</footer>
 
 <script>
-/* matrix */
+/* ===== Matrix background ===== */
 const canvas=document.getElementById('matrix'); const ctx=canvas.getContext('2d');
 let letters="0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ@#$%^&*", fontSize=16, cols, drops;
 function resizeCanvas(){ canvas.width=innerWidth; canvas.height=innerHeight; cols=Math.floor(canvas.width/fontSize); drops=Array(cols).fill(0) }
 resizeCanvas(); addEventListener('resize', resizeCanvas);
-function drawMatrix(){ ctx.fillStyle="rgba(11,0,0,.1)"; ctx.fillRect(0,0,canvas.width,canvas.height); ctx.fillStyle="#FF1A1A"; ctx.font=fontSize+"px monospace";
-  for(let i=0;i<cols;i++){ const t=letters[(Math.random()*letters.length)|0]; ctx.fillText(t,i*fontSize,drops[i]); drops[i]+=fontSize; if(drops[i]>canvas.height && Math.random()>0.975) drops[i]=0; } }
+function drawMatrix(){
+  ctx.fillStyle="rgba(11,0,0,.1)"; ctx.fillRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle="#FF1A1A"; ctx.font=fontSize+"px monospace";
+  for(let i=0;i<cols;i++){
+    const t=letters[(Math.random()*letters.length)|0];
+    ctx.fillText(t,i*fontSize,drops[i]);
+    drops[i]+=fontSize;
+    if(drops[i]>canvas.height && Math.random()>0.975) drops[i]=0;
+  }
+}
 setInterval(drawMatrix,50);
 
-/* data */
+/* ===== Data ===== */
+
+/* 1) Current Drops (sellable) */
 const SELL_COLLECTIONS=[
   { title:"Present Polarity", folder:"Present Polarity", files:Array.from({length:4},(_,i)=>`art (${i+1}).webp`) },
   { title:"Chaos Wizard", folder:"chaos wizard", files:Array.from({length:9},(_,i)=>`chaos (${i+1}).webp`) },
   { title:"Genesis", folder:"Genesis", files:["latr.webp"] }
 ];
-const DROPS_ITEMS = SELL_COLLECTIONS.flatMap(col=> col.files.map(f=>({
-  src:`images/${encodeURIComponent(col.folder)}/${f}`,
-  name:col.title,
-  link:`prints.html#${encodeURIComponent(col.title.replace(/\s+/g,'-').toLowerCase())}`
-})));
-const GALLERY_ITEMS = SELL_COLLECTIONS.flatMap(col=> col.files.map(f=>({ src:`images/${encodeURIComponent(col.folder)}/${f}`, name:col.title })));
 
-/* card builders */
+const DROPS_ITEMS = SELL_COLLECTIONS.flatMap(col=>
+  col.files.map(f=>({
+    src:`images/${encodeURIComponent(col.folder)}/${f}`,
+    name:col.title,
+    link:`prints.html#${encodeURIComponent(col.title.replace(/\s+/g,'-').toLowerCase())}`
+  }))
+);
+
+/* 2) Gallery feed (real gallery, not just drops) */
+const GALLERY_COLLECTIONS = [
+  { title:"Present Polarity", folder:"Present Polarity", count:4, name:(i)=>`art (${i}).webp` },
+  { title:"chaos wizard", folder:"chaos wizard", count:9, name:(i)=>`chaos (${i}).webp` },
+  { title:"Selfish and Unsane", folder:"Selfish and Unsane", count:14, name:(i)=>`self (${i}).webp` },
+  { title:"Sentience and calamity", folder:"Sentience and calamity", count:5, name:(i)=>`war (${i}).webp` },
+  { title:"Unsane", folder:"Unsane", count:5, name:(i)=>`unsane (${i}).webp` },
+  { title:"Wollongong Major", folder:"Wollongong Major", count:9, name:(i)=>`bong (${i}).webp` },
+  { title:"Wollongong minor", folder:"Wollongong minor", count:18, name:(i)=>`minor (${i}).webp` },
+  { title:"Genesis", folder:"Genesis", count:1, name:()=>`latr.webp` },
+  { title:"I LOVE MKULTRA", folder:"I LOVE MKULTRA", count:2, name:(i)=>`mkultra (${i}).webp` },
+  { title:"SWAG#1", folder:"SWAG#1", count:1, name:()=>`SWAG.webp` }
+];
+
+const GALLERY_ITEMS = GALLERY_COLLECTIONS.flatMap(col=>{
+  const arr=[];
+  for(let i=1;i<=col.count;i++){
+    const file = col.name(i);
+    arr.push({
+      src:`images/${encodeURIComponent(col.folder)}/${file}`,
+      name:col.title
+    });
+  }
+  return arr;
+});
+
+/* ===== Card builders ===== */
 function createCard(obj, linkToPrint=false){
-  const card=document.createElement('a');
-  card.className='card';
-  card.href= linkToPrint ? (obj.link || 'prints.html') : 'javascript:void(0)';
-  if(linkToPrint) card.setAttribute('title','View print options');
-  const img=new Image(); img.src=obj.src; img.alt=obj.name||'Art'; img.loading='lazy'; img.decoding='async';
-  img.addEventListener('error',()=>card.style.display='none');
-  card.appendChild(img);
-  if(linkToPrint){ const info=document.createElement('div'); info.className='info'; info.innerHTML=`<p>${obj.name}</p><p>See sizes & price</p>`; card.appendChild(info); }
-  return card;
+  const a=document.createElement('a');
+  a.className='card';
+  a.href = linkToPrint ? (obj.link || 'prints.html') : 'javascript:void(0)';
+  if(linkToPrint) a.setAttribute('title','View print options');
+
+  const img=new Image();
+  img.src=obj.src; img.alt=obj.name||'Art'; img.loading='lazy'; img.decoding='async';
+  img.addEventListener('error',()=>a.style.display='none');
+  a.appendChild(img);
+
+  if(linkToPrint){
+    const info=document.createElement('div');
+    info.className='info';
+    info.innerHTML=`<p>${obj.name}</p><p>See sizes & price</p>`;
+    a.appendChild(info);
+  }
+  return a;
 }
+
 function populateBelt(container, items, linkToPrint=false){
   items.forEach(item=>container.appendChild(createCard(item, linkToPrint)));
+  // duplicate children for seamless loop
   Array.from(container.children).forEach(node=>container.appendChild(node.cloneNode(true)));
 }
 
-/* render belts */
-const dropsContainer=document.getElementById('current-drops-inner');
-const galleryContainer=document.getElementById('gallery-inner');
-const drops8=DROPS_ITEMS.sort(()=>Math.random()-0.5).slice(0,8);
+/* ===== Render belts (pills first) ===== */
+const dropsContainer  = document.getElementById('current-drops-inner');
+const galleryContainer = document.getElementById('gallery-inner');
+
+/* Pill at START of Current Drops -> prints */
+const dropsPill = document.createElement('a');
+dropsPill.href = 'prints.html';
+dropsPill.className = 'gallery-pill';
+dropsPill.textContent = 'Check out the Prints →';
+dropsContainer.appendChild(dropsPill);
+
+/* Then the drops items (link to prints) */
+const drops8 = DROPS_ITEMS.sort(()=>Math.random()-0.5).slice(0,8);
 populateBelt(dropsContainer, drops8, true);
-const pill=document.createElement('a'); pill.href='prints.html'; pill.className='gallery-pill'; pill.textContent='Find more prints →';
-galleryContainer.appendChild(pill);
-populateBelt(galleryContainer, GALLERY_ITEMS, false);
 
-/* animate belts */
-let dropsOffset=0, galleryOffset=0, BASE_SPEED=1.0, BOOST=2.2, SLOW=.28, dropsSpeed=BASE_SPEED, gallerySpeed=BASE_SPEED;
-function speedFactor(e, container, dir){ const r=container.getBoundingClientRect(); const p=(e.clientX-r.left)/r.width; if(p>0.40&&p<0.60) return SLOW; if(dir==='left'&&p<0.10) return BOOST; if(dir==='right'&&p>0.90) return BOOST; return 1; }
-function recycleLeft(c){ const first=c.firstElementChild; if(!first) return 0; const rect=first.getBoundingClientRect(); if(rect.right<-2){ const gap=parseInt(getComputedStyle(c).gap||20); const w=first.offsetWidth+gap; c.appendChild(first); return w } return 0 }
-function recycleRight(c){ const last=c.lastElementChild; if(!last) return 0; const rect=last.getBoundingClientRect(); if(rect.left>innerWidth+2){ const gap=parseInt(getComputedStyle(c).gap||20); const w=last.offsetWidth+gap; c.insertBefore(last,c.firstElementChild); return w } return 0 }
-function animate(){ dropsOffset-=dropsSpeed; dropsContainer.style.transform=`translateX(${dropsOffset}px)`; const a=recycleLeft(dropsContainer); if(a) dropsOffset+=a;
-  galleryOffset+=gallerySpeed; galleryContainer.style.transform=`translateX(${galleryOffset}px)`; const b=recycleRight(galleryContainer); if(b) galleryOffset-=b; requestAnimationFrame(animate) }
+/* Pill at START of Gallery -> gallery */
+const galleryPill = document.createElement('a');
+galleryPill.href = 'gallery.html';
+galleryPill.className = 'gallery-pill';
+galleryPill.textContent = 'Find more in the Gallery →';
+galleryContainer.appendChild(galleryPill);
+
+/* Then gallery items (open lightbox) */
+const galleryPick = GALLERY_ITEMS.sort(()=>Math.random()-0.5).slice(0,12);
+populateBelt(galleryContainer, galleryPick, false);
+
+/* ===== Animations ===== */
+let dropsOffset=0, galleryOffset=0;
+const BASE_SPEED=1.0, BOOST=2.2, SLOW=.28;
+let dropsSpeed=BASE_SPEED, gallerySpeed=BASE_SPEED;
+
+function speedFactor(e, container, dir){
+  const r=container.getBoundingClientRect();
+  const p=(e.clientX-r.left)/r.width;
+  if(p>0.40&&p<0.60) return SLOW;
+  if(dir==='left' && p<0.10) return BOOST;
+  if(dir==='right'&& p>0.90) return BOOST;
+  return 1;
+}
+function recycleLeft(c){
+  const first=c.firstElementChild; if(!first) return 0;
+  const rect=first.getBoundingClientRect();
+  if(rect.right<-2){
+    const gap=parseInt(getComputedStyle(c).gap||20);
+    const w=first.offsetWidth+gap;
+    c.appendChild(first); return w;
+  }
+  return 0;
+}
+function recycleRight(c){
+  const last=c.lastElementChild; if(!last) return 0;
+  const rect=last.getBoundingClientRect();
+  if(rect.left>innerWidth+2){
+    const gap=parseInt(getComputedStyle(c).gap||20);
+    const w=last.offsetWidth+gap;
+    c.insertBefore(last,c.firstElementChild); return w;
+  }
+  return 0;
+}
+function animate(){
+  // Drops move left
+  dropsOffset -= dropsSpeed;
+  dropsContainer.style.transform = `translateX(${dropsOffset}px)`;
+  const a = recycleLeft(dropsContainer); if(a) dropsOffset += a;
+
+  // Gallery moves right
+  galleryOffset += gallerySpeed;
+  galleryContainer.style.transform = `translateX(${galleryOffset}px)`;
+  const b = recycleRight(galleryContainer); if(b) galleryOffset -= b;
+
+  requestAnimationFrame(animate);
+}
 requestAnimationFrame(animate);
-const dropsSection=document.getElementById('scroll-drops'); const gallerySection=document.getElementById('scroll-gallery');
-dropsSection.addEventListener('mousemove',e=>dropsSpeed=BASE_SPEED*speedFactor(e,dropsSection,'left')); dropsSection.addEventListener('mouseleave',()=>dropsSpeed=BASE_SPEED);
-gallerySection.addEventListener('mousemove',e=>gallerySpeed=BASE_SPEED*speedFactor(e,gallerySection,'right')); gallerySection.addEventListener('mouseleave',()=>gallerySpeed=BASE_SPEED);
 
-/* lightbox for gallery items only (drops go to prints) */
-const overlay=document.getElementById('lightbox'); const ovImg=document.getElementById('overlay-img'); const ovName=document.getElementById('overlay-name'); const closeBtn=document.getElementById('modal-close');
+const dropsSection=document.getElementById('scroll-drops');
+const gallerySection=document.getElementById('scroll-gallery');
+dropsSection.addEventListener('mousemove',e=>dropsSpeed=BASE_SPEED*speedFactor(e,dropsSection,'left'));
+dropsSection.addEventListener('mouseleave',()=>dropsSpeed=BASE_SPEED);
+gallerySection.addEventListener('mousemove',e=>gallerySpeed=BASE_SPEED*speedFactor(e,gallerySection,'right'));
+gallerySection.addEventListener('mouseleave',()=>gallerySpeed=BASE_SPEED);
+
+/* ===== Lightbox for gallery items only ===== */
+const overlay=document.getElementById('lightbox');
+const ovImg=document.getElementById('overlay-img');
+const ovName=document.getElementById('overlay-name');
+const closeBtn=document.getElementById('modal-close');
+
 document.getElementById('gallery-inner').addEventListener('click',e=>{
-  const a=e.target.closest('.card'); if(!a || a.href!=='javascript:void(0)') return;
-  ovImg.src=a.querySelector('img').src; ovName.textContent=a.querySelector('img').alt || 'Artwork'; overlay.classList.add('show'); overlay.setAttribute('aria-hidden','false');
+  const a=e.target.closest('.card');
+  if(!a || a.href!=='javascript:void(0)') return; // ignore drops
+  const img=a.querySelector('img');
+  ovImg.src=img.src;
+  ovName.textContent=img.alt || 'Artwork';
+  overlay.classList.add('show');
+  overlay.setAttribute('aria-hidden','false');
 });
 closeBtn.addEventListener('click',()=>overlay.classList.remove('show'));
 overlay.addEventListener('click',e=>{ if(e.target===overlay) overlay.classList.remove('show'); });
 document.addEventListener('keydown',e=>{ if(e.key==='Escape') overlay.classList.remove('show'); });
 
-/* logo intro */
+/* ===== Logo intro ===== */
 const logo=document.getElementById('site-logo'); const seen=sessionStorage.getItem('celloutz_logo_seen');
 if(!seen){ setTimeout(()=>logo.classList.add('logo-visible'),80); sessionStorage.setItem('celloutz_logo_seen','1'); } else { logo.classList.add('logo-visible'); }
 </script>

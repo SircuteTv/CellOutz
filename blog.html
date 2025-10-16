@@ -13,6 +13,7 @@
   --accent: rgba(255,26,26,0.15);
 }
 *{box-sizing:border-box;}
+html,body{height:100%}
 body{
   margin:0;
   font-family:'Share Tech Mono',monospace;
@@ -20,30 +21,36 @@ body{
   color:var(--text);
   overflow-x:hidden;
 }
+
+/* ---------- Sideways Matrix BG ---------- */
+#matrixX{
+  position:fixed; inset:0;
+  width:100%; height:100%;
+  z-index:-2;
+  background:var(--bg);
+}
+
+/* subtle vignette over the canvas for depth */
+.bg-vignette::before{
+  content:""; position:fixed; inset:0; pointer-events:none; z-index:-1;
+  background:
+    radial-gradient(1200px 800px at 50% 10%, rgba(255,26,26,.10), transparent 55%),
+    radial-gradient(1800px 1200px at 50% 120%, rgba(255,26,26,.06), transparent 60%);
+}
+
+/* ---------- Header / Nav ---------- */
 header{
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  padding:20px 40px 10px 40px;
-  position:relative;
+  display:flex; flex-direction:column; align-items:center;
+  padding:20px 40px 10px 40px; position:relative;
 }
-.logo-container{
-  max-width:480px;
-  width:100%;
-  margin-bottom:20px;
-}
+.logo-container{ max-width:480px; width:100%; margin-bottom:20px; }
 .logo-container img{
-  width:100%;
-  height:auto;
-  display:block;
-  object-fit:contain;
+  width:100%; height:auto; display:block; object-fit:contain;
   animation:logo-glitch 3s infinite;
-  opacity:0; 
-  transform: translateY(-6px) scale(0.98);
+  opacity:0; transform: translateY(-6px) scale(0.98);
   transition: opacity 600ms ease, transform 600ms cubic-bezier(.2,.9,.2,1);
 }
 .logo-visible { opacity:1 !important; transform: translateY(0) scale(1) !important; }
-
 @keyframes logo-glitch{
   0%{transform:translate(0,0)}
   20%{transform:translate(-1px,1px) rotate(-0.5deg)}
@@ -52,73 +59,128 @@ header{
   80%{transform:translate(1px,-1px) rotate(-0.5deg)}
   100%{transform:translate(0,0)}
 }
-
 nav{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;align-items:center;margin-bottom:20px;}
 nav a{
-  text-decoration:none;
-  color:var(--text);
-  padding:8px 12px;
-  border:1px solid var(--red);
-  border-radius:6px;
-  transition:0.3s;
-  position:relative;
-  display:inline-flex;
-  align-items:center;
-  gap:6px;
+  text-decoration:none; color:var(--text); padding:8px 12px;
+  border:1px solid var(--red); border-radius:6px; transition:0.3s;
+  position:relative; display:inline-flex; align-items:center; gap:6px;
 }
-nav a:hover{
-  background:var(--red); 
-  color:var(--bg); 
-  box-shadow:0 0 20px var(--red);
-}
-/* make the inline SVG icon size nicely */
+nav a:hover{ background:var(--red); color:var(--bg); box-shadow:0 0 20px var(--red); }
 nav .insta-link svg{ width:20px;height:20px; display:block; }
-
 #cart-button{
   position:fixed; top:18px; right:24px;
-  width:64px; height:64px; border-radius:50%; display:flex; align-items:center; justify-content:center;
-  border:3px solid var(--red); background:rgba(0,0,0,0.35); cursor:pointer; z-index:2000;
-  transition: transform .12s ease;
+  width:64px; height:64px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  border:3px solid var(--red); background:rgba(0,0,0,0.35);
+  cursor:pointer; z-index:2000; transition: transform .12s ease;
 }
 #cart-button:hover{ transform: scale(1.03) }
-#cart-button img{ width:34px; height:34px; object-fit:contain; filter: invert(27%) sepia(100%) saturate(7000%) hue-rotate(340deg) }
-#cart-count{ position:absolute; top:-8px; right:-8px; width:22px; height:22px; border-radius:50%; background:var(--red); color:#000; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:12px; }
+#cart-button img{ width:34px; height:34px; object-fit:contain;
+  filter: invert(27%) sepia(100%) saturate(7000%) hue-rotate(340deg) }
+#cart-count{ position:absolute; top:-8px; right:-8px; width:22px; height:22px; border-radius:50%;
+  background:var(--red); color:#000; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:12px; }
 .hidden { display: none !important; }
 
-.blog-container{
-  max-width:1000px;
-  margin:0 auto;
-  padding:20px;
-  display:grid;
-  grid-template-columns:1fr;
-  gap:20px;
-}
-.blog-post{
-  background:rgba(0,0,0,0.6);
-  border:2px solid var(--red);
-  border-radius:12px;
-  padding:20px;
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-.blog-post:hover{
-  transform:scale(1.02);
-  box-shadow:0 0 20px var(--red);
-}
-.blog-post h2{ margin:0 0 8px 0; font-size:24px; }
-.blog-post .date{ font-size:12px; opacity:0.6; margin-bottom:12px; }
-.blog-post p{ margin:0 0 12px 0; line-height:1.4; }
-.read-more{
-  display:inline-block; padding:8px 12px; border:1px solid var(--red); border-radius:6px; color:var(--text); text-decoration:none; transition:0.3s;
-}
-.read-more:hover{ background:var(--red); color:var(--bg); box-shadow:0 0 12px var(--red); }
+/* ---------- Blog feed ---------- */
+.feed{ max-width:1000px; margin:10px auto 60px; padding:0 18px; display:grid; gap:14px; }
 
-@media(max-width:800px){
-  .blog-post h2{font-size:20px;}
-  .logo-container{max-width:320px;}
+/* pill rows with an internal canvas background */
+.entry{
+  position:relative;
+  background: rgba(0,0,0,.65);
+  border: 2px solid var(--red);
+  border-radius: 999px;
+  padding: 14px 18px;
+  display:grid;
+  grid-template-columns: 1fr auto;
+  grid-template-rows: auto auto;
+  align-items:center;
+  gap:4px 14px;
+  cursor:pointer;
+  box-shadow: 0 0 14px rgba(255,26,26,.18);
+  transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
+  overflow:hidden;
+}
+.entry:hover{ transform: translateY(-2px); box-shadow:0 0 24px var(--red); background: rgba(0,0,0,.75); }
+
+/* animated glyphs layer inside each pill */
+.entry canvas.pill-matrix{
+  position:absolute; inset:0; width:100%; height:100%;
+  opacity:.25; filter:contrast(1.15) saturate(1.1);
+}
+
+/* text sits above the canvas */
+.entry > span{ position:relative; z-index:2; }
+.entry-title{
+  grid-column:1 / 2; grid-row:1;
+  font-family:'UnifrakturCook', cursive;
+  font-size: clamp(18px, 2.6vw, 26px);
+  letter-spacing:.5px;
+}
+.entry-date{ grid-column:2 / 3; grid-row:1; justify-self:end; opacity:.8; font-size:12px; }
+.entry-snippet{
+  grid-column:1 / -1; grid-row:2;
+  opacity:.9; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+
+/* ---------- Chatbox modal ---------- */
+.overlay{ position:fixed; inset:0; display:none; place-items:center;
+  background:rgba(0,0,0,.88); z-index:3000; }
+.overlay.show{ display:grid; animation:fade .15s ease both; }
+@keyframes fade{ from{opacity:0} to{opacity:1} }
+
+.chatwin{
+  width:min(960px, 96vw);
+  height:min(640px, 86vh);
+  background:#0c0000;
+  border:2px solid var(--red);
+  border-radius:14px;
+  box-shadow:0 0 30px rgba(255,26,26,.35), 0 20px 60px rgba(0,0,0,.6);
+  display:grid; grid-template-rows:auto 1fr auto; overflow:hidden;
+}
+.bar{
+  background: linear-gradient(180deg, #290000, #120000);
+  border-bottom:1px solid var(--red);
+  padding:10px 12px; display:flex; align-items:center; justify-content:space-between;
+}
+.bar .name{ font-family:'UnifrakturCook', cursive; letter-spacing:.5px; }
+.messages{
+  background: radial-gradient(1200px 800px at 50% 10%, rgba(255,26,26,.07), transparent 60%);
+  padding:14px; overflow:auto; display:flex; flex-direction:column; gap:10px;
+}
+.msg{
+  max-width:80%;
+  padding:10px 12px;
+  border:1px solid rgba(255,26,26,.35);
+  border-radius:10px;
+  background:#090000;
+  line-height:1.35;
+  box-shadow:0 4px 14px rgba(0,0,0,.5);
+}
+.msg.you{ align-self:flex-end; background:#140000; border-color:rgba(255,26,26,.55) }
+.meta{ font-size:11px; opacity:.65; margin-bottom:6px }
+.inputbar{
+  border-top:1px solid var(--red);
+  padding:10px; display:flex; align-items:center; gap:8px;
+}
+.inputbar .fake{
+  flex:1; padding:10px 12px; border:1px dashed rgba(255,26,26,.35);
+  border-radius:8px; color:#a55; opacity:.8;
+}
+.btn{ border:1px solid var(--red); border-radius:10px; padding:8px 12px; background:transparent; color:var(--text); cursor:pointer; }
+.btn:hover{ background:var(--red); color:#000; box-shadow:0 0 12px var(--red) }
+
+@media(max-width:640px){
+  .entry{ border-radius:14px; }
+  .entry-snippet{ white-space:normal }
+  .chatwin{ height:min(88vh, 620px) }
 }
 </style>
 </head>
-<body>
+<body class="bg-vignette">
+
+<!-- sideways matrix background -->
+<canvas id="matrixX" aria-hidden="true"></canvas>
 
 <header>
   <div class="logo-container">
@@ -145,29 +207,181 @@ nav .insta-link svg{ width:20px;height:20px; display:block; }
   </div>
 </header>
 
-<div class="blog-container" id="blog-container"></div>
+<main class="feed" id="feed"></main>
+
+<!-- Chatbox Modal -->
+<div id="overlay" class="overlay" aria-hidden="true">
+  <div class="chatwin" role="dialog" aria-modal="true">
+    <div class="bar">
+      <div class="name" id="chatTitle">Entry</div>
+      <button class="btn" id="closeBtn">Close ✕</button>
+    </div>
+    <div class="messages" id="messages"></div>
+    <div class="inputbar">
+      <div class="fake">— journal playback —</div>
+      <button class="btn" id="okBtn">OK</button>
+    </div>
+  </div>
+</div>
 
 <script>
-const blogPosts = [
-  { title:'The Philosophy of Dark Fashion', date:'Oct 1, 2025', excerpt:'Exploring the underground gothic and cyber aesthetics that inspire our creations.', link:'#' },
-  { title:'Behind Present Polarity', date:'Sep 25, 2025', excerpt:'A deep dive into the concept and meaning behind our latest digital art collection.', link:'#' },
-  { title:'Creating Chaos Wizard', date:'Sep 18, 2025', excerpt:'An inside look at how we built the 3x3 digital art series.', link:'#' },
-  { title:'Limited Edition Prints: What Makes Them Special', date:'Sep 10, 2025', excerpt:'Why our prints are unique and why you should act fast to collect them.', link:'#' },
-  { title:'The Story of CellOutz', date:'Sep 2, 2025', excerpt:'How the brand started and the creative vision driving it today.', link:'#' }
+/* ---------- Data ---------- */
+function fmtDate(d){
+  const opts = {year:'numeric', month:'short', day:'numeric'};
+  return new Intl.DateTimeFormat('en-US', opts).format(d);
+}
+const today = fmtDate(new Date());
+const posts = [
+  { title:'beginning', date: today, body:'test.' }
 ];
-const container = document.getElementById('blog-container');
-blogPosts.forEach(post=>{
-  const div = document.createElement('div');
-  div.className = 'blog-post';
-  div.innerHTML = `
-    <h2>${post.title}</h2>
-    <div class="date">${post.date}</div>
-    <p>${post.excerpt}</p>
-    <a class="read-more" href="${post.link}">Read More</a>
+
+/* ---------- Build pills (with per-pill canvas) ---------- */
+const feed = document.getElementById('feed');
+const pillCanvases = [];
+
+posts.forEach((p, idx)=>{
+  const row = document.createElement('button');
+  row.className = 'entry';
+  row.type = 'button';
+
+  // animated matrix background inside the pill
+  const pillCanvas = document.createElement('canvas');
+  pillCanvas.className = 'pill-matrix';
+  row.appendChild(pillCanvas);
+  pillCanvases.push(pillCanvas);
+
+  row.innerHTML += `
+    <span class="entry-title">${p.title}</span>
+    <span class="entry-date">${p.date}</span>
+    <span class="entry-snippet">${p.body}</span>
   `;
-  container.appendChild(div);
+  row.addEventListener('click', ()=> openChat(idx));
+  feed.appendChild(row);
 });
-// logo animation
+
+/* ---------- Chat window ---------- */
+const overlay = document.getElementById('overlay');
+const messages = document.getElementById('messages');
+const chatTitle = document.getElementById('chatTitle');
+
+function openChat(i){
+  const p = posts[i];
+  chatTitle.textContent = `${p.title} — ${p.date}`;
+  messages.innerHTML = '';
+
+  const meta = document.createElement('div');
+  meta.className = 'meta';
+  meta.textContent = `↯ opened ${p.date}`;
+  messages.appendChild(meta);
+
+  const sys = document.createElement('div');
+  sys.className = 'msg';
+  sys.textContent = 'journal // entry loaded';
+  messages.appendChild(sys);
+
+  const you = document.createElement('div');
+  you.className = 'msg you';
+  you.textContent = p.body;
+  messages.appendChild(you);
+
+  const end = document.createElement('div');
+  end.className = 'meta';
+  end.textContent = '— end —';
+  messages.appendChild(end);
+
+  overlay.classList.add('show');
+  overlay.setAttribute('aria-hidden','false');
+  messages.scrollTop = messages.scrollHeight;
+}
+document.getElementById('closeBtn').addEventListener('click', ()=> overlay.classList.remove('show'));
+document.getElementById('okBtn').addEventListener('click', ()=> overlay.classList.remove('show'));
+overlay.addEventListener('click', e=>{ if(e.target===overlay) overlay.classList.remove('show'); });
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') overlay.classList.remove('show'); });
+
+/* ---------- Sideways Matrix (full background) ---------- */
+(function(){
+  const canvas = document.getElementById('matrixX');
+  const ctx = canvas.getContext('2d');
+  const glyphs = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ@#$%^&*";
+  let fontSize = 16;
+  let rows = 0, pos = [];
+
+  function fit(){
+    canvas.width = innerWidth * devicePixelRatio;
+    canvas.height = innerHeight * devicePixelRatio;
+    ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);
+    rows = Math.floor(innerHeight / fontSize);
+    pos = Array.from({length:rows}, (_,r)=> innerWidth + Math.random()*innerWidth);
+  }
+  fit(); addEventListener('resize', fit);
+
+  function step(){
+    ctx.fillStyle = "rgba(11,0,0,0.08)";
+    ctx.fillRect(0,0,innerWidth,innerHeight);
+    ctx.fillStyle = "#FF1A1A";
+    ctx.font = `${fontSize}px monospace`;
+
+    for(let r=0; r<rows; r++){
+      const ch = glyphs[(Math.random()*glyphs.length)|0];
+      const y = (r+1)*fontSize - 2;
+      ctx.fillText(ch, pos[r], y);
+      pos[r] -= fontSize * (0.6 + Math.random()*0.6); // sideways drift speed
+      if(pos[r] < -60) pos[r] = innerWidth + Math.random()*innerWidth;
+    }
+    requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+})();
+
+/* ---------- Mini Matrix inside each pill ---------- */
+(function(){
+  const glyphs = "01ZXCVBNMASDFGHJKLQWERTYUIOP";
+  const fontSize = 12;
+  const speed = 0.45;
+
+  function paintPill(canvas, state){
+    const w = canvas.clientWidth, h = canvas.clientHeight;
+    if(!w || !h) return;
+    // scale for crispness
+    const dpr = devicePixelRatio || 1;
+    if(canvas.width !== Math.floor(w*dpr) || canvas.height !== Math.floor(h*dpr)){
+      canvas.width = Math.floor(w*dpr);
+      canvas.height = Math.floor(h*dpr);
+      const ctx = canvas.getContext('2d');
+      ctx.setTransform(dpr,0,0,dpr,0,0);
+      // recompute rows
+      state.rows = Math.floor(h / fontSize);
+      state.pos = Array.from({length:state.rows}, ()=> Math.random()*w);
+    }
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = "rgba(11,0,0,0.25)";
+    ctx.fillRect(0,0,canvas.clientWidth,canvas.clientHeight);
+    ctx.fillStyle = "rgba(255,26,26,0.9)";
+    ctx.font = `${fontSize}px monospace`;
+    for(let r=0; r<state.rows; r++){
+      const ch = glyphs[(Math.random()*glyphs.length)|0];
+      const y = (r+1)*fontSize - 2;
+      ctx.fillText(ch, state.pos[r], y);
+      state.pos[r] -= fontSize * speed;
+      if(state.pos[r] < -40) state.pos[r] = canvas.clientWidth + Math.random()*60;
+    }
+  }
+
+  const states = pillCanvases.map(()=>({rows:0,pos:[]}));
+
+  function tick(){
+    pillCanvases.forEach((c, i)=> paintPill(c, states[i]));
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+
+  // keep canvases synced on resize
+  addEventListener('resize', ()=> pillCanvases.forEach((c,i)=>{
+    states[i].rows = 0; // force re-measure next frame
+  }));
+})();
+
+/* ---------- Logo intro ---------- */
 const logo = document.getElementById('site-logo');
 const seen = sessionStorage.getItem('celloutz_logo_seen');
 if(!seen){ setTimeout(()=> logo.classList.add('logo-visible'), 80); sessionStorage.setItem('celloutz_logo_seen','1'); }
