@@ -3,133 +3,104 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>About & Contact — CellOutz</title>
+<title>Contact & About — CellOutz</title>
 <link href="https://fonts.googleapis.com/css2?family=UnifrakturCook:wght@700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
-:root{
-  --red:#FF1A1A; --bg:#0B0000; --text:#FF1A1A; --accent:rgba(255,26,26,.15);
-  --barTop:#290000; --barBottom:#120000;
-}
+:root{ --red:#FF1A1A; --bg:#0B0000; --text:#FF1A1A; --accent:rgba(255,26,26,.15) }
 *{box-sizing:border-box}
 html,body{height:100%}
-body{ margin:0; background:var(--bg); color:var(--text); font-family:'Share Tech Mono',monospace; overflow-x:hidden }
+body{ margin:0; font-family:'Share Tech Mono',monospace; background:var(--bg); color:var(--text); overflow-x:hidden }
 
-/* ---------- Sideways Matrix Background ---------- */
+/* Sideways Matrix BG */
 #matrixX{ position:fixed; inset:0; width:100%; height:100%; z-index:-2; background:var(--bg) }
-.bg-vignette::before{
+.vignette:before{
   content:""; position:fixed; inset:0; pointer-events:none; z-index:-1;
   background:
     radial-gradient(1200px 800px at 50% 10%, rgba(255,26,26,.10), transparent 55%),
     radial-gradient(1800px 1200px at 50% 120%, rgba(255,26,26,.06), transparent 60%);
 }
 
-/* ---------- Header / Nav ---------- */
-header{display:flex;flex-direction:column;align-items:center;padding:20px 40px 10px;position:relative}
-.logo-container{max-width:480px;width:100%;margin-bottom:18px}
-.logo-container img{
-  width:100%;height:auto;display:block;object-fit:contain;
-  animation:logo-glitch 3s infinite; opacity:0; transform:translateY(-6px) scale(.98);
-  transition:opacity .6s ease, transform .6s cubic-bezier(.2,.9,.2,1)
-}
-.logo-visible{opacity:1 !important; transform:translateY(0) scale(1) !important}
-@keyframes logo-glitch{
-  0%{transform:translate(0,0)} 20%{transform:translate(-1px,1px) rotate(-.5deg)}
-  40%{transform:translate(1px,-1px) rotate(.5deg)} 60%{transform:translate(-1px,1px)}
-  80%{transform:translate(1px,-1px) rotate(-.5deg)} 100%{transform:translate(0,0)}
-}
-nav{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;align-items:center}
+/* Header / Nav */
+header{ display:flex; flex-direction:column; align-items:center; padding:20px 40px 10px; position:relative }
+.logo{ max-width:460px; width:100%; margin-bottom:14px }
+.logo img{ width:100%; height:auto; display:block; object-fit:contain }
+nav{ display:flex; gap:12px; flex-wrap:wrap; justify-content:center; align-items:center }
 nav a{
-  text-decoration:none;color:var(--text);padding:8px 12px;border:1px solid var(--red);
-  border-radius:6px;transition:.3s;position:relative;display:inline-flex;align-items:center;gap:6px
+  text-decoration:none; color:var(--text); padding:8px 12px; border:1px solid var(--red); border-radius:6px;
+  transition:.25s; position:relative; display:inline-flex; align-items:center; gap:6px;
 }
-nav a:hover{background:var(--red);color:#000;box-shadow:0 0 20px var(--red)}
-nav .insta-link svg{width:20px;height:20px;display:block}
+nav a:hover{ background:var(--red); color:#000; box-shadow:0 0 20px var(--red) }
+nav .insta-link svg{ width:20px; height:20px; display:block }
 
-/* Cart */
-#cart-button{position:fixed;top:18px;right:24px;width:64px;height:64px;border-radius:50%;
-  display:flex;align-items:center;justify-content:center;border:3px solid var(--red);
-  background:rgba(0,0,0,.35);cursor:pointer;z-index:2000;transition:transform .12s}
-#cart-button:hover{transform:scale(1.03)}
-#cart-button img{width:34px;height:34px;filter:invert(27%) sepia(100%) saturate(7000%) hue-rotate(340deg)}
-#cart-count{position:absolute;top:-8px;right:-8px;width:22px;height:22px;border-radius:50%;
-  background:var(--red);color:#000;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px}
-.hidden{display:none !important}
-
-/* ---------- Layout ---------- */
-.wrapper{
-  max-width:1200px;margin:16px auto 70px;padding:0 18px;
-  display:grid; grid-template-columns: 220px 1fr 220px; gap:16px;
+/* Layout: 3 columns, 2 rows (top images / bottom flipped images) */
+.wrap{ max-width:1200px; margin:16px auto 60px; padding:0 18px }
+.grid{
+  display:grid;
+  grid-template-columns: 1fr min(640px, 70vw) 1fr;
   grid-auto-rows: auto;
+  gap:18px;
   align-items:start;
 }
-@media(max-width:1020px){ .wrapper{ grid-template-columns: 160px 1fr 160px } }
-@media(max-width:780px){ .wrapper{ grid-template-columns: 1fr; } }
 
-/* GIF towers (left / right) + center gif */
-.gif-box{
-  border:1px dashed rgba(255,26,26,.45); border-radius:12px; background:#0a0000;
-  min-height:280px; display:grid; place-items:center; color:#a66; font-size:12px; opacity:.9;
-  box-shadow:0 0 10px rgba(255,26,26,.15);
+/* Side images (top and flipped bottom) */
+.sideimg{
+  border:2px solid var(--red); border-radius:12px; overflow:hidden; background:#000;
+  box-shadow:0 0 16px rgba(255,26,26,.25);
 }
-.gif-box img{width:100%;height:100%;object-fit:cover;border-radius:12px}
-.center-strip{ grid-column:2; display:grid; gap:16px }
-@media(max-width:780px){ .center-strip{ grid-column:1 } }
+.sideimg img{ display:block; width:100%; height:auto; object-fit:cover; filter:contrast(1.02) brightness(.96) }
+.flipY img{ transform: scaleY(-1) }
 
-/* ---------- Retro Chat Windows ---------- */
-.chat{
-  background:#0c0000; border:2px solid var(--red); border-radius:14px;
-  box-shadow:0 0 28px rgba(255,26,26,.28), 0 18px 60px rgba(0,0,0,.6);
-  overflow:hidden; display:grid; grid-template-rows:auto 1fr auto; min-height:260px;
+/* Center column: About → middle image → Contact */
+.center{ display:flex; flex-direction:column }
+.box{
+  position:relative; background:rgba(0,0,0,.65); border:2px solid var(--red); border-radius:16px;
+  padding:16px 18px; box-shadow:0 0 16px rgba(255,26,26,.18); overflow:hidden;
 }
-.bar{
-  background:linear-gradient(180deg, var(--barTop), var(--barBottom));
-  border-bottom:1px solid var(--red); padding:10px 12px;
-  display:flex; align-items:center; justify-content:space-between;
+.box h2{
+  margin:0 0 8px; font-family:'UnifrakturCook',cursive; letter-spacing:.4px; font-size:clamp(20px,2.6vw,26px)
 }
-.bar .name{ font-family:'UnifrakturCook',cursive; letter-spacing:.5px }
-.win-btns{display:flex; gap:6px}
-.win-dot{width:11px;height:11px;border-radius:50%; border:1px solid var(--red); background:#180000; box-shadow:0 0 6px rgba(255,26,26,.35)}
+.box p{ margin:0; line-height:1.45 }
+.center-media{
+  margin:14px 0; border:2px solid var(--red); border-radius:12px; overflow:hidden; background:#000;
+  box-shadow:0 0 16px rgba(255,26,26,.25);
+}
+.center-media img{ display:block; width:100%; height:auto; object-fit:cover }
 
-/* message area */
-.messages{
-  padding:12px; display:flex; flex-direction:column; gap:10px; overflow:auto;
-  background: radial-gradient(1200px 800px at 50% 8%, rgba(255,26,26,.07), transparent 60%);
+/* Contact links */
+.contact-links{ display:flex; flex-direction:column; gap:8px; margin-top:10px }
+.contact-links a{
+  color:var(--text); text-decoration:none; border-bottom:1px dashed var(--red);
 }
-.msg{
-  max-width:86%; padding:10px 12px; border:1px solid rgba(255,26,26,.35);
-  border-radius:10px; background:#090000; line-height:1.35; box-shadow:0 4px 14px rgba(0,0,0,.5)
-}
-.msg.you{ align-self:flex-end; background:#140000; border-color:rgba(255,26,26,.55) }
-.meta{ font-size:11px; opacity:.65 }
-.footer{
-  border-top:1px solid var(--red); padding:10px; display:flex; align-items:center; gap:10px;
-}
-.footer .status{ font-size:12px; opacity:.7 }
-.footer .btn{ margin-left:auto; border:1px solid var(--red); border-radius:8px; padding:8px 12px; background:transparent; color:var(--text); cursor:pointer }
-.footer .btn:hover{ background:var(--red); color:#000; box-shadow:0 0 12px var(--red) }
+.contact-links a:hover{ color:#fff; border-bottom-color:#fff }
 
-/* stacking column for chats + center gif */
-.stack{ grid-column:2; display:grid; gap:16px }
-@media(max-width:780px){ .stack{ grid-column:1 } }
+/* Grid placement */
+.left-top    { grid-column:1; grid-row:1 }
+.center-col  { grid-column:2; grid-row:1 / span 2 } /* center spans both rows */
+.right-top   { grid-column:3; grid-row:1 }
+.left-bottom { grid-column:1; grid-row:2 }
+.right-bottom{ grid-column:3; grid-row:2 }
 
-/* --- Specific row placement for the CONTACT trio --- */
-.contact-left  { grid-column:1; align-self:stretch }
-.contact-chat  { grid-column:2 }
-.contact-right { grid-column:3; align-self:stretch }
-@media(max-width:780px){
-  .contact-left, .contact-right{ grid-column:1 }
+/* Mobile */
+@media(max-width:900px){
+  .grid{
+    grid-template-columns: 1fr;
+    grid-auto-rows: auto;
+  }
+  .left-top, .center-col, .right-top, .left-bottom, .right-bottom {
+    grid-column: 1 !important;
+    grid-row: auto !important;
+  }
+  .sideimg{ max-width:520px; margin:0 auto }
+  .center{ max-width:720px; width:100%; margin:0 auto }
 }
 </style>
 </head>
-<body class="bg-vignette">
+<body class="vignette">
 
-<!-- Sideways Matrix background -->
 <canvas id="matrixX" aria-hidden="true"></canvas>
 
 <header>
-  <div class="logo-container">
-    <a href="index.html"><img id="site-logo" src="images/logo.png" alt="CellOutz Logo"></a>
-  </div>
+  <div class="logo"><a href="index.html"><img src="images/logo.png" alt="CellOutz Logo"></a></div>
   <nav>
     <a href="index.html">Home</a>
     <a href="prints.html">Prints</a>
@@ -145,97 +116,63 @@ nav .insta-link svg{width:20px;height:20px;display:block}
     <a href="gallery.html">Gallery</a>
     <a href="contact.html">Contact</a>
   </nav>
-  <div id="cart-button" aria-label="Cart" title="Cart">
-    <img src="images/cart.png" alt="Cart">
-    <div id="cart-count" class="hidden">0</div>
-  </div>
 </header>
 
-<div class="wrapper">
-  <!-- Top row: Left GIF / Stack / Right GIF -->
-  <div class="gif-box">
-    <!-- <img src="images/about/left.gif" alt="Left"> -->
-    GIF — LEFT (top)
-  </div>
+<main class="wrap">
+  <div class="grid">
+    <!-- Top row, left/right -->
+    <figure class="sideimg left-top">
+      <img src="images/left.jpg" alt="Artist portrait (left)">
+    </figure>
 
-  <div class="stack">
-    <!-- About Me (chat window) -->
-    <section class="chat">
-      <div class="bar">
-        <div class="name">About Me — @CellOutz</div>
-        <div class="win-btns"><span class="win-dot"></span><span class="win-dot"></span><span class="win-dot"></span></div>
-      </div>
-      <div class="messages">
-        <div class="meta">[ system ] connected — AU // channel: bio</div>
-        <div class="msg">My name is Phoenix Hakker-Payne. I’m an 18-year-old digital artist in Australia. .</div>
-        <div class="msg you">Pieces loop back with new mutations. If something sells out, it might return stranger.</div>
-        <div class="meta">— end —</div>
-      </div>
-      <div class="footer">
-        <span class="status">online · idle</span>
-        <button class="btn" type="button" disabled>send</button>
-      </div>
-    </section>
+    <!-- Center column spans two rows -->
+    <div class="center center-col">
+      <section class="box">
+        <h2>About Me</h2>
+        <p>Hi! I’m an 18-year-old digital artist based in Australia. I create high-resolution digital artwork and edgy underground designs, blending gothic aesthetics with modern digital techniques. My work ranges from prints to apparel, each piece carefully curated to fit my vision.</p>
+      </section>
 
-    <!-- Center GIF (between the two boxes) -->
-    <div class="gif-box">
-      <!-- <img src="images/about/center.gif" alt="Center"> -->
-      GIF — CENTER
+      <figure class="center-media">
+        <img src="images/middle.jpg" alt="Artist portrait (center)">
+      </figure>
+
+      <section class="box">
+        <h2>Contact — Direct Line</h2>
+        <p>If you’d like to get in touch for commissions, inquiries, or collaborations, feel free to reach out via email:</p>
+        <div class="contact-links">
+          <a href="mailto:Allusionstoograndeur@gmail.com">Allusionstoograndeur@gmail.com</a>
+        </div>
+      </section>
     </div>
-  </div>
 
-  <div class="gif-box">
-    <!-- <img src="images/about/right.gif" alt="Right"> -->
-    GIF — RIGHT (top)
-  </div>
+    <figure class="sideimg right-top">
+      <img src="images/right.jpg" alt="Artist portrait (right)">
+    </figure>
 
-  <!-- CONTACT ROW: left GIF / contact chat / right GIF (same row) -->
-  <div class="gif-box contact-left">
-    <!-- <img src="images/about/bottom-left.gif" alt="Left of Contact"> -->
-    GIF — LEFT (contact row)
-  </div>
+    <!-- Bottom row, flipped mirrors -->
+    <figure class="sideimg flipY left-bottom">
+      <img src="images/left.jpg" alt="Artist portrait (left, flipped)">
+    </figure>
 
-  <section class="chat contact-chat">
-    <div class="bar">
-      <div class="name">Contact — direct line</div>
-      <div class="win-btns"><span class="win-dot"></span><span class="win-dot"></span><span class="win-dot"></span></div>
-    </div>
-    <div class="messages">
-      <div class="meta">[ system ] connected — AU // channel: contact</div>
-      <!-- Kept your original wording inside the bubble -->
-      <div class="msg">
-        If you’d like to get in touch for commissions, inquiries, or collaborations, feel free to reach out via email:
-      </div>
-      <div class="msg you">
-        <a href="mailto:Allusionstoograndeur@gmail.com" style="color:var(--text);text-decoration:none;border-bottom:1px dashed var(--red)">Allusionstoograndeur@gmail.com</a>
-      </div>
-      <div class="meta">— end —</div>
-    </div>
-    <div class="footer">
-      <span class="status">awaiting reply</span>
-      <button class="btn" type="button" onclick="window.location='mailto:Allusionstoograndeur@gmail.com'">compose</button>
-    </div>
-  </section>
-
-  <div class="gif-box contact-right">
-    <!-- <img src="images/about/bottom-right.gif" alt="Right of Contact"> -->
-    GIF — RIGHT (contact row)
+    <figure class="sideimg flipY right-bottom">
+      <img src="images/right.jpg" alt="Artist portrait (right, flipped)">
+    </figure>
   </div>
-</div>
+</main>
 
 <script>
-/* Sideways Matrix (consistent with blog/gallery) */
+/* Sideways Matrix renderer */
 (function(){
   const canvas = document.getElementById('matrixX');
   const ctx = canvas.getContext('2d');
   const glyphs = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ@#$%^&*";
-  let fontSize = 16, rows = 0, pos = [];
+  let fontSize = 16;
+  let rows = 0, pos = [];
 
   function fit(){
-    const dpr = devicePixelRatio || 1;
-    canvas.width = Math.floor(innerWidth * dpr);
-    canvas.height = Math.floor(innerHeight * dpr);
-    ctx.setTransform(dpr,0,0,dpr,0,0);
+    canvas.width = innerWidth * devicePixelRatio;
+    canvas.height = innerHeight * devicePixelRatio;
+    ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);
     rows = Math.floor(innerHeight / fontSize);
     pos = Array.from({length:rows}, ()=> innerWidth + Math.random()*innerWidth);
   }
@@ -245,8 +182,9 @@ nav .insta-link svg{width:20px;height:20px;display:block}
     ctx.fillStyle = "rgba(11,0,0,0.08)";
     ctx.fillRect(0,0,innerWidth,innerHeight);
     ctx.fillStyle = "#FF1A1A";
-    ctx.font = fontSize + "px monospace";
-    for(let r=0;r<rows;r++){
+    ctx.font = `${fontSize}px monospace`;
+
+    for(let r=0; r<rows; r++){
       const ch = glyphs[(Math.random()*glyphs.length)|0];
       const y = (r+1)*fontSize - 2;
       ctx.fillText(ch, pos[r], y);
@@ -257,27 +195,6 @@ nav .insta-link svg{width:20px;height:20px;display:block}
   }
   requestAnimationFrame(step);
 })();
-
-/* Cart stub */
-let cart = [];
-function renderCart(){
-  const el=document.getElementById('cart-count');
-  if(cart.length>0){ el.textContent=cart.length; el.classList.remove('hidden')}
-  else el.classList.add('hidden');
-}
-document.getElementById('cart-button').addEventListener('click', ()=>{
-  if(cart.length===0){ alert('Your cart is empty.')}
-  else{
-    let txt='Cart:\n'; cart.forEach((it,i)=>txt+=`${i+1}. ${it.name} — $${it.price}\n`);
-    txt+=`Total: $${cart.reduce((s,i)=>s+i.price,0).toFixed(2)}\n\n(Checkout not configured)`; alert(txt);
-  }
-});
-
-/* Logo intro */
-const logo = document.getElementById('site-logo');
-const seen = sessionStorage.getItem('celloutz_logo_seen');
-if(!seen){ setTimeout(()=> logo.classList.add('logo-visible'), 80); sessionStorage.setItem('celloutz_logo_seen','1'); }
-else { logo.classList.add('logo-visible'); }
 </script>
 </body>
 </html>
