@@ -29,8 +29,6 @@ body{
   z-index:-2;
   background:var(--bg);
 }
-
-/* subtle vignette over the canvas for depth */
 .bg-vignette::before{
   content:""; position:fixed; inset:0; pointer-events:none; z-index:-1;
   background:
@@ -82,7 +80,7 @@ nav .insta-link svg{ width:20px;height:20px; display:block; }
 .hidden { display: none !important; }
 
 /* ---------- Blog feed ---------- */
-.feed{ max-width:1000px; margin:10px auto 60px; padding:0 18px; display:grid; gap:14px; }
+.feed{ max-width:1000px; margin:10px auto 24px; padding:0 18px; display:grid; gap:14px; }
 
 /* pill rows with an internal canvas background */
 .entry{
@@ -175,6 +173,30 @@ nav .insta-link svg{ width:20px;height:20px; display:block; }
   .entry-snippet{ white-space:normal }
   .chatwin{ height:min(88vh, 620px) }
 }
+
+/* ---------- GIF Under Feed ---------- */
+.gif-wrap{
+  max-width:1000px;
+  margin:0 auto 60px;
+  padding:0 18px;
+}
+.gif-frame{
+  display:block;
+  width:100%;
+  max-width:820px;
+  margin:12px auto 0;
+  border-radius:12px;
+  border:2px solid var(--red);
+  background:#000;
+  box-shadow:0 0 20px rgba(255,26,26,.35), inset 0 0 18px rgba(255,26,26,.15);
+}
+.gif-frame img{
+  display:block;
+  width:100%;
+  height:auto;
+  border-radius:10px;
+  image-rendering:auto;
+}
 </style>
 </head>
 <body class="bg-vignette">
@@ -208,6 +230,14 @@ nav .insta-link svg{ width:20px;height:20px; display:block; }
 </header>
 
 <main class="feed" id="feed"></main>
+
+<!-- GIF under the pill feed -->
+<div class="gif-wrap">
+  <div class="gif-frame">
+    <!-- GIFs loop inherently; slowing requires converting to video -->
+    <img src="images/dance4me.gif" alt="dance4me" loading="lazy" decoding="async">
+  </div>
+</div>
 
 <!-- Chatbox Modal -->
 <div id="overlay" class="overlay" aria-hidden="true">
@@ -325,7 +355,7 @@ document.addEventListener('keydown', e=>{ if(e.key==='Escape') overlay.classList
       const ch = glyphs[(Math.random()*glyphs.length)|0];
       const y = (r+1)*fontSize - 2;
       ctx.fillText(ch, pos[r], y);
-      pos[r] -= fontSize * (0.6 + Math.random()*0.6); // sideways drift speed
+      pos[r] -= fontSize * (0.6 + Math.random()*0.6);
       if(pos[r] < -60) pos[r] = innerWidth + Math.random()*innerWidth;
     }
     requestAnimationFrame(step);
@@ -342,14 +372,12 @@ document.addEventListener('keydown', e=>{ if(e.key==='Escape') overlay.classList
   function paintPill(canvas, state){
     const w = canvas.clientWidth, h = canvas.clientHeight;
     if(!w || !h) return;
-    // scale for crispness
     const dpr = devicePixelRatio || 1;
     if(canvas.width !== Math.floor(w*dpr) || canvas.height !== Math.floor(h*dpr)){
       canvas.width = Math.floor(w*dpr);
       canvas.height = Math.floor(h*dpr);
       const ctx = canvas.getContext('2d');
       ctx.setTransform(dpr,0,0,dpr,0,0);
-      // recompute rows
       state.rows = Math.floor(h / fontSize);
       state.pos = Array.from({length:state.rows}, ()=> Math.random()*w);
     }
@@ -375,10 +403,7 @@ document.addEventListener('keydown', e=>{ if(e.key==='Escape') overlay.classList
   }
   requestAnimationFrame(tick);
 
-  // keep canvases synced on resize
-  addEventListener('resize', ()=> pillCanvases.forEach((c,i)=>{
-    states[i].rows = 0; // force re-measure next frame
-  }));
+  addEventListener('resize', ()=> pillCanvases.forEach((c,i)=>{ states[i].rows = 0; }));
 })();
 
 /* ---------- Logo intro ---------- */
