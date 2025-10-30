@@ -201,7 +201,6 @@ main{max-width:1400px;margin:10px auto 60px;padding:0 18px}
       const ch = glyphs[(Math.random()*glyphs.length)|0];
       const y = (r+1)*fontSize - 2;
       ctx.fillText(ch, pos[r], y);
-      // drift left at slightly varied speeds
       pos[r] -= fontSize * (0.6 + Math.random()*0.6);
       if (pos[r] < -60) pos[r] = innerWidth + Math.random()*innerWidth;
     }
@@ -214,15 +213,28 @@ main{max-width:1400px;margin:10px auto 60px;padding:0 18px}
 const enc = s => encodeURIComponent(s);
 const joinSeg = (...segs) => segs.map(enc).join('/');
 
+/* add a final hard-fail logger so you can spot missing files fast */
 function imgWithFallback(folderCandidates, file, className="", alt=""){
-  const img=document.createElement('img'); if(className) img.className=className; img.alt=alt||"";
+  const img=document.createElement('img');
+  if(className) img.className=className;
+  img.alt=alt||"";
   const folders = Array.isArray(folderCandidates) ? folderCandidates : [folderCandidates];
-  let i=0; const tryNext=()=>{ if(i>=folders.length) return; img.src=`images/${joinSeg(folders[i], file)}`; i++; };
-  img.addEventListener('error', tryNext); tryNext(); return img;
+  let i=0;
+  const tryNext=()=>{
+    if(i>=folders.length){
+      console.warn('Image not found after all fallbacks:', {folders, file, alt});
+      return;
+    }
+    img.src=`images/${joinSeg(folders[i], file)}`;
+    i++;
+  };
+  img.addEventListener('error', tryNext);
+  tryNext();
+  return img;
 }
 const range = n => Array.from({length:n},(_,i)=>String(i+1));
 
-/* ===== Collections (Selfish and Unsane without & ) ===== */
+/* ===== Collections ===== */
 const COLLECTIONS = {
   grandeur: [
     { title:"Present Polarity", folder:["Present Polarity"], grid:"two",
@@ -231,8 +243,19 @@ const COLLECTIONS = {
     { title:"chaos wizard", folder:["chaos wizard"], grid:"three",
       images: range(9).map(i=>({file:`chaos (${i}).webp`, name:`chaos (${i})`})) },
 
-    { title:"Selfish and Unsane", folder:["Selfish and Unsane","selfish and unsane"], grid:"four",
-      images: range(14).map(i=>({file:`self (${i}).webp`, name:`self (${i})`})) },
+    /* Robust GitHub-safe fallbacks for Selfish and Unsane */
+    { title:"Selfish and Unsane",
+      folder:[
+        "selfish-and-unsane",           // recommended: lowercase-hyphen
+        "Selfish-and-Unsane",           // title-case hyphen
+        "Selfish and Unsane",           // spaces
+        "selfish and unsane",           // spaces lowercase
+        "Selfish & Unsane",             // ampersand
+        "selfish-&-unsane"              // ampersand with hyphens
+      ],
+      grid:"four",
+      images: range(14).map(i=>({file:`self (${i}).webp`, name:`self (${i})`}))
+    },
 
     { title:"Sentience and calamity", folder:["Sentience and calamity"], grid:"three",
       images: range(5).map(i=>({file:`war (${i}).webp`, name:`war (${i})`})) },
