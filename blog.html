@@ -14,6 +14,7 @@
   --accent: rgba(255,26,26,0.15);
   --glow: rgba(255,26,26,.35);
   --matrix: var(--text);
+  --titleColor: var(--red);
 }
 html[data-theme="halloween"]{
   --bg:#090107;
@@ -22,6 +23,7 @@ html[data-theme="halloween"]{
   --accent:rgba(255,106,0,.16);
   --glow: rgba(255,106,0,.35);
   --matrix:#B3FF38; /* slime green runes */
+  --titleColor:#B3FF38;
 }
 
 *{box-sizing:border-box;}
@@ -78,7 +80,7 @@ nav a{
 nav a:hover{ background:var(--red); color:var(--bg); box-shadow:0 0 20px var(--red); }
 nav .insta-link svg{ width:20px;height:20px; display:block; }
 
-/* Cart bubble (unchanged) */
+/* Cart bubble */
 #cart-button{
   position:fixed; top:18px; right:80px;   /* make room for theme toggle */
   width:64px; height:64px; border-radius:50%;
@@ -134,7 +136,7 @@ nav .insta-link svg{ width:20px;height:20px; display:block; }
 }
 .entry:hover{ transform: translateY(-2px); box-shadow:0 0 24px var(--red); background: rgba(0,0,0,.75); }
 
-/* animated glyphs layer inside each pill */
+/* animated glyphs layer inside the pill */
 .entry canvas.pill-matrix{
   position:absolute; inset:0; width:100%; height:100%;
   opacity:.25; filter:contrast(1.15) saturate(1.1);
@@ -147,6 +149,17 @@ nav .insta-link svg{ width:20px;height:20px; display:block; }
   font-family:'UnifrakturCook', cursive;
   font-size: clamp(18px, 2.6vw, 26px);
   letter-spacing:.5px;
+  color: var(--titleColor);
+  text-shadow:
+    0 0 6px var(--titleColor),
+    0 0 14px color-mix(in srgb, var(--titleColor) 45%, transparent),
+    0 0 24px color-mix(in srgb, var(--titleColor) 30%, transparent);
+}
+.entry:hover .entry-title{
+  text-shadow:
+    0 0 10px var(--titleColor),
+    0 0 26px color-mix(in srgb, var(--titleColor) 55%, transparent),
+    0 0 40px color-mix(in srgb, var(--titleColor) 40%, transparent);
 }
 .entry-date{ grid-column:2 / 3; grid-row:1; justify-self:end; opacity:.8; font-size:12px; }
 .entry-snippet{
@@ -187,6 +200,7 @@ nav .insta-link svg{ width:20px;height:20px; display:block; }
   background:#090000;
   line-height:1.35;
   box-shadow:0 4px 14px rgba(0,0,0,.5);
+  white-space: pre-wrap; /* preserve manual line breaks/spaces */
 }
 .msg.you{ align-self:flex-end; background:#140000; border-color:rgba(255,26,26,.55) }
 .meta{ font-size:11px; opacity:.65; margin-bottom:6px }
@@ -208,28 +222,13 @@ nav .insta-link svg{ width:20px;height:20px; display:block; }
 }
 
 /* ---------- GIF Under Feed ---------- */
-.gif-wrap{
-  max-width:1000px;
-  margin:0 auto 60px;
-  padding:0 18px;
-}
+.gif-wrap{ max-width:1000px; margin:0 auto 60px; padding:0 18px; }
 .gif-frame{
-  display:block;
-  width:100%;
-  max-width:820px;
-  margin:12px auto 0;
-  border-radius:12px;
-  border:2px solid var(--red);
-  background:#000;
+  display:block; width:100%; max-width:820px; margin:12px auto 0;
+  border-radius:12px; border:2px solid var(--red); background:#000;
   box-shadow:0 0 20px var(--glow), inset 0 0 18px rgba(255,26,26,.15);
 }
-.gif-frame img{
-  display:block;
-  width:100%;
-  height:auto;
-  border-radius:10px;
-  image-rendering:auto;
-}
+.gif-frame img{ display:block; width:100%; height:auto; border-radius:10px; image-rendering:auto; }
 </style>
 </head>
 <body class="bg-vignette">
@@ -263,7 +262,7 @@ nav .insta-link svg{ width:20px;height:20px; display:block; }
     <div id="cart-count" class="hidden">0</div>
   </div>
 
-  <!-- Theme toggle (persists across pages) -->
+  <!-- Theme toggle -->
   <label class="theme-toggle" title="Halloween mode">
     <input id="themeSwitch" type="checkbox" aria-label="Toggle Halloween theme">
     <span class="track"><span class="knob">🎃</span></span>
@@ -296,6 +295,9 @@ nav .insta-link svg{ width:20px;height:20px; display:block; }
 </div>
 
 <script>
+/* Always land at TOP on load */
+window.addEventListener('load', () => { window.scrollTo(0, 0); });
+
 /* ===== Theme persistence (shared key) ===== */
 (function(){
   const KEY='celloutz_theme';
@@ -320,8 +322,79 @@ function fmtDate(d){
   return new Intl.DateTimeFormat('en-US', opts).format(d);
 }
 const today = fmtDate(new Date());
+
 const posts = [
-  { title:'beginning', date: today, body:'test.' }
+  { title:'beginning', date: today, body:'test.' },
+
+  {
+    title:'Hollow / Hallow',
+    date: today,
+    body:
+`ART
+
+I haven’t written in a long time. I once wanted to be an author,
+but that dream withered—like they do. I can’t say why.
+
+About my work: it’s unknowable even to me what I’ll make.
+A seed grows in my head as I create; I’m a vessel for imagination.
+I’m probably up in a tower somewhere. I’ll write about my life—
+cryptically transparent, like a jellyfish.
+
+— — — — — — — — — — — —
+
+HALLOWEEN
+
+I hope everyone has a good Halloween. More art is coming.
+Life is fast; new times are approaching. Creation is a subconscious
+priority—let me express.
+
+— — — — — — — — — — — —
+
+THE WEBSITE
+
+Halloween is tomorrow, and I made it my deadline for this site.
+You can’t purchase prints yet, but it still needs to rise—
+or ideas burn out and turn to coal. Earthy as I am, I keep a flame;
+my internal torch won’t dim.
+
+— — — — — — — — — — — —
+
+THE POEM
+
+I don’t want to pin it down with meaning, but it’s how this year felt.
+I want to stop the hollowing. The future seems short—
+but it’s okay. Next year will be better.
+
+I begin
+recently I am breathless
+gasping for air
+the constant chaos consumes
+harbouring happiness
+nothing but waves
+hollow humming
+I am aboard my ship
+as the sea rages on
+the flooding comes closer
+silence
+
+A breath
+thin air travels
+eating my insides
+like a chore
+ignored
+thinning
+beginning descent
+caves emerge
+cold
+terror
+hollow echoes from within
+a lock
+a door
+unlocked and open
+yet I stay.
+
+— hakker`
+  }
 ];
 
 /* ---------- Build pills (with per-pill canvas) ---------- */
@@ -342,7 +415,7 @@ posts.forEach((p, idx)=>{
   row.innerHTML += `
     <span class="entry-title">${p.title}</span>
     <span class="entry-date">${p.date}</span>
-    <span class="entry-snippet">${p.body}</span>
+    <span class="entry-snippet">${p.body.split('\n').slice(0,3).join(' ')}</span>
   `;
   row.addEventListener('click', ()=> openChat(idx));
   feed.appendChild(row);
@@ -370,7 +443,7 @@ function openChat(i){
 
   const you = document.createElement('div');
   you.className = 'msg you';
-  you.textContent = p.body;
+  you.textContent = p.body; // preserves spacing via CSS white-space: pre-wrap;
   messages.appendChild(you);
 
   const end = document.createElement('div');
@@ -380,7 +453,9 @@ function openChat(i){
 
   overlay.classList.add('show');
   overlay.setAttribute('aria-hidden','false');
-  messages.scrollTop = messages.scrollHeight;
+
+  /* <<< start at TOP of the conversation >>> */
+  messages.scrollTop = 0;
 }
 document.getElementById('closeBtn').addEventListener('click', ()=> overlay.classList.remove('show'));
 document.getElementById('okBtn').addEventListener('click', ()=> overlay.classList.remove('show'));
