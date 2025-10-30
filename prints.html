@@ -1,14 +1,31 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1.0" />
 <title>CellOutz — Prints</title>
 <link href="https://fonts.googleapis.com/css2?family=UnifrakturCook:wght@700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
+/* ===== THEME SYSTEM (default + Halloween) ===== */
 :root{
-  --red:#FF1A1A; --bg:#0B0000; --text:#FF1A1A; --accent: rgba(255,26,26,.15);
+  /* Default (current crimson/black) */
+  --bg:#0B0000;
+  --text:#FF1A1A;
+  --red:#FF1A1A;
+  --accent: rgba(255,26,26,.15);
+  --glow: rgba(255,26,26,.35);
+  --matrix: var(--text); /* matrix glyph color */
 }
+html[data-theme="halloween"]{
+  /* Halloween: orange UI + slime-green matrix */
+  --bg:#090107;
+  --text:#FF6A00;
+  --red:#FF6A00;
+  --accent: rgba(255,106,0,.16);
+  --glow: rgba(255,106,0,.35);
+  --matrix:#B3FF38;
+}
+
 *{box-sizing:border-box}
 html,body{height:100%}
 body{
@@ -31,7 +48,7 @@ body{
 }
 
 /* Header / Nav */
-header{display:flex;flex-direction:column;align-items:center;padding:20px 40px 10px}
+header{display:flex;flex-direction:column;align-items:center;padding:20px 40px 10px;position:relative}
 .logo-container{display:flex;justify-content:center;align-items:center;margin-bottom:18px;max-width:100%}
 .logo-container img{max-width:440px;width:100%;height:auto;object-fit:contain}
 nav{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;align-items:center}
@@ -41,7 +58,7 @@ nav a{
 }
 nav a::after{ content:''; position:absolute; inset:0; background:var(--accent); mix-blend-mode:screen; opacity:0; transition:.25s }
 nav a:hover::after{opacity:1}
-nav a:hover{ background:var(--red); color:#000; box-shadow:0 0 18px var(--red), inset 0 0 28px var(--red) }
+nav a:hover{ background:var(--red); color:#000; box-shadow:0 0 18px var(--glow), inset 0 0 28px var(--glow) }
 nav .insta-link svg{ width:20px; height:20px; display:block; }
 
 /* Floating cart bubble */
@@ -59,12 +76,41 @@ nav .insta-link svg{ width:20px; height:20px; display:block; }
 }
 .hidden{ display:none !important; }
 
+/* ===== Halloween toggle ===== */
+.theme-toggle{
+  position:fixed; top:18px; right:100px; /* sits left of cart */
+  display:inline-flex; align-items:center; gap:8px;
+  font:12px/1 'Share Tech Mono', monospace; z-index:3000; user-select:none;
+}
+.theme-toggle .lbl{ opacity:.85 }
+.theme-toggle input{ display:none }
+.theme-toggle .track{
+  width:54px; height:28px; border-radius:999px;
+  border:2px solid var(--red); background:rgba(0,0,0,.35);
+  display:inline-flex; align-items:center; padding:2px; position:relative;
+  box-shadow:0 0 10px var(--glow);
+}
+.theme-toggle .knob{
+  width:22px; height:22px; border-radius:50%;
+  display:inline-flex; align-items:center; justify-content:center;
+  background:var(--red); color:#000; font-size:14px;
+  transform: translateX(0); transition: transform .18s ease, background .18s ease;
+  box-shadow: inset 0 0 10px rgba(0,0,0,.35), 0 0 12px var(--glow);
+}
+.theme-toggle input:checked + .track .knob{
+  transform: translateX(26px);
+  background:#B3FF38; /* slime when ON */
+}
+@media(max-width:600px){
+  .theme-toggle{ right:14px; top:14px; }
+}
+
 main{ max-width:1300px; margin:12px auto 80px; padding:0 18px; }
 
 /* Section titles */
 h2.section-title{
   font-family:'UnifrakturCook',cursive; text-align:center; margin:34px 0 14px;
-  text-shadow:0 0 10px var(--red), 0 0 24px rgba(255,26,26,.6);
+  text-shadow:0 0 10px var(--red), 0 0 24px var(--glow);
 }
 
 /* Product grid */
@@ -96,7 +142,7 @@ h2.section-title{
 .btn{
   width:100%; padding:10px; border-radius:10px; border:1px solid var(--red);
   background:var(--red); color:#000; font-weight:700; cursor:pointer;
-  box-shadow:0 0 12px var(--red), inset 0 0 24px rgba(255,26,26,.5); transition:transform .12s ease;
+  box-shadow:0 0 12px var(--glow), inset 0 0 24px var(--accent); transition:transform .12s ease;
 }
 .btn:hover{ transform:translateY(-2px) }
 
@@ -108,7 +154,7 @@ h2.section-title{
 .viewer{
   position:absolute; inset:20px 20px 60px 20px; display:grid; grid-template-columns:1fr auto; gap:16px;
   border:1px solid rgba(255,26,26,.35); border-radius:14px; overflow:hidden;
-  box-shadow:0 0 28px rgba(255,26,26,.25), 0 18px 60px rgba(0,0,0,.6); background:rgba(11,0,0,.85);
+  box-shadow:0 0 28px var(--glow), 0 18px 60px rgba(0,0,0,.6); background:rgba(11,0,0,.85);
   max-width:1220px; width:92vw; max-height:90vh; margin:auto; left:0; right:0; top:0; bottom:0;
 }
 .viewer.full{ grid-template-columns:1fr 0 }
@@ -132,12 +178,20 @@ h2.section-title{
 </head>
 <body class="vignette scan">
 
-<canvas id="matrix"></canvas>
+<canvas id="matrix" aria-hidden="true"></canvas>
 
 <header>
   <div class="logo-container">
     <a href="index.html"><img src="images/logo.png" alt="CellOutz Logo"></a>
   </div>
+
+  <!-- Theme toggle -->
+  <label class="theme-toggle" title="Halloween mode">
+    <input id="themeSwitch" type="checkbox" aria-label="Toggle Halloween theme">
+    <span class="track"><span class="knob">🎃</span></span>
+    <span class="lbl">Halloween</span>
+  </label>
+
   <nav>
     <a href="index.html">Home</a>
     <a href="prints.html">Prints</a>
@@ -193,26 +247,56 @@ h2.section-title{
 </div>
 
 <script>
-/* ===== Matrix background ===== */
+/* ===== Theme persistence (shared across pages) ===== */
+(function(){
+  const KEY='celloutz_theme';
+  const html=document.documentElement;
+  const input=document.getElementById('themeSwitch');
+  const saved=localStorage.getItem(KEY) || 'default';
+  if(saved==='halloween'){ html.setAttribute('data-theme','halloween'); if(input) input.checked=true; }
+  if(input){
+    input.addEventListener('change',()=>{
+      const mode=input.checked?'halloween':'default';
+      if(mode==='halloween') html.setAttribute('data-theme','halloween');
+      else html.removeAttribute('data-theme');
+      localStorage.setItem(KEY,mode);
+      document.dispatchEvent(new CustomEvent('themechanged',{detail:{mode}}));
+    });
+  }
+})();
+
+/* ===== Matrix background (theme-aware, animation-frame smooth) ===== */
 const canvas = document.getElementById('matrix');
 const ctx = canvas.getContext('2d');
 let letters = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ@#$%^&*",
     fontSize = 16, cols, drops;
+
+function getMatrixColor(){
+  const v=getComputedStyle(document.documentElement).getPropertyValue('--matrix').trim();
+  return v || '#FF1A1A';
+}
 function resizeCanvas(){
   canvas.width = innerWidth; canvas.height = innerHeight;
   cols = Math.floor(canvas.width / fontSize); drops = Array(cols).fill(0);
 }
 resizeCanvas(); addEventListener('resize', resizeCanvas);
-function drawMatrix(){
-  ctx.fillStyle = "rgba(11,0,0,0.09)"; ctx.fillRect(0,0,canvas.width,canvas.height);
-  ctx.fillStyle = "#FF1A1A"; ctx.font = fontSize + "px monospace";
+
+let raf;
+function draw(){
+  ctx.fillStyle = "rgba(11,0,0,0.09)";
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle = getMatrixColor();
+  ctx.font = fontSize + "px monospace";
   for(let i=0;i<cols;i++){
     const t = letters[(Math.random()*letters.length)|0];
     ctx.fillText(t, i*fontSize, drops[i]);
     drops[i]+= fontSize; if(drops[i] > canvas.height && Math.random()>0.975) drops[i]=0;
   }
+  raf = requestAnimationFrame(draw);
 }
-setInterval(drawMatrix, 60);
+raf = requestAnimationFrame(draw);
+document.addEventListener('visibilitychange', ()=>{ if(document.hidden){ cancelAnimationFrame(raf); } else { raf=requestAnimationFrame(draw); }});
+document.addEventListener('themechanged', ()=>{/* color auto-updates next frame */});
 
 /* ===== CONFIG ===== */
 
@@ -240,11 +324,10 @@ function aspectFamily(w,h){
   if (close(r,1.414) || close(inv,1.414)) return "sqrt2";
   if (close(r,1.5)   || close(inv,1.5))   return "threeTwo";
   if (close(r,1.25)  || close(inv,1.25))  return "fourFive";
-  // default to sqrt2 (A sizes) so there’s always something reasonable
-  return "sqrt2";
+  return "sqrt2"; // fallback
 }
 
-/* Catalog: paths exactly as you named them */
+/* Catalog: paths exactly as named */
 const PRODUCTS = [
   // Present Polarity (4)
   ...[1,2,3,4].map(i => ({
@@ -296,7 +379,6 @@ function makeCard(p){
   `;
   card.appendChild(body);
 
-  // When image loads, decide aspect & sizes
   img.addEventListener('load', ()=>{
     const fam = aspectFamily(img.naturalWidth, img.naturalHeight);
     const sizes = SIZE_SETS[fam] || SIZE_SETS.sqrt2;
@@ -305,17 +387,13 @@ function makeCard(p){
     updatePrice(body);
   });
 
-  // Hide card if image fails (missing file etc.)
   img.addEventListener('error', ()=> card.style.display='none');
 
-  // Price update on change
   body.querySelector('.sizeSel').addEventListener('change', ()=> updatePrice(body));
   body.querySelector('.qty').addEventListener('input', ()=> updatePrice(body));
 
-  // Open modal on image click
   wrap.addEventListener('click', ()=> openModal(p, img));
 
-  // Add to cart
   body.querySelector('.btn').addEventListener('click', ()=>{
     const size = body.querySelector('.sizeSel').value;
     const qty  = Math.max(1, parseInt(body.querySelector('.qty').value||'1',10));
@@ -358,7 +436,6 @@ function openModal(p, imgEl){
   bigImg.src = p.src;
   sideTitle.textContent = p.title;
   sideDesc.textContent  = p.desc || '';
-  // compute max recommended size from source pixels
   const w = imgEl.naturalWidth, h = imgEl.naturalHeight;
   const maxSide300 = Math.floor(Math.max(w,h) / 300);
   const maxSide240 = Math.floor(Math.max(w,h) / 240);
@@ -393,11 +470,6 @@ cartButton.addEventListener('click', ()=>{
   txt += `\nTotal: $${total.toFixed(2)} AUD\n\n(Checkout not configured in this demo.)`;
   alert(txt);
 });
-
-/* ===== Little tip: A-series conversion =====
-A4 ≈ 210×297mm, A3 ≈ 297×420mm, A2 ≈ 420×594mm (ratio ~1.414).
-We auto-pick A-sizes only for sqrt(2) images; squares/3:2/4:5 get better-fitting inch sizes.
-*/
 </script>
 </body>
 </html>

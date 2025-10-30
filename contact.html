@@ -1,12 +1,23 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Contact & About — CellOutz</title>
 <link href="https://fonts.googleapis.com/css2?family=UnifrakturCook:wght@700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
-:root{ --red:#FF1A1A; --bg:#0B0000; --text:#FF1A1A; --accent:rgba(255,26,26,.15) }
+/* ===== Theme system (default + Halloween) ===== */
+:root{
+  --red:#FF1A1A; --bg:#0B0000; --text:#FF1A1A; --accent:rgba(255,26,26,.15);
+  --glow: rgba(255,26,26,.35);
+  --matrix: var(--text);
+}
+html[data-theme="halloween"]{
+  --bg:#090107; --text:#FF6A00; --red:#FF6A00; --accent:rgba(255,106,0,.16);
+  --glow: rgba(255,106,0,.35);
+  --matrix:#B3FF38; /* slime green */
+}
+
 *{box-sizing:border-box}
 html,body{height:100%}
 body{ margin:0; font-family:'Share Tech Mono',monospace; background:var(--bg); color:var(--text); overflow-x:hidden }
@@ -29,8 +40,27 @@ nav a{
   text-decoration:none; color:var(--text); padding:8px 12px; border:1px solid var(--red); border-radius:6px;
   transition:.25s; position:relative; display:inline-flex; align-items:center; gap:6px;
 }
-nav a:hover{ background:var(--red); color:#000; box-shadow:0 0 20px var(--red) }
+nav a:hover{ background:var(--red); color:#000; box-shadow:0 0 20px var(--glow) }
 nav .insta-link svg{ width:20px; height:20px; display:block }
+
+/* Theme toggle */
+.theme-toggle{
+  position:fixed; top:18px; right:14px; z-index:3000;
+  display:inline-flex; align-items:center; gap:8px; font:12px/1 'Share Tech Mono', monospace;
+}
+.theme-toggle input{ display:none }
+.theme-toggle .track{
+  width:54px; height:28px; border-radius:999px; padding:2px;
+  border:2px solid var(--red); background:rgba(0,0,0,.35); display:inline-flex; align-items:center;
+  box-shadow:0 0 10px var(--glow);
+}
+.theme-toggle .knob{
+  width:22px; height:22px; border-radius:50%; background:var(--red); color:#000;
+  display:inline-flex; align-items:center; justify-content:center; font-size:14px;
+  transform:translateX(0); transition:transform .18s ease, background .18s ease;
+  box-shadow: inset 0 0 10px rgba(0,0,0,.35), 0 0 12px var(--glow);
+}
+.theme-toggle input:checked + .track .knob{ transform:translateX(26px); background:#B3FF38 }
 
 /* Layout: 3 columns, 2 rows (top images / bottom flipped images) */
 .wrap{ max-width:1200px; margin:16px auto 60px; padding:0 18px }
@@ -113,6 +143,14 @@ nav .insta-link svg{ width:20px; height:20px; display:block }
 
 <header>
   <div class="logo"><a href="index.html"><img src="images/logo.png" alt="CellOutz Logo" loading="eager" decoding="async"></a></div>
+
+  <!-- Theme toggle (persists across pages) -->
+  <label class="theme-toggle" title="Halloween mode">
+    <input id="themeSwitch" type="checkbox" aria-label="Toggle Halloween theme">
+    <span class="track"><span class="knob">🎃</span></span>
+    <span class="lbl">Halloween</span>
+  </label>
+
   <nav>
     <a href="index.html">Home</a>
     <a href="prints.html">Prints</a>
@@ -173,7 +211,25 @@ nav .insta-link svg{ width:20px; height:20px; display:block }
 </main>
 
 <script>
-/* ---------- Sideways Matrix renderer (matches blog/gallery) ---------- */
+/* ===== Theme persistence (shared with other pages) ===== */
+(function(){
+  const KEY='celloutz_theme';
+  const html=document.documentElement;
+  const input=document.getElementById('themeSwitch');
+  const saved=localStorage.getItem(KEY) || 'default';
+  if(saved==='halloween'){ html.setAttribute('data-theme','halloween'); if(input) input.checked=true; }
+  if(input){
+    input.addEventListener('change',()=>{
+      const mode=input.checked?'halloween':'default';
+      if(mode==='halloween') html.setAttribute('data-theme','halloween');
+      else html.removeAttribute('data-theme');
+      localStorage.setItem(KEY,mode);
+      document.dispatchEvent(new CustomEvent('themechanged',{detail:{mode}}));
+    });
+  }
+})();
+
+/* ===== Sideways Matrix renderer (theme-aware) ===== */
 (function(){
   const canvas = document.getElementById('matrixX');
   const ctx = canvas.getContext('2d');
@@ -181,6 +237,10 @@ nav .insta-link svg{ width:20px; height:20px; display:block }
   let fontSize = 16;
   let rows = 0, pos = [];
 
+  function glyphColor(){
+    const v=getComputedStyle(document.documentElement).getPropertyValue('--matrix').trim();
+    return v || '#FF1A1A';
+  }
   function fit(){
     const dpr = devicePixelRatio || 1;
     canvas.width = innerWidth * dpr;
@@ -191,10 +251,11 @@ nav .insta-link svg{ width:20px; height:20px; display:block }
   }
   fit(); addEventListener('resize', fit);
 
+  let raf;
   function step(){
     ctx.fillStyle = "rgba(11,0,0,0.08)";
     ctx.fillRect(0,0,innerWidth,innerHeight);
-    ctx.fillStyle = "#FF1A1A";
+    ctx.fillStyle = glyphColor();
     ctx.font = fontSize + "px monospace";
     for(let r=0; r<rows; r++){
       const ch = glyphs[(Math.random()*glyphs.length)|0];
@@ -203,42 +264,32 @@ nav .insta-link svg{ width:20px; height:20px; display:block }
       pos[r] -= fontSize * (0.6 + Math.random()*0.6);
       if(pos[r] < -60) pos[r] = innerWidth + Math.random()*innerWidth;
     }
-    requestAnimationFrame(step);
+    raf=requestAnimationFrame(step);
   }
-  requestAnimationFrame(step);
+  raf=requestAnimationFrame(step);
+  document.addEventListener('visibilitychange', ()=>{ if(document.hidden){ cancelAnimationFrame(raf); } else { raf=requestAnimationFrame(step); }});
+  document.addEventListener('themechanged', ()=>{/* color updates next frame */});
 })();
 
-/* ---------- Robust image loader for hosted case/extension issues ---------- */
-/* It tries variants like: images/left.jpg, left.jpeg, left.png, left.webp
-   and also uppercase extensions (JPG/JPEG/PNG/WEBP), stopping on the first that loads.
-   Add files under /images: left.jpg, right.jpg, middle.jpg (or any of the alternates). */
+/* ===== Robust image loader for hosted case/extension issues =====
+   Tries: images/{left|right|middle}.{jpg,jpeg,png,webp} + uppercase variations. */
 (function(){
   const exts = ['jpg','jpeg','png','webp','JPG','JPEG','PNG','WEBP'];
-  function variants(name){
-    // keep simple base names (left/right/middle). If your files are exactly left.jpg etc, the first hit will work.
-    return exts.map(ext => `images/${name}.${ext}`);
-  }
+  function variants(name){ return exts.map(ext => `images/${name}.${ext}`); }
   function loadBest(img){
-    const name = img.getAttribute('data-name');
-    if(!name){ return; }
-    const tries = variants(name);
-    let i = 0;
+    const name = img.getAttribute('data-name'); if(!name) return;
+    const tries = variants(name); let i = 0;
     const tryNext = () => {
       if(i >= tries.length){
-        // show a tasteful missing panel
         const holder = document.createElement('div');
         holder.className = 'missing';
         holder.textContent = `missing: images/${name}.{jpg,jpeg,png,webp}`;
-        const parent = img.parentElement;
-        img.remove();
-        parent && parent.appendChild(holder);
+        const parent = img.parentElement; img.remove(); parent && parent.appendChild(holder);
         return;
       }
-      img.src = tries[i] + `?v=${encodeURIComponent(name)}`; // tiny query prevents stale caches on host
-      i++;
+      img.src = tries[i] + `?v=${encodeURIComponent(name)}`; i++;
     };
-    img.addEventListener('error', tryNext, { once:false });
-    // try first immediately
+    img.addEventListener('error', tryNext);
     tryNext();
   }
   document.querySelectorAll('img[data-name]').forEach(loadBest);

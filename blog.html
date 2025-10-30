@@ -1,17 +1,29 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>CellOutz Blog</title>
 <link href="https://fonts.googleapis.com/css2?family=UnifrakturCook:wght@700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
+/* ===== Theme system (default + Halloween) ===== */
 :root{
   --red:#FF1A1A;
   --bg:#0B0000;
   --text:#FF1A1A;
   --accent: rgba(255,26,26,0.15);
+  --glow: rgba(255,26,26,.35);
+  --matrix: var(--text);
 }
+html[data-theme="halloween"]{
+  --bg:#090107;
+  --text:#FF6A00;
+  --red:#FF6A00;
+  --accent:rgba(255,106,0,.16);
+  --glow: rgba(255,106,0,.35);
+  --matrix:#B3FF38; /* slime green runes */
+}
+
 *{box-sizing:border-box;}
 html,body{height:100%}
 body{
@@ -65,8 +77,10 @@ nav a{
 }
 nav a:hover{ background:var(--red); color:var(--bg); box-shadow:0 0 20px var(--red); }
 nav .insta-link svg{ width:20px;height:20px; display:block; }
+
+/* Cart bubble (unchanged) */
 #cart-button{
-  position:fixed; top:18px; right:24px;
+  position:fixed; top:18px; right:80px;   /* make room for theme toggle */
   width:64px; height:64px; border-radius:50%;
   display:flex; align-items:center; justify-content:center;
   border:3px solid var(--red); background:rgba(0,0,0,0.35);
@@ -78,6 +92,25 @@ nav .insta-link svg{ width:20px;height:20px; display:block; }
 #cart-count{ position:absolute; top:-8px; right:-8px; width:22px; height:22px; border-radius:50%;
   background:var(--red); color:#000; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:12px; }
 .hidden { display: none !important; }
+
+/* ---------- Theme toggle ---------- */
+.theme-toggle{
+  position:fixed; top:18px; right:14px; z-index:3000;
+  display:inline-flex; align-items:center; gap:8px; font:12px/1 'Share Tech Mono', monospace;
+}
+.theme-toggle input{ display:none }
+.theme-toggle .track{
+  width:54px; height:28px; border-radius:999px; padding:2px;
+  border:2px solid var(--red); background:rgba(0,0,0,.35); display:inline-flex; align-items:center;
+  box-shadow:0 0 10px var(--glow);
+}
+.theme-toggle .knob{
+  width:22px; height:22px; border-radius:50%; background:var(--red); color:#000;
+  display:inline-flex; align-items:center; justify-content:center; font-size:14px;
+  transform:translateX(0); transition:transform .18s ease, background .18s ease;
+  box-shadow: inset 0 0 10px rgba(0,0,0,.35), 0 0 12px var(--glow);
+}
+.theme-toggle input:checked + .track .knob{ transform:translateX(26px); background:#B3FF38 }
 
 /* ---------- Blog feed ---------- */
 .feed{ max-width:1000px; margin:10px auto 24px; padding:0 18px; display:grid; gap:14px; }
@@ -133,7 +166,7 @@ nav .insta-link svg{ width:20px;height:20px; display:block; }
   background:#0c0000;
   border:2px solid var(--red);
   border-radius:14px;
-  box-shadow:0 0 30px rgba(255,26,26,.35), 0 20px 60px rgba(0,0,0,.6);
+  box-shadow:0 0 30px var(--glow), 0 20px 60px rgba(0,0,0,.6);
   display:grid; grid-template-rows:auto 1fr auto; overflow:hidden;
 }
 .bar{
@@ -188,7 +221,7 @@ nav .insta-link svg{ width:20px;height:20px; display:block; }
   border-radius:12px;
   border:2px solid var(--red);
   background:#000;
-  box-shadow:0 0 20px rgba(255,26,26,.35), inset 0 0 18px rgba(255,26,26,.15);
+  box-shadow:0 0 20px var(--glow), inset 0 0 18px rgba(255,26,26,.15);
 }
 .gif-frame img{
   display:block;
@@ -223,10 +256,19 @@ nav .insta-link svg{ width:20px;height:20px; display:block; }
     <a href="gallery.html">Gallery</a>
     <a href="contact.html">Contact</a>
   </nav>
+
+  <!-- Cart -->
   <div id="cart-button" aria-label="Cart" title="Cart">
     <img src="images/cart.png" alt="Cart">
     <div id="cart-count" class="hidden">0</div>
   </div>
+
+  <!-- Theme toggle (persists across pages) -->
+  <label class="theme-toggle" title="Halloween mode">
+    <input id="themeSwitch" type="checkbox" aria-label="Toggle Halloween theme">
+    <span class="track"><span class="knob">🎃</span></span>
+    <span class="lbl">Halloween</span>
+  </label>
 </header>
 
 <main class="feed" id="feed"></main>
@@ -234,7 +276,6 @@ nav .insta-link svg{ width:20px;height:20px; display:block; }
 <!-- GIF under the pill feed -->
 <div class="gif-wrap">
   <div class="gif-frame">
-    <!-- GIFs loop inherently; slowing requires converting to video -->
     <img src="images/dance4me.gif" alt="dance4me" loading="lazy" decoding="async">
   </div>
 </div>
@@ -255,6 +296,24 @@ nav .insta-link svg{ width:20px;height:20px; display:block; }
 </div>
 
 <script>
+/* ===== Theme persistence (shared key) ===== */
+(function(){
+  const KEY='celloutz_theme';
+  const html=document.documentElement;
+  const input=document.getElementById('themeSwitch');
+  const saved=localStorage.getItem(KEY) || 'default';
+  if(saved==='halloween'){ html.setAttribute('data-theme','halloween'); if(input) input.checked=true; }
+  if(input){
+    input.addEventListener('change',()=>{
+      const mode=input.checked?'halloween':'default';
+      if(mode==='halloween') html.setAttribute('data-theme','halloween');
+      else html.removeAttribute('data-theme');
+      localStorage.setItem(KEY,mode);
+      document.dispatchEvent(new CustomEvent('themechanged',{detail:{mode}}));
+    });
+  }
+})();
+
 /* ---------- Data ---------- */
 function fmtDate(d){
   const opts = {year:'numeric', month:'short', day:'numeric'};
@@ -328,7 +387,12 @@ document.getElementById('okBtn').addEventListener('click', ()=> overlay.classLis
 overlay.addEventListener('click', e=>{ if(e.target===overlay) overlay.classList.remove('show'); });
 document.addEventListener('keydown', e=>{ if(e.key==='Escape') overlay.classList.remove('show'); });
 
-/* ---------- Sideways Matrix (full background) ---------- */
+/* ---------- Helpers for theme-aware colors ---------- */
+function cssVar(name){
+  return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+}
+
+/* ---------- Sideways Matrix (full background, theme-aware) ---------- */
 (function(){
   const canvas = document.getElementById('matrixX');
   const ctx = canvas.getContext('2d');
@@ -341,15 +405,16 @@ document.addEventListener('keydown', e=>{ if(e.key==='Escape') overlay.classList
     canvas.height = innerHeight * devicePixelRatio;
     ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);
     rows = Math.floor(innerHeight / fontSize);
-    pos = Array.from({length:rows}, (_,r)=> innerWidth + Math.random()*innerWidth);
+    pos = Array.from({length:rows}, ()=> innerWidth + Math.random()*innerWidth);
   }
   fit(); addEventListener('resize', fit);
 
   function step(){
     ctx.fillStyle = "rgba(11,0,0,0.08)";
     ctx.fillRect(0,0,innerWidth,innerHeight);
-    ctx.fillStyle = "#FF1A1A";
+
     ctx.font = `${fontSize}px monospace`;
+    ctx.fillStyle = cssVar('--matrix') || "#FF1A1A";
 
     for(let r=0; r<rows; r++){
       const ch = glyphs[(Math.random()*glyphs.length)|0];
@@ -361,9 +426,12 @@ document.addEventListener('keydown', e=>{ if(e.key==='Escape') overlay.classList
     requestAnimationFrame(step);
   }
   requestAnimationFrame(step);
+
+  // live theme updates
+  document.addEventListener('themechanged', ()=>{/* colors picked up next frame */});
 })();
 
-/* ---------- Mini Matrix inside each pill ---------- */
+/* ---------- Mini Matrix inside each pill (theme-aware) ---------- */
 (function(){
   const glyphs = "01ZXCVBNMASDFGHJKLQWERTYUIOP";
   const fontSize = 12;
@@ -382,10 +450,15 @@ document.addEventListener('keydown', e=>{ if(e.key==='Escape') overlay.classList
       state.pos = Array.from({length:state.rows}, ()=> Math.random()*w);
     }
     const ctx = canvas.getContext('2d');
+
+    // faint trail background
     ctx.fillStyle = "rgba(11,0,0,0.25)";
     ctx.fillRect(0,0,canvas.clientWidth,canvas.clientHeight);
-    ctx.fillStyle = "rgba(255,26,26,0.9)";
+
+    // rune color from theme
+    ctx.fillStyle = cssVar('--matrix') || "rgba(255,26,26,0.9)";
     ctx.font = `${fontSize}px monospace`;
+
     for(let r=0; r<state.rows; r++){
       const ch = glyphs[(Math.random()*glyphs.length)|0];
       const y = (r+1)*fontSize - 2;
@@ -404,6 +477,7 @@ document.addEventListener('keydown', e=>{ if(e.key==='Escape') overlay.classList
   requestAnimationFrame(tick);
 
   addEventListener('resize', ()=> pillCanvases.forEach((c,i)=>{ states[i].rows = 0; }));
+  document.addEventListener('themechanged', ()=>{/* color updates next frame */});
 })();
 
 /* ---------- Logo intro ---------- */

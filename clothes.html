@@ -1,17 +1,29 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>CellOutz — Clothes</title>
 <link href="https://fonts.googleapis.com/css2?family=UnifrakturCook:wght@700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
+/* ===== Theme system (default + Halloween) ===== */
 :root{
   --red:#FF1A1A;
   --bg:#0B0000;
   --text:#FF1A1A;
   --accent: rgba(255,26,26,0.15);
+  --glow: rgba(255,26,26,.35);
+  --matrix: var(--text);
 }
+html[data-theme="halloween"]{
+  --bg:#090107;
+  --text:#FF6A00;
+  --red:#FF6A00;
+  --accent:rgba(255,106,0,.16);
+  --glow: rgba(255,106,0,.35);
+  --matrix:#B3FF38; /* slime green runes */
+}
+
 *{box-sizing:border-box}
 html,body{height:100%}
 body{
@@ -28,7 +40,7 @@ body{
   z-index:-2; background:var(--bg);
 }
 
-/* Film grime / vignette / scanlines overlays (CSS-only, cheap) */
+/* Film grime / vignette / scanlines overlays */
 .fx{ position:fixed; inset:0; pointer-events:none; }
 .vignette{
   z-index:-1;
@@ -38,7 +50,6 @@ body{
       rgba(0,0,0,0.25) 55%,
       rgba(0,0,0,0.5) 80%,
       rgba(0,0,0,0.85) 100%);
-  mix-blend-mode:normal;
 }
 .scan{
   z-index:-1;
@@ -52,6 +63,25 @@ body{
     );
   opacity:0.25;
 }
+
+/* Theme toggle */
+.theme-toggle{
+  position:fixed; top:18px; right:14px; z-index:3000;
+  display:inline-flex; align-items:center; gap:8px; font:12px/1 'Share Tech Mono', monospace;
+}
+.theme-toggle input{ display:none }
+.theme-toggle .track{
+  width:54px; height:28px; border-radius:999px; padding:2px;
+  border:2px solid var(--red); background:rgba(0,0,0,.35); display:inline-flex; align-items:center;
+  box-shadow:0 0 10px var(--glow);
+}
+.theme-toggle .knob{
+  width:22px; height:22px; border-radius:50%; background:var(--red); color:#000;
+  display:inline-flex; align-items:center; justify-content:center; font-size:14px;
+  transform:translateX(0); transition:transform .18s ease, background .18s ease;
+  box-shadow: inset 0 0 10px rgba(0,0,0,.35), 0 0 12px var(--glow);
+}
+.theme-toggle input:checked + .track .knob{ transform:translateX(26px); background:#B3FF38 }
 
 /* Center card */
 .container{
@@ -103,9 +133,16 @@ body{
 </head>
 <body>
 
-<canvas id="matrix"></canvas>
+<canvas id="matrix" aria-hidden="true"></canvas>
 <div class="fx vignette"></div>
 <div class="fx scan"></div>
+
+<!-- Theme toggle (persists across pages) -->
+<label class="theme-toggle" title="Halloween mode">
+  <input id="themeSwitch" type="checkbox" aria-label="Toggle Halloween theme">
+  <span class="track"><span class="knob">🎃</span></span>
+  <span class="lbl">Halloween</span>
+</label>
 
 <div class="container">
   <div class="card" role="region" aria-label="Clothes splash">
@@ -116,92 +153,110 @@ body{
 </div>
 
 <script>
-/* ===== Spooky Matrix (drifting red runes, long trails, omen flashes) ===== */
-const canvas = document.getElementById('matrix');
-const ctx = canvas.getContext('2d');
+/* ===== Theme persistence (shared key) ===== */
+(function(){
+  const KEY='celloutz_theme';
+  const html=document.documentElement;
+  const input=document.getElementById('themeSwitch');
+  const saved=localStorage.getItem(KEY) || 'default';
+  if(saved==='halloween'){ html.setAttribute('data-theme','halloween'); if(input) input.checked=true; }
+  if(input){
+    input.addEventListener('change',()=>{
+      const mode=input.checked?'halloween':'default';
+      if(mode==='halloween') html.setAttribute('data-theme','halloween');
+      else html.removeAttribute('data-theme');
+      localStorage.setItem(KEY,mode);
+      document.dispatchEvent(new CustomEvent('themechanged',{detail:{mode}}));
+    });
+  }
+})();
 
-const RUNE_SET = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ@#$%^&*";
-const OMENS = "†∴☍₪☬☿⚚✠✶✧✦"; // occasional big glyphs
+/* ===== Spooky Matrix (theme-aware color) ===== */
+(function(){
+  const canvas = document.getElementById('matrix');
+  const ctx = canvas.getContext('2d');
 
-let w, h, fontSize, cols, drops, speeds, swayPhase, lastTime;
+  const RUNE_SET = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ@#$%^&*";
+  const OMENS = "†∴☍₪☬☿⚚✠✶✧✦";
 
-function resize(){
-  w = canvas.width = window.innerWidth;
-  h = canvas.height = window.innerHeight;
-  fontSize = Math.max(14, Math.min(22, Math.floor(h/40))); // adaptive
-  cols = Math.floor(w / fontSize);
-  drops = Array(cols).fill(0).map(()=> Math.random()*h);
-  speeds = Array(cols).fill(0).map(()=> fontSize * (0.9 + Math.random()*0.7)); // varied fall
-  swayPhase = Array(cols).fill(0).map(()=> Math.random()*Math.PI*2);
-}
-resize();
-window.addEventListener('resize', resize);
+  let w, h, fontSize, cols, drops, speeds, swayPhase, lastTime;
 
-// draw one frame
-function frame(t){
-  if (!lastTime) lastTime = t;
-  const dt = Math.min(33, t - lastTime); // clamp delta
-  lastTime = t;
-
-  // long trail fade
-  ctx.fillStyle = "rgba(11,0,0,0.08)";
-  ctx.fillRect(0,0,w,h);
-
-  // slight red haze for depth
-  ctx.fillStyle = "rgba(255,26,26,0.02)";
-  ctx.fillRect(0,0,w,h);
-
-  // columns with gentle horizontal sway
-  ctx.font = fontSize + "px monospace";
-  for(let i=0;i<cols;i++){
-    const ch = RUNE_SET[(Math.random()*RUNE_SET.length)|0];
-    const sway = Math.sin((t*0.0007) + swayPhase[i]) * 4; // ±4px drift
-    const x = i*fontSize + sway;
-    const y = drops[i];
-
-    // bright head
-    ctx.fillStyle = "#FF1A1A";
-    ctx.fillText(ch, x, y);
-
-    // dim tail undercurrent (ghost)
-    ctx.fillStyle = "rgba(255,26,26,0.15)";
-    ctx.fillText(ch, x, y - fontSize*1.5);
-
-    drops[i] += speeds[i] * (dt/16.7);
-
-    // recycle with chance so columns desync
-    if (drops[i] > h + fontSize*4){
-      drops[i] = (-Math.random()*h*0.6)|0;
-      speeds[i] = fontSize * (0.9 + Math.random()*0.7);
-      swayPhase[i] = Math.random()*Math.PI*2;
-    }
+  function runeColor(){
+    const v=getComputedStyle(document.documentElement).getPropertyValue('--matrix').trim();
+    return v || '#FF1A1A';
   }
 
-  // occasional ominous glyph pulse
-  if (Math.random() < 0.03){
-    const gx = (Math.random()*w)|0;
-    const gy = (Math.random()*h)|0;
-    const size = fontSize * (2 + Math.random()*3);
-    ctx.save();
-    ctx.font = size + "px 'UnifrakturCook', serif";
-    ctx.shadowColor = "#FF1A1A";
-    ctx.shadowBlur = 24;
-    ctx.globalAlpha = 0.12 + Math.random()*0.2;
-    ctx.fillStyle = "#FF1A1A";
-    const omen = OMENS[(Math.random()*OMENS.length)|0];
-    ctx.fillText(omen, gx, gy);
-    ctx.restore();
+  function resize(){
+    w = canvas.width = window.innerWidth;
+    h = canvas.height = window.innerHeight;
+    fontSize = Math.max(14, Math.min(22, Math.floor(h/40)));
+    cols = Math.floor(w / fontSize);
+    drops = Array(cols).fill(0).map(()=> Math.random()*h);
+    speeds = Array(cols).fill(0).map(()=> fontSize * (0.9 + Math.random()*0.7));
+    swayPhase = Array(cols).fill(0).map(()=> Math.random()*Math.PI*2);
   }
+  resize();
+  window.addEventListener('resize', resize);
 
-  // rare glitch flash wash
-  if (Math.random() < 0.006){
-    ctx.fillStyle = "rgba(255,26,26,0.07)";
+  function frame(t){
+    if (!lastTime) lastTime = t;
+    const dt = Math.min(33, t - lastTime);
+    lastTime = t;
+
+    ctx.fillStyle = "rgba(11,0,0,0.08)";
     ctx.fillRect(0,0,w,h);
-  }
 
+    ctx.fillStyle = "rgba(255,26,26,0.02)";
+    ctx.fillRect(0,0,w,h);
+
+    ctx.font = fontSize + "px monospace";
+    for(let i=0;i<cols;i++){
+      const ch = RUNE_SET[(Math.random()*RUNE_SET.length)|0];
+      const sway = Math.sin((t*0.0007) + swayPhase[i]) * 4;
+      const x = i*fontSize + sway;
+      const y = drops[i];
+
+      ctx.fillStyle = runeColor();
+      ctx.fillText(ch, x, y);
+
+      ctx.fillStyle = "rgba(255,26,26,0.15)";
+      ctx.fillText(ch, x, y - fontSize*1.5);
+
+      drops[i] += speeds[i] * (dt/16.7);
+      if (drops[i] > h + fontSize*4){
+        drops[i] = (-Math.random()*h*0.6)|0;
+        speeds[i] = fontSize * (0.9 + Math.random()*0.7);
+        swayPhase[i] = Math.random()*Math.PI*2;
+      }
+    }
+
+    if (Math.random() < 0.03){
+      const gx = (Math.random()*w)|0;
+      const gy = (Math.random()*h)|0;
+      const size = fontSize * (2 + Math.random()*3);
+      ctx.save();
+      ctx.font = size + "px 'UnifrakturCook', serif";
+      ctx.shadowColor = runeColor();
+      ctx.shadowBlur = 24;
+      ctx.globalAlpha = 0.12 + Math.random()*0.2;
+      ctx.fillStyle = runeColor();
+      const omen = OMENS[(Math.random()*OMENS.length)|0];
+      ctx.fillText(omen, gx, gy);
+      ctx.restore();
+    }
+
+    if (Math.random() < 0.006){
+      ctx.fillStyle = "rgba(255,26,26,0.07)";
+      ctx.fillRect(0,0,w,h);
+    }
+
+    requestAnimationFrame(frame);
+  }
   requestAnimationFrame(frame);
-}
-requestAnimationFrame(frame);
+
+  document.addEventListener('visibilitychange', ()=>{ if(document.hidden){ /* let RAF self-throttle */ } });
+  document.addEventListener('themechanged', ()=>{ /* color updates next frame via runeColor() */ });
+})();
 </script>
 </body>
 </html>
