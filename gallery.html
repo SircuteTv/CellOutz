@@ -33,7 +33,7 @@ nav a{
 nav a::after{content:"";position:absolute;inset:0;background:var(--accent);mix-blend-mode:screen;opacity:0;transition:.25s}
 nav a:hover{background:var(--red);color:#000;box-shadow:0 0 18px var(--red), inset 0 0 28px var(--red)}
 nav a:hover::after{opacity:1}
-/* make the insta icon match the blog page */
+/* insta icon inline to match other pages */
 nav .insta-link svg{ width:20px;height:20px; display:block; }
 
 main{max-width:1400px;margin:10px auto 60px;padding:0 18px}
@@ -121,7 +121,6 @@ main{max-width:1400px;margin:10px auto 60px;padding:0 18px}
     <a href="index.html">Home</a>
     <a href="prints.html">Prints</a>
     <a href="clothes.html">Clothes</a>
-    <!-- Instagram icon (inline SVG to match blog/contact) -->
     <a class="insta-link" href="https://www.instagram.com/allusionstoograndeur/" target="_blank" aria-label="Instagram">
       <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
         <rect x="3" y="3" width="18" height="18" rx="5" stroke="currentColor" stroke-width="2"/>
@@ -209,107 +208,176 @@ main{max-width:1400px;margin:10px auto 60px;padding:0 18px}
   requestAnimationFrame(step);
 })();
 
-/* ===== Helpers ===== */
+/* ===== Smart image loader with folder + filename + extension fallbacks ===== */
 const enc = s => encodeURIComponent(s);
 const joinSeg = (...segs) => segs.map(enc).join('/');
 
-/* add a final hard-fail logger so you can spot missing files fast */
-function imgWithFallback(folderCandidates, file, className="", alt=""){
-  const img=document.createElement('img');
-  if(className) img.className=className;
-  img.alt=alt||"";
+function makeSmartImg(folderCandidates, fileBaseCandidates, extCandidates, className="", alt=""){
+  const img = document.createElement('img');
+  if(className) img.className = className;
+  img.alt = alt || "";
+  img.loading = 'lazy';
+  img.decoding = 'async';
+
   const folders = Array.isArray(folderCandidates) ? folderCandidates : [folderCandidates];
-  let i=0;
-  const tryNext=()=>{
-    if(i>=folders.length){
-      console.warn('Image not found after all fallbacks:', {folders, file, alt});
+  const bases   = Array.isArray(fileBaseCandidates) ? fileBaseCandidates : [fileBaseCandidates];
+  const exts    = Array.isArray(extCandidates) ? extCandidates : [extCandidates];
+
+  const attempts = [];
+  for(const f of folders){
+    for(const b of bases){
+      for(const e of exts){
+        attempts.push(`images/${joinSeg(f, `${b}.${e}`)}`);
+      }
+    }
+  }
+
+  let i = 0;
+  const tryNext = () => {
+    if(i >= attempts.length){
+      img.remove(); // quietly drop if nothing loads
       return;
     }
-    img.src=`images/${joinSeg(folders[i], file)}`;
+    img.src = attempts[i] + `?v=${Date.now()%1000}`; // avoid weird host caches
     i++;
   };
   img.addEventListener('error', tryNext);
+  // kick it off
   tryNext();
   return img;
 }
-const range = n => Array.from({length:n},(_,i)=>String(i+1));
 
-/* ===== Collections ===== */
+const EXT_LIST = ['webp','jpg','jpeg','png','JPG','JPEG','PNG','WEBP'];
+
+/* ===== Collections (now with aggressive fallback for Selfish &/and Unsane) ===== */
 const COLLECTIONS = {
   grandeur: [
-    { title:"Present Polarity", folder:["Present Polarity"], grid:"two",
-      images: range(4).map(i=>({file:`art (${i}).webp`, name:`art (${i})`})) },
-
-    { title:"chaos wizard", folder:["chaos wizard"], grid:"three",
-      images: range(9).map(i=>({file:`chaos (${i}).webp`, name:`chaos (${i})`})) },
-
-    /* Robust GitHub-safe fallbacks for Selfish and Unsane */
-    { title:"Selfish and Unsane",
-      folder:[
-        "selfish-and-unsane",           // recommended: lowercase-hyphen
-        "Selfish-and-Unsane",           // title-case hyphen
-        "Selfish and Unsane",           // spaces
-        "selfish and unsane",           // spaces lowercase
-        "Selfish & Unsane",             // ampersand
-        "selfish-&-unsane"              // ampersand with hyphens
-      ],
-      grid:"four",
-      images: range(14).map(i=>({file:`self (${i}).webp`, name:`self (${i})`}))
+    { title:"Present Polarity",
+      folders:["Present Polarity"],
+      grid:"two",
+      files: Array.from({length:4},(_,i)=>({bases:[`art (${i+1})`]}))
     },
 
-    { title:"Sentience and calamity", folder:["Sentience and calamity"], grid:"three",
-      images: range(5).map(i=>({file:`war (${i}).webp`, name:`war (${i})`})) },
+    { title:"chaos wizard",
+      folders:["chaos wizard","Chaos Wizard"],
+      grid:"three",
+      files: Array.from({length:9},(_,i)=>({bases:[`chaos (${i+1})`]}))
+    },
 
-    { title:"Unsane", folder:["Unsane"], grid:"three",
-      images: range(5).map(i=>({file:`unsane (${i}).webp`, name:`unsane (${i})`})) },
+    /* <<< The problematic one — covers these folders:
+         - Selfish and Unsane
+         - selfish and unsane
+         - Selfish & Unsane
+         - selfish & unsane
+         - Selfish%20&%20Unsane  (handled by encodeURIComponent)
+       And covers filenames like:
+         - self (1).webp/jpg/png
+         - Self (1).*
+         - selfish (1).*
+       >>> */
+    { title:"Selfish and Unsane",
+      folders:["Selfish and Unsane","selfish and unsane","Selfish & Unsane","selfish & unsane"],
+      grid:"four",
+      files: Array.from({length:14},(_,i)=>({
+        bases:[`self (${i+1})`,`Self (${i+1})`,`selfish (${i+1})`]
+      }))
+    },
 
-    { title:"Wollongong Major", folder:["Wollongong Major"], grid:"three",
-      images: range(9).map(i=>({file:`bong (${i}).webp`, name:`bong (${i})`})) },
+    { title:"Sentience and calamity",
+      folders:["Sentience and calamity","Sentience And Calamity"],
+      grid:"three",
+      files: Array.from({length:5},(_,i)=>({bases:[`war (${i+1})`]}))
+    },
 
-    { title:"Wollongong minor", folder:["Wollongong minor"], grid:"four",
-      images: range(18).map(i=>({file:`minor (${i}).webp`, name:`minor (${i})`})) },
+    { title:"Unsane",
+      folders:["Unsane","unsane"],
+      grid:"three",
+      files: Array.from({length:5},(_,i)=>({bases:[`unsane (${i+1})`]}))
+    },
 
-    { title:"Genesis", folder:["Genesis"], grid:"two",
-      images: [{file:"latr.webp", name:"latr"}] },
+    { title:"Wollongong Major",
+      folders:["Wollongong Major","wollongong major"],
+      grid:"three",
+      files: Array.from({length:9},(_,i)=>({bases:[`bong (${i+1})`]}))
+    },
 
-    { title:"I LOVE MKULTRA", folder:["I LOVE MKULTRA"], grid:"two",
-      images: [{file:"mkultra (1).webp", name:"mkultra (1)"},
-               {file:"mkultra (2).webp", name:"mkultra (2)"}] },
+    { title:"Wollongong minor",
+      folders:["Wollongong minor","wollongong minor"],
+      grid:"four",
+      files: Array.from({length:18},(_,i)=>({bases:[`minor (${i+1})`]}))
+    },
 
-    { title:"SWAG#1", folder:["SWAG#1"], grid:"two",
-      images: [{file:"SWAG.webp", name:"SWAG"}] },
+    { title:"Genesis",
+      folders:["Genesis"],
+      grid:"two",
+      files:[{bases:["latr"]}]
+    },
+
+    { title:"I LOVE MKULTRA",
+      folders:["I LOVE MKULTRA","I Love MKULTRA"],
+      grid:"two",
+      files:[{bases:["mkultra (1)"]},{bases:["mkultra (2)"]}]
+    },
+
+    { title:"SWAG#1",
+      folders:["SWAG#1","Swag#1","SWAG1","swag1"],
+      grid:"two",
+      files:[{bases:["SWAG","swag"]}]
+    },
   ],
   misc: [
-    { title:"Before My Allusions", folder:["Before My Allusions","Before My Allusions (2023-2024)"], grid:"four",
-      images: range(18).map(i=>({file:`old (${i}).webp`, name:`old (${i})`})) },
-    { title:"IngestNutmeg", folder:["IngestNutmeg","IngestNutmeg (2024)"], grid:"three",
-      images: range(3).map(i=>({file:`nutmeg (${i}).webp`, name:`nutmeg (${i})`})) },
+    { title:"Before My Allusions",
+      folders:["Before My Allusions","Before My Allusions (2023-2024)"],
+      grid:"four",
+      files: Array.from({length:18},(_,i)=>({bases:[`old (${i+1})`]}))
+    },
+    { title:"IngestNutmeg",
+      folders:["IngestNutmeg","IngestNutmeg (2024)","ingestnutmeg"],
+      grid:"three",
+      files: Array.from({length:3},(_,i)=>({bases:[`nutmeg (${i+1})`]}))
+    },
   ]
 };
 
 /* ===== Build deck + sections ===== */
-const deck=document.getElementById('deck'); const sections=document.getElementById('sections'); let currentTab='grandeur';
+const deck = document.getElementById('deck');
+const sections = document.getElementById('sections');
+let currentTab = 'grandeur';
+
 function buildDeck(){
   deck.innerHTML=''; sections.innerHTML='';
   COLLECTIONS[currentTab].forEach((col, idx)=>{
     const card=document.createElement('div'); card.className='col-card';
-    const thumb=imgWithFallback(col.folder, col.images[0].file,'thumb',col.title);
     const label=document.createElement('div'); label.className='label'; label.textContent=col.title;
-    card.appendChild(thumb); card.appendChild(label); card.addEventListener('click',()=>openSection(idx)); deck.appendChild(card);
+
+    // thumb: first file bases with fallbacks
+    const firstBases = col.files[0]?.bases || ["cover","thumb","index"];
+    const thumb = makeSmartImg(col.folders, firstBases, EXT_LIST, 'thumb', col.title);
+    card.appendChild(thumb);
+    card.appendChild(label);
+    card.addEventListener('click',()=>openSection(idx));
+    deck.appendChild(card);
 
     const sec=document.createElement('section'); sec.className='section hide'; sec.dataset.index=idx;
     const h=document.createElement('div'); h.className='title'; h.textContent=col.title;
     const grid=document.createElement('div'); grid.className=`grid ${col.grid}`;
-    (col.images||[]).forEach((img,i)=>{ const tile=document.createElement('div'); tile.className='tile'; tile.dataset.col=idx; tile.dataset.i=i;
-      tile.appendChild(imgWithFallback(col.folder,img.file,'',img.name)); tile.addEventListener('click',()=>openOverlay(idx,i)); grid.appendChild(tile); });
+    (col.files||[]).forEach((file,i)=>{
+      const tile=document.createElement('div'); tile.className='tile'; tile.dataset.col=idx; tile.dataset.i=i;
+      const img = makeSmartImg(col.folders, file.bases, EXT_LIST, '', `${col.title} — ${file.bases[0]}`);
+      tile.appendChild(img);
+      tile.addEventListener('click',()=>openOverlay(idx,i));
+      grid.appendChild(tile);
+    });
     sec.appendChild(h); sec.appendChild(grid); sections.appendChild(sec);
   });
 }
+
 function openSection(idx){
   sections.querySelectorAll('.section').forEach(s=>s.classList.add('hide'));
   const target=sections.querySelector(`.section[data-index="${idx}"]`);
   if(target){ target.classList.remove('hide'); target.scrollIntoView({behavior:'smooth', block:'start'}); }
 }
+
 document.querySelectorAll('.tab').forEach(btn=>{
   btn.addEventListener('click', ()=>{
     document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
@@ -320,18 +388,56 @@ document.querySelectorAll('.tab').forEach(btn=>{
 buildDeck();
 
 /* ===== Overlay ===== */
-const overlay=document.getElementById('overlay'); const viewer=document.getElementById('viewer'); const bigImg=document.getElementById('bigImg');
-const infoTitle=document.getElementById('infoTitle'); const infoDesc=document.getElementById('infoDesc'); const infoToggle=document.getElementById('infoToggle'); const fsBtn=document.getElementById('fsBtn');
+const overlay = document.getElementById('overlay');
+const viewer  = document.getElementById('viewer');
+const bigImg  = document.getElementById('bigImg');
+const infoTitle = document.getElementById('infoTitle');
+const infoDesc  = document.getElementById('infoDesc');
+const infoToggle= document.getElementById('infoToggle');
+const fsBtn     = document.getElementById('fsBtn');
+
 let activeCol=0, activeIdx=0;
-function sourceFor(col,i){ const c=COLLECTIONS[currentTab][col]; const candidates=Array.isArray(c.folder)?c.folder:[c.folder]; const file=c.images[i].file; return {candidates,file,title:c.title,name:c.images[i].name}; }
-function setBigImg(candidates,file){ let k=0; const tryNext=()=>{ if(k>=candidates.length) return; bigImg.src=`images/${joinSeg(candidates[k],file)}`; k++; }; bigImg.onerror=tryNext; tryNext(); }
-function openOverlay(colIdx,imgIdx){ activeCol=colIdx; activeIdx=imgIdx; const s=sourceFor(activeCol,activeIdx); setBigImg(s.candidates,s.file); infoTitle.textContent=`${s.title} — ${s.name}`; infoDesc.textContent='—'; viewer.classList.add('full'); overlay.classList.add('show'); overlay.setAttribute('aria-hidden','false'); }
-function nextImg(step){ const data=COLLECTIONS[currentTab][activeCol]; activeIdx=(activeIdx+step+data.images.length)%data.images.length; const s=sourceFor(activeCol,activeIdx); setBigImg(s.candidates,s.file); infoTitle.textContent=`${s.title} — ${s.name}`; }
-document.getElementById('prevBtn').addEventListener('click',()=>nextImg(-1));
-document.getElementById('nextBtn').addEventListener('click',()=>nextImg(1));
+function sourceFor(colIndex,imgIndex){
+  const c = COLLECTIONS[currentTab][colIndex];
+  const bases = c.files[imgIndex].bases;
+  return { folders:c.folders, bases, title:c.title };
+}
+function setBigImg(folders,bases){
+  const img = makeSmartImg(folders, bases, EXT_LIST, '', '');
+  // replace the src of existing bigImg
+  const onload = () => {
+    bigImg.src = img.src;
+    img.remove();
+  };
+  img.addEventListener('load', onload, { once:true });
+}
+function openOverlay(colIdx,imgIdx){
+  activeCol=colIdx; activeIdx=imgIdx;
+  const s=sourceFor(activeCol,activeIdx);
+  setBigImg(s.folders,s.bases);
+  infoTitle.textContent=`${s.title} — ${s.bases[0]}`;
+  infoDesc.textContent='—';
+  viewer.classList.add('full');
+  overlay.classList.add('show');
+  overlay.setAttribute('aria-hidden','false');
+}
+function stepImg(step){
+  const data = COLLECTIONS[currentTab][activeCol];
+  activeIdx = (activeIdx + step + data.files.length) % data.files.length;
+  const s=sourceFor(activeCol,activeIdx);
+  setBigImg(s.folders,s.bases);
+  infoTitle.textContent=`${s.title} — ${s.bases[0]}`;
+}
+document.getElementById('prevBtn').addEventListener('click',()=>stepImg(-1));
+document.getElementById('nextBtn').addEventListener('click',()=>stepImg(1));
 document.getElementById('closeBtn').addEventListener('click',()=>overlay.classList.remove('show'));
 overlay.addEventListener('click',e=>{ if(e.target===overlay) overlay.classList.remove('show'); });
-addEventListener('keydown',e=>{ if(!overlay.classList.contains('show')) return; if(e.key==='Escape') overlay.classList.remove('show'); if(e.key==='ArrowLeft') nextImg(-1); if(e.key==='ArrowRight') nextImg(1); });
+addEventListener('keydown',e=>{
+  if(!overlay.classList.contains('show')) return;
+  if(e.key==='Escape') overlay.classList.remove('show');
+  if(e.key==='ArrowLeft') stepImg(-1);
+  if(e.key==='ArrowRight') stepImg(1);
+});
 infoToggle.addEventListener('click',()=>viewer.classList.toggle('full'));
 fsBtn.addEventListener('click',()=>{ const el=bigImg; if(!document.fullscreenElement){ el.requestFullscreen?.(); } else { document.exitFullscreen?.(); } });
 </script>
