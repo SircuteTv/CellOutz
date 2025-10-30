@@ -46,8 +46,12 @@ nav .insta-link svg{ width:20px; height:20px; display:block }
 .sideimg{
   border:2px solid var(--red); border-radius:12px; overflow:hidden; background:#000;
   box-shadow:0 0 16px rgba(255,26,26,.25);
+  min-height: 140px; /* keeps layout steady while lazy loads */
 }
-.sideimg img{ display:block; width:100%; height:auto; object-fit:cover; filter:contrast(1.02) brightness(.96) }
+.sideimg img{
+  display:block; width:100%; height:auto; object-fit:cover;
+  filter:contrast(1.02) brightness(.96);
+}
 .flipY img{ transform: scaleY(-1) }
 
 /* Center column: About → middle image → Contact */
@@ -80,18 +84,26 @@ nav .insta-link svg{ width:20px; height:20px; display:block }
 .left-bottom { grid-column:1; grid-row:2 }
 .right-bottom{ grid-column:3; grid-row:2 }
 
-/* Mobile */
+/* Hosted image fail-safe indicator */
+.missing{
+  display:grid; place-items:center; color:#d66; font-size:12px; padding:10px;
+  background:repeating-linear-gradient(45deg, #190000 0 8px, #120000 8px 16px);
+}
+
+/* Mobile polish */
 @media(max-width:900px){
-  .grid{
-    grid-template-columns: 1fr;
-    grid-auto-rows: auto;
-  }
+  .grid{ grid-template-columns: 1fr; grid-auto-rows: auto; }
   .left-top, .center-col, .right-top, .left-bottom, .right-bottom {
-    grid-column: 1 !important;
-    grid-row: auto !important;
+    grid-column: 1 !important; grid-row: auto !important;
   }
   .sideimg{ max-width:520px; margin:0 auto }
   .center{ max-width:720px; width:100%; margin:0 auto }
+}
+
+/* Extra-small phones: tighten spacing */
+@media(max-width:420px){
+  .wrap{ padding: 0 12px }
+  .box{ padding: 14px 14px }
 }
 </style>
 </head>
@@ -100,7 +112,7 @@ nav .insta-link svg{ width:20px; height:20px; display:block }
 <canvas id="matrixX" aria-hidden="true"></canvas>
 
 <header>
-  <div class="logo"><a href="index.html"><img src="images/logo.png" alt="CellOutz Logo"></a></div>
+  <div class="logo"><a href="index.html"><img src="images/logo.png" alt="CellOutz Logo" loading="eager" decoding="async"></a></div>
   <nav>
     <a href="index.html">Home</a>
     <a href="prints.html">Prints</a>
@@ -122,7 +134,7 @@ nav .insta-link svg{ width:20px; height:20px; display:block }
   <div class="grid">
     <!-- Top row, left/right -->
     <figure class="sideimg left-top">
-      <img src="images/left.jpg" alt="Artist portrait (left)">
+      <img data-name="left" alt="Artist portrait (left)" loading="lazy" decoding="async">
     </figure>
 
     <!-- Center column spans two rows -->
@@ -133,7 +145,7 @@ nav .insta-link svg{ width:20px; height:20px; display:block }
       </section>
 
       <figure class="center-media">
-        <img src="images/middle.jpg" alt="Artist portrait (center)">
+        <img data-name="middle" alt="Artist portrait (center)" loading="lazy" decoding="async">
       </figure>
 
       <section class="box">
@@ -146,22 +158,22 @@ nav .insta-link svg{ width:20px; height:20px; display:block }
     </div>
 
     <figure class="sideimg right-top">
-      <img src="images/right.jpg" alt="Artist portrait (right)">
+      <img data-name="right" alt="Artist portrait (right)" loading="lazy" decoding="async">
     </figure>
 
     <!-- Bottom row, flipped mirrors -->
     <figure class="sideimg flipY left-bottom">
-      <img src="images/left.jpg" alt="Artist portrait (left, flipped)">
+      <img data-name="left" alt="Artist portrait (left, flipped)" loading="lazy" decoding="async">
     </figure>
 
     <figure class="sideimg flipY right-bottom">
-      <img src="images/right.jpg" alt="Artist portrait (right, flipped)">
+      <img data-name="right" alt="Artist portrait (right, flipped)" loading="lazy" decoding="async">
     </figure>
   </div>
 </main>
 
 <script>
-/* Sideways Matrix renderer */
+/* ---------- Sideways Matrix renderer (matches blog/gallery) ---------- */
 (function(){
   const canvas = document.getElementById('matrixX');
   const ctx = canvas.getContext('2d');
@@ -170,9 +182,10 @@ nav .insta-link svg{ width:20px; height:20px; display:block }
   let rows = 0, pos = [];
 
   function fit(){
-    canvas.width = innerWidth * devicePixelRatio;
-    canvas.height = innerHeight * devicePixelRatio;
-    ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);
+    const dpr = devicePixelRatio || 1;
+    canvas.width = innerWidth * dpr;
+    canvas.height = innerHeight * dpr;
+    ctx.setTransform(dpr,0,0,dpr,0,0);
     rows = Math.floor(innerHeight / fontSize);
     pos = Array.from({length:rows}, ()=> innerWidth + Math.random()*innerWidth);
   }
@@ -182,8 +195,7 @@ nav .insta-link svg{ width:20px; height:20px; display:block }
     ctx.fillStyle = "rgba(11,0,0,0.08)";
     ctx.fillRect(0,0,innerWidth,innerHeight);
     ctx.fillStyle = "#FF1A1A";
-    ctx.font = `${fontSize}px monospace`;
-
+    ctx.font = fontSize + "px monospace";
     for(let r=0; r<rows; r++){
       const ch = glyphs[(Math.random()*glyphs.length)|0];
       const y = (r+1)*fontSize - 2;
@@ -194,6 +206,42 @@ nav .insta-link svg{ width:20px; height:20px; display:block }
     requestAnimationFrame(step);
   }
   requestAnimationFrame(step);
+})();
+
+/* ---------- Robust image loader for hosted case/extension issues ---------- */
+/* It tries variants like: images/left.jpg, left.jpeg, left.png, left.webp
+   and also uppercase extensions (JPG/JPEG/PNG/WEBP), stopping on the first that loads.
+   Add files under /images: left.jpg, right.jpg, middle.jpg (or any of the alternates). */
+(function(){
+  const exts = ['jpg','jpeg','png','webp','JPG','JPEG','PNG','WEBP'];
+  function variants(name){
+    // keep simple base names (left/right/middle). If your files are exactly left.jpg etc, the first hit will work.
+    return exts.map(ext => `images/${name}.${ext}`);
+  }
+  function loadBest(img){
+    const name = img.getAttribute('data-name');
+    if(!name){ return; }
+    const tries = variants(name);
+    let i = 0;
+    const tryNext = () => {
+      if(i >= tries.length){
+        // show a tasteful missing panel
+        const holder = document.createElement('div');
+        holder.className = 'missing';
+        holder.textContent = `missing: images/${name}.{jpg,jpeg,png,webp}`;
+        const parent = img.parentElement;
+        img.remove();
+        parent && parent.appendChild(holder);
+        return;
+      }
+      img.src = tries[i] + `?v=${encodeURIComponent(name)}`; // tiny query prevents stale caches on host
+      i++;
+    };
+    img.addEventListener('error', tryNext, { once:false });
+    // try first immediately
+    tryNext();
+  }
+  document.querySelectorAll('img[data-name]').forEach(loadBest);
 })();
 </script>
 </body>
