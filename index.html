@@ -1,12 +1,31 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1.0" />
 <title>CellOutz</title>
 <link href="https://fonts.googleapis.com/css2?family=UnifrakturCook:wght@700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
-:root{ --red:#FF1A1A; --bg:#0B0000; --text:#FF1A1A; --accent: rgba(255,26,26,0.15) }
+/* ===== THEME SYSTEM (default + Halloween) ===== */
+:root{
+  /* Default (your current crimson/black) */
+  --bg:#0B0000;
+  --text:#FF1A1A;
+  --red:#FF1A1A;
+  --accent: rgba(255,26,26,0.15);
+  --glow: rgba(255,26,26,0.35);
+  --matrix: var(--text); /* matrix glyph color */
+}
+html[data-theme="halloween"]{
+  /* Halloween: orange UI with slime-green matrix */
+  --bg:#090107;
+  --text:#FF6A00;
+  --red:#FF6A00;
+  --accent: rgba(255,106,0,0.16);
+  --glow: rgba(255,106,0,0.35);
+  --matrix:#B3FF38;
+}
+
 *{box-sizing:border-box}
 html,body{height:100%}
 body{ margin:0; font-family:'Share Tech Mono',monospace; background:var(--bg); color:var(--text); overflow-x:hidden }
@@ -30,11 +49,41 @@ nav a:hover::after{opacity:1}
 nav a:hover{ background:var(--red); color:var(--bg); box-shadow:0 0 20px var(--red), inset 0 0 40px var(--red); text-shadow:0 0 10px var(--red) }
 nav .insta-link svg{ width:20px;height:20px; display:block }
 
+/* Cart */
 #cart-button{ position:fixed; top:18px; right:24px; width:64px; height:64px; border-radius:50%; display:flex; align-items:center; justify-content:center; border:3px solid var(--red); background:rgba(0,0,0,.35); cursor:pointer; z-index:2000; transition: transform .12s ease }
 #cart-button:hover{ transform: scale(1.03) }
 #cart-button img{ width:34px; height:34px; object-fit:contain; filter: invert(27%) sepia(100%) saturate(7000%) hue-rotate(340deg) }
 #cart-count{ position:absolute; top:-8px; right:-8px; width:22px; height:22px; border-radius:50%; background:var(--red); color:#000; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:12px }
 .hidden{ display:none !important }
+
+/* ===== Halloween toggle ===== */
+.theme-toggle{
+  position:fixed; top:18px; right:100px; /* sits left of cart */
+  display:inline-flex; align-items:center; gap:8px;
+  font:12px/1 'Share Tech Mono', monospace; z-index:3000; user-select:none;
+}
+.theme-toggle .lbl{ opacity:.85 }
+.theme-toggle input{ display:none }
+.theme-toggle .track{
+  width:54px; height:28px; border-radius:999px;
+  border:2px solid var(--red); background:rgba(0,0,0,.35);
+  display:inline-flex; align-items:center; padding:2px; position:relative;
+  box-shadow:0 0 10px var(--glow);
+}
+.theme-toggle .knob{
+  width:22px; height:22px; border-radius:50%;
+  display:inline-flex; align-items:center; justify-content:center;
+  background:var(--red); color:#000; font-size:14px;
+  transform: translateX(0); transition: transform .18s ease, background .18s ease;
+  box-shadow: inset 0 0 10px rgba(0,0,0,.35), 0 0 12px var(--glow);
+}
+.theme-toggle input:checked + .track .knob{
+  transform: translateX(26px);
+  background:#B3FF38; /* slime when ON */
+}
+@media(max-width:600px){
+  .theme-toggle{ right:14px; top:14px; }
+}
 
 /* marquee */
 .marquee{ overflow:hidden; white-space:nowrap; padding:10px; border-bottom:1px solid var(--red)}
@@ -43,19 +92,19 @@ nav .insta-link svg{ width:20px;height:20px; display:block }
 @keyframes neon-glow{ 0%{text-shadow:0 0 5px var(--red)} 50%{text-shadow:0 0 15px var(--red)} 100%{text-shadow:0 0 5px var(--red)} }
 
 /* hero */
-.hero{ position:relative; overflow:visible; max-width:880px; margin:30px auto; padding:22px; background:rgba(0,0,0,.6); border:2px solid var(--red); border-radius:12px; box-shadow:0 0 20px var(--red); text-align:center; animation:float 3s ease-in-out infinite alternate }
+.hero{ position:relative; overflow:visible; max-width:880px; margin:30px auto; padding:22px; background:rgba(0,0,0,.6); border:2px solid var(--red); border-radius:12px; box-shadow:0 0 20px var(--glow); text-align:center; animation:float 3s ease-in-out infinite alternate }
 @keyframes float{ from{transform:translateY(0)} to{transform:translateY(-8px)} }
 .hero-grid{ display:grid; grid-template-columns:auto 1fr auto; align-items:center; column-gap:clamp(12px,3vw,28px) }
 .hero-grid p{ margin:0 }
-.eye{ --src:url('images/eyes-trans.gif'); --size:clamp(120px,22vw,220px); width:var(--size); position:relative; pointer-events:none; filter:drop-shadow(0 0 8px var(--text)) drop-shadow(0 0 18px var(--text)) drop-shadow(0 0 36px rgba(255,26,26,.9)) drop-shadow(0 0 60px rgba(255,26,26,.85)) }
+.eye{ --src:url('images/eyes-trans.gif'); --size:clamp(120px,22vw,220px); width:var(--size); position:relative; pointer-events:none; filter:drop-shadow(0 0 8px var(--text)) drop-shadow(0 0 18px var(--text)) drop-shadow(0 0 36px var(--glow)) drop-shadow(0 0 60px var(--glow)) }
 .eye>img{ width:100%; display:block }
 .eye::before{ content:""; position:absolute; inset:0; background:var(--text); opacity:.85; filter:blur(10px) saturate(1.4); -webkit-mask:var(--src) center/100% 100% no-repeat; mask:var(--src) center/100% 100% no-repeat }
 .eye.left{ clip-path:inset(0 50% 0 0) } .eye.right{ clip-path:inset(0 0 0 50%) }
 
 /* belts */
 h2{text-align:center;margin-top:40px}
-.scroll-section{ overflow:hidden; white-space:nowrap; margin:20px auto 40px; max-width:100%; position:relative; border-top:1px solid var(--red); border-bottom:1px solid var(--red); padding:10px 0; box-shadow:0 0 12px var(--red); transition:box-shadow .3s ease}
-.scroll-section:hover{ box-shadow:0 0 25px var(--red) }
+.scroll-section{ overflow:hidden; white-space:nowrap; margin:20px auto 40px; max-width:100%; position:relative; border-top:1px solid var(--red); border-bottom:1px solid var(--red); padding:10px 0; box-shadow:0 0 12px var(--glow); transition:box-shadow .3s ease}
+.scroll-section:hover{ box-shadow:0 0 25px var(--glow) }
 .scroll-inner{ display:inline-flex; gap:20px; align-items:center; will-change: transform; contain: content; transform: translate3d(0,0,0); }
 .card{ display:inline-block; vertical-align:top; position:relative; cursor:pointer; transition: transform .25s ease; will-change: transform }
 .card img{ display:block; max-height:300px; height:auto; border-radius:8px }
@@ -64,7 +113,7 @@ h2{text-align:center;margin-top:40px}
 .card:hover{ transform: translateY(-6px) scale(1.02) }
 
 /* pills */
-.pill{ display:inline-flex; align-items:center; justify-content:center; padding:10px 14px; border:1px solid var(--red); border-radius:999px; text-decoration:none; color:var(--text); text-shadow:0 0 8px var(--red); box-shadow:0 0 14px var(--red), inset 0 0 20px rgba(255,26,26,.25); font-weight:700; letter-spacing:.5px; white-space:nowrap }
+.pill{ display:inline-flex; align-items:center; justify-content:center; padding:10px 14px; border:1px solid var(--red); border-radius:999px; text-decoration:none; color:var(--text); text-shadow:0 0 8px var(--red); box-shadow:0 0 14px var(--glow), inset 0 0 20px var(--accent); font-weight:700; letter-spacing:.5px; white-space:nowrap }
 .pill:hover{ background:var(--red); color:#000 }
 
 /* modal (gallery items only) */
@@ -72,7 +121,7 @@ h2{text-align:center;margin-top:40px}
 .item-overlay.show{ display:flex; animation:fadeIn .2s ease both }
 @keyframes fadeIn{ from{opacity:0} to{opacity:1} }
 .modal-box{ display:flex; gap:18px; background:var(--bg); border:2px solid var(--red); border-radius:12px; overflow:hidden; max-width:1000px; width:92%; max-height:80vh; box-shadow:0 10px 40px rgba(0,0,0,.7); transform: scale(1); opacity:0; animation:popIn .26s cubic-bezier(.2,.9,.2,1) forwards }
-.modal-box:hover{ transform: scale(1.03); box-shadow: 0 0 60px rgba(255,26,26,.6) }
+.modal-box:hover{ transform: scale(1.03); box-shadow: 0 0 60px var(--glow) }
 @keyframes popIn{ to{ transform:scale(1); opacity:1 } }
 .modal-left{ flex:1 1 54%; display:flex; justify-content:center; align-items:center; padding:12px; background:linear-gradient(180deg, rgba(255,26,26,.04), rgba(0,0,0,.15)) }
 .modal-left img{ max-width:100%; max-height:70vh; object-fit:contain; border-radius:6px; border:3px solid rgba(255,26,26,.06) }
@@ -88,7 +137,7 @@ h2{text-align:center;margin-top:40px}
   .hero-grid{ grid-template-columns:1fr; row-gap:14px }
   .eye{ --size:clamp(88px,36vw,160px) }
   h2{ margin-top:28px }
-  .scroll-section{ padding:8px 0; box-shadow:0 0 8px var(--red) }
+  .scroll-section{ padding:8px 0; box-shadow:0 0 8px var(--glow) }
   .card img{ max-height:170px }
   nav{ gap:8px }
   nav a{ padding:10px 12px; border-radius:10px }
@@ -96,10 +145,8 @@ h2{text-align:center;margin-top:40px}
 @media (max-width: 560px){
   .marquee{ padding:8px }
   .pill{ padding:10px 14px; font-size:14px }
-  /* remove hover-only effects on touch to prevent jank */
   .card:hover{ transform:none }
   .card .info{ opacity:1; transform:none }
-  /* tighten gaps so belts feel smoother on narrow viewports */
   .scroll-inner{ gap:12px }
   #cart-button{ width:56px; height:56px } 
   #cart-button img{ width:28px; height:28px }
@@ -110,18 +157,16 @@ h2{text-align:center;margin-top:40px}
   .marquee span{ animation: none }
   .hero{ animation: none }
 }
+
 /* ===== Mobile-only polish for hero with eye GIFs ===== */
 @media (max-width: 600px){
-  /* tighter card */
   .hero{
     width: 92%;
     margin: 16px auto;
     padding: 12px;
     border-radius: 10px;
-    box-shadow: 0 0 14px var(--red);
+    box-shadow: 0 0 14px var(--glow);
   }
-
-  /* make layout a neat 2x1 grid: eyes on top row, text below */
   .hero-grid{
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -132,24 +177,14 @@ h2{text-align:center;margin-top:40px}
     column-gap: 10px;
     row-gap: 8px;
   }
-
-  /* shrink and unclip the eyes so they match perfectly */
   .eye{
-    --size: 96px;           /* was larger; this keeps the box compact */
-    clip-path: none !important; /* remove left/right clipping on small screens */
-    filter: drop-shadow(0 0 6px var(--text)) drop-shadow(0 0 16px rgba(255,26,26,.8));
+    --size: 96px;
+    clip-path: none !important;
+    filter: drop-shadow(0 0 6px var(--text)) drop-shadow(0 0 16px var(--glow));
   }
   .eye.left{  grid-area: eyeL; justify-self: end; }
   .eye.right{ grid-area: eyeR; justify-self: start; }
-
-  /* make sure the GIF inside scales cleanly */
-  .eye > img{
-    width: 100%;
-    height: auto;
-    display: block;
-  }
-
-  /* copy goes under the eyes, centered and tighter leading */
+  .eye > img{ width:100%; height:auto; display:block; }
   .hero-grid p{
     grid-area: copy;
     margin: 4px 0 0 0;
@@ -158,17 +193,24 @@ h2{text-align:center;margin-top:40px}
     text-align: center;
   }
 }
-
 </style>
 </head>
 <body>
 
-<canvas id="matrix"></canvas>
+<canvas id="matrix" aria-hidden="true"></canvas>
 
 <header>
   <div class="logo-container">
     <a href="index.html"><img id="site-logo" src="images/logo.png" alt="CellOutz Logo" width="480" height="160"></a>
   </div>
+
+  <!-- Theme toggle -->
+  <label class="theme-toggle" title="Halloween mode">
+    <input id="themeSwitch" type="checkbox" aria-label="Toggle Halloween theme">
+    <span class="track"><span class="knob">🎃</span></span>
+    <span class="lbl">Halloween</span>
+  </label>
+
   <nav>
     <a href="index.html">HOME</a>
     <a href="prints.html">PRINTS</a>
@@ -184,6 +226,7 @@ h2{text-align:center;margin-top:40px}
     <a href="gallery.html">GALLERY</a>
     <a href="contact.html">CONTACT</a>
   </nav>
+
   <div id="cart-button" aria-label="Cart" title="Cart">
     <img src="images/cart.png" alt="Cart" width="34" height="34">
     <div id="cart-count" class="hidden">0</div>
@@ -227,17 +270,57 @@ h2{text-align:center;margin-top:40px}
 <footer>© 2025 CellOutz</footer>
 
 <script>
-/* Matrix (pause when tab hidden) */
+/* ===== Theme persistence + broadcast ===== */
+(function(){
+  const KEY='celloutz_theme';
+  const html=document.documentElement;
+  const input=document.getElementById('themeSwitch');
+  const saved=localStorage.getItem(KEY) || 'default';
+  if(saved==='halloween'){ html.setAttribute('data-theme','halloween'); if(input) input.checked=true; }
+  if(input){
+    input.addEventListener('change',()=>{
+      const mode=input.checked?'halloween':'default';
+      if(mode==='halloween') html.setAttribute('data-theme','halloween');
+      else html.removeAttribute('data-theme');
+      localStorage.setItem(KEY,mode);
+      document.dispatchEvent(new CustomEvent('themechanged',{detail:{mode}}));
+    });
+  }
+})();
+
+/* ===== Matrix (theme-aware; pauses when tab hidden) ===== */
 const canvas=document.getElementById('matrix'); const ctx=canvas.getContext('2d');
 let letters="0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ@#$%^&*", fontSize=16, cols, drops;
-function resizeCanvas(){ canvas.width=innerWidth; canvas.height=innerHeight; cols=Math.floor(canvas.width/fontSize); drops=Array(cols).fill(0) }
-resizeCanvas(); addEventListener('resize', resizeCanvas);
-function drawMatrix(){ ctx.fillStyle="rgba(11,0,0,.1)"; ctx.fillRect(0,0,canvas.width,canvas.height); ctx.fillStyle="#FF1A1A"; ctx.font=fontSize+"px monospace";
-  for(let i=0;i<cols;i++){ const t=letters[(Math.random()*letters.length)|0]; ctx.fillText(t,i*fontSize,drops[i]); drops[i]+=fontSize; if(drops[i]>canvas.height && Math.random()>0.975) drops[i]=0; } }
-let matrixRAF; function matrixLoop(){ drawMatrix(); matrixRAF=requestAnimationFrame(matrixLoop) } matrixLoop();
-document.addEventListener('visibilitychange', ()=>{ if(document.hidden){ cancelAnimationFrame(matrixRAF); } else { matrixLoop(); } });
 
-/* Data */
+function getMatrixColor(){
+  const v=getComputedStyle(document.documentElement).getPropertyValue('--matrix').trim();
+  return v || '#FF1A1A';
+}
+function resizeCanvas(){
+  canvas.width=innerWidth; canvas.height=innerHeight;
+  cols=Math.floor(canvas.width/fontSize); drops=Array(cols).fill(0);
+}
+resizeCanvas(); addEventListener('resize', resizeCanvas);
+
+function drawMatrix(){
+  ctx.fillStyle="rgba(11,0,0,.1)";
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle=getMatrixColor();
+  ctx.font=fontSize+"px monospace";
+  for(let i=0;i<cols;i++){
+    const t=letters[(Math.random()*letters.length)|0];
+    ctx.fillText(t,i*fontSize,drops[i]);
+    drops[i]+=fontSize;
+    if(drops[i]>canvas.height && Math.random()>0.975) drops[i]=0;
+  }
+}
+let matrixRAF;
+function matrixLoop(){ drawMatrix(); matrixRAF=requestAnimationFrame(matrixLoop) }
+matrixLoop();
+document.addEventListener('visibilitychange', ()=>{ if(document.hidden){ cancelAnimationFrame(matrixRAF); } else { matrixLoop(); } });
+document.addEventListener('themechanged', ()=>{/* color will update on next frame via getMatrixColor */});
+
+/* ===== Data ===== */
 const SELL_COLLECTIONS=[
   { title:"Present Polarity", folder:"Present Polarity", files:Array.from({length:4},(_,i)=>`art (${i+1}).webp`) },
   { title:"Chaos Wizard", folder:"chaos wizard", files:Array.from({length:9},(_,i)=>`chaos (${i+1}).webp`) },
@@ -250,7 +333,7 @@ const DROPS_ITEMS = SELL_COLLECTIONS.flatMap(col=> col.files.map(f=>({
 })));
 const GALLERY_ITEMS = SELL_COLLECTIONS.flatMap(col=> col.files.map(f=>({ src:`images/${encodeURIComponent(col.folder)}/${f}`, name:col.title })));
 
-/* Builders */
+/* ===== Builders ===== */
 function createCard(obj, linkToPrint=false){
   const a=document.createElement('a');
   a.className='card';
@@ -259,7 +342,11 @@ function createCard(obj, linkToPrint=false){
   const img=new Image(); img.src=obj.src; img.alt=obj.name||'Art'; img.loading='lazy'; img.decoding='async'; img.width=300; img.height=300;
   img.addEventListener('error',()=>a.style.display='none');
   a.appendChild(img);
-  if(linkToPrint){ const info=document.createElement('div'); info.className='info'; info.innerHTML=`<p>${obj.name}</p><p>See sizes & price</p>`; a.appendChild(info); }
+  if(linkToPrint){
+    const info=document.createElement('div'); info.className='info';
+    info.innerHTML=`<p>${obj.name}</p><p>See sizes & price</p>`;
+    a.appendChild(info);
+  }
   return a;
 }
 function populateBelt(container, items, linkToPrint=false){
@@ -268,7 +355,7 @@ function populateBelt(container, items, linkToPrint=false){
   Array.from(container.children).forEach(node=>container.appendChild(node.cloneNode(true)));
 }
 
-/* Render belts (+ pills appear first) */
+/* ===== Render belts (+ pills appear first) ===== */
 const dropsContainer=document.getElementById('current-drops-inner');
 const galleryContainer=document.getElementById('gallery-inner');
 
@@ -285,14 +372,14 @@ galleryContainer.appendChild(pillGallery);
 
 populateBelt(galleryContainer, GALLERY_ITEMS, false);
 
-/* Animate belts (time-based, mobile-smooth, pause when off-screen) */
+/* ===== Animate belts (time-based, mobile-smooth, pause when off-screen) ===== */
 const dropsSection = document.getElementById('scroll-drops');
 const gallerySection = document.getElementById('scroll-gallery');
 let dropsOffset = 0, galleryOffset = 0;
 const BASE = 55; const BOOST = 2.2, SLOW = 0.28;
 let dropsSpeedFactor = 1, gallerySpeedFactor = 1;
 
-/* Speed zones on hover (desktop), tap has no effect so no jank on mobile */
+/* Speed zones on hover (desktop only) */
 function speedFactor(e, container, dir){
   const r = container.getBoundingClientRect();
   const p = (e.clientX - r.left) / r.width;
@@ -359,7 +446,7 @@ function animate(now){
 }
 requestAnimationFrame(animate);
 
-/* Lightbox for gallery belt */
+/* ===== Lightbox for gallery belt ===== */
 const overlay=document.getElementById('lightbox'); const ovImg=document.getElementById('overlay-img'); const ovName=document.getElementById('overlay-name'); const closeBtn=document.getElementById('modal-close');
 document.getElementById('gallery-inner').addEventListener('click',e=>{
   const a=e.target.closest('.card'); if(!a || a.href!=='javascript:void(0)') return;
@@ -369,7 +456,7 @@ closeBtn.addEventListener('click',()=>overlay.classList.remove('show'));
 overlay.addEventListener('click',e=>{ if(e.target===overlay) overlay.classList.remove('show'); });
 document.addEventListener('keydown',e=>{ if(e.key==='Escape') overlay.classList.remove('show'); });
 
-/* logo intro */
+/* ===== logo intro ===== */
 const logo=document.getElementById('site-logo'); const seen=sessionStorage.getItem('celloutz_logo_seen');
 if(!seen){ setTimeout(()=>logo.classList.add('logo-visible'),80); sessionStorage.setItem('celloutz_logo_seen','1'); } else { logo.classList.add('logo-visible'); }
 </script>
