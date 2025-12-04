@@ -324,7 +324,7 @@ document.addEventListener('themechanged', ()=>{/* color auto-updates next frame 
 
 /* ===== CONFIG ===== */
 
-/* Price table (AUD) by size label */
+/* Price table (AUD) by size label – still here for future if you add other sizes */
 const PRICING_AUD = {
   "A4": 45, "A3": 75, "A2": 140,
   "12×12\"": 65, "16×16\"": 120, "20×20\"": 180,
@@ -335,9 +335,9 @@ const PRICING_AUD = {
 /* Size sets by aspect “family” */
 const SIZE_SETS = {
   square:   ["12×12\"", "16×16\"", "20×20\""],
-  sqrt2:    ["A4","A3","A2"],                       // A-series (ratio ~1.414)
-  threeTwo: ["12×18\"","16×24\"","24×36\""],        // ~1.5
-  fourFive: ["12×15\"","16×20\"","20×25\""]         // 4:5 = 0.8 (portrait) or 1.25 landscape
+  sqrt2:    ["A4","A3","A2"],
+  threeTwo: ["12×18\"","16×24\"","24×36\""],
+  fourFive: ["12×15\"","16×20\"","20×25\""]
 };
 
 /* Aspect categorizer */
@@ -351,7 +351,6 @@ function aspectFamily(w,h){
   return "sqrt2"; // fallback
 }
 
-/* Catalog: Chaos Wizard only */
 /* Catalog: Chaos Wizard only */
 const PRODUCTS = [
   {
@@ -406,8 +405,6 @@ const PRODUCTS = [
     stripePriceId: "price_REPLACE_MINDBODYSOUL"
   }
 ];
-
-
 
 /* ===== DOM build ===== */
 function makeCard(p){
@@ -558,25 +555,58 @@ document.getElementById('fsBtn').addEventListener('click', ()=>{
 document.getElementById('closeBtn').addEventListener('click', ()=> overlay.classList.remove('show'));
 overlay.addEventListener('click', e=>{ if(e.target === overlay) overlay.classList.remove('show'); });
 
-/* ===== Cart (demo) ===== */
+/* ===== Cart + Stripe checkout ===== */
 const cartButton = document.getElementById('cart-button');
 const cartCount  = document.getElementById('cart-count');
 let CART = [];
+
 function addToCart(item){
-  CART.push(item); renderCart();
+  CART.push(item);
+  renderCart();
   alert(`Added:\n${item.title}\nSize: ${item.size}\nQty: ${item.qty}\nSubtotal: $${item.price.toFixed(2)} AUD`);
 }
+
 function renderCart(){
-  if(CART.length>0){ cartCount.textContent = CART.length; cartCount.classList.remove('hidden'); }
-  else cartCount.classList.add('hidden');
+  if(CART.length>0){
+    cartCount.textContent = CART.length;
+    cartCount.classList.remove('hidden');
+  } else {
+    cartCount.classList.add('hidden');
+  }
 }
-cartButton.addEventListener('click', ()=>{
-  if(CART.length===0){ alert('Your cart is empty.'); return; }
-  let txt = 'Cart:\n';
-  CART.forEach((it,i)=> txt+= `${i+1}. ${it.title} — ${it.size} × ${it.qty} — $${it.price.toFixed(2)} AUD\n`);
-  const total = CART.reduce((s,i)=> s+i.price, 0);
-  txt += `\nTotal: $${total.toFixed(2)} AUD\n\n(Checkout not configured in this demo.)`;
-  alert(txt);
+
+cartButton.addEventListener('click', async ()=>{
+  if(CART.length===0){
+    alert('Your cart is empty.');
+    return;
+  }
+
+  const first = CART[0]; // for now: checkout first item in cart
+  if (!first.stripePriceId){
+    alert('Stripe price ID is missing for this item.');
+    return;
+  }
+
+  try{
+    const res = await fetch('/create-checkout-session', {
+      method:'POST',
+      headers:{ 'Content-Type':'application/json' },
+      body: JSON.stringify({
+        priceId: first.stripePriceId,
+        quantity: first.qty
+      })
+    });
+
+    const data = await res.json();
+    if (!res.ok){
+      throw new Error(data.error || 'Failed to create Stripe session');
+    }
+
+    window.location.href = data.url; // go to Stripe checkout
+  } catch (err){
+    console.error(err);
+    alert('Error starting checkout: ' + err.message);
+  }
 });
 </script>
 </body>
