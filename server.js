@@ -1,76 +1,69 @@
-// server.js
-const dotenv = require('dotenv');
-dotenv.config();
+require('dotenv').config();
 
 const express = require('express');
 const path = require('path');
-
-// Try both ENV names so you don't have to rename it in Render
-const STRIPE_KEY =
-  process.env.STRIPE_SECRET ||
-  process.env.STRIPE_SECRET_KEY ||
-  process.env.stripe_secret_key;
-
-if (!STRIPE_KEY) {
-  console.error('⚠️ No Stripe secret key found in ENV (STRIPE_SECRET or STRIPE_SECRET_KEY).');
-}
-
-const stripe = require('stripe')(STRIPE_KEY);
-
+const Stripe = require('stripe');
 
 const app = express();
+
+// Try either STRIPE_SECRET or STRIPE_SECRET_KEY, since you mentioned both
+const stripeSecret =
+  process.env.STRIPE_SECRET ||
+  process.env.STRIPE_SECRET_KEY;
+
+if (!stripeSecret) {
+  console.warn('⚠️ No STRIPE_SECRET or STRIPE_SECRET_KEY set in Render env');
+}
+
+const stripe = Stripe(stripeSecret);
+
+const PORT = process.env.PORT || 3000;
 
 // Parse JSON bodies
 app.use(express.json());
 
-// Serve your static files (index.html, prints.html, images, etc.)
+// Serve your HTML/CSS/JS/images from the project root
 app.use(express.static(path.join(__dirname)));
 
-// Home route
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'));
-});
-
-// ===== Stripe Checkout route =====
+// Create Checkout Session
 app.post('/create-checkout-session', async (req, res) => {
   try {
     const items = req.body.items || [];
-    console.log('🛒 /create-checkout-session called with items:', items);
 
-    const realItems = items.filter(it => it.stripePriceId);
-    if (realItems.length === 0) {
-      console.warn('No purchasable items in cart');
-      return res
-        .status(400)
-        .json({ error: 'No purchasable items in cart (missing stripePriceId).' });
+    if (!Array.isArray(items) || items.length === 0) {
+      return res.status(400).json({ error: 'No items in cart' });
     }
 
-    const line_items = realItems.map(it => ({
-      price: it.stripePriceId,
-      quantity: it.qty || 1,
-    }));
+    // Map cart items -> Stripe line_items
+    const lineItems = items
+      .map(item => {
+        if (!item.stripePriceId) return null;
+        return {
+          price: item.stripePriceId,
+          quantity: item.qty || 1
+        };
+      })
+      .filter(Boolean);
 
-    console.log('Creating Stripe session with line_items:', line_items);
+    if (lineItems.length === 0) {
+      return res.status(400).json({ error: 'No valid items to charge' });
+    }
 
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',
-      line_items,
+      line_items: lineItems,
       success_url: 'https://celloutz-backend.onrender.com/success.html',
-      cancel_url: 'https://celloutz-backend.onrender.com/prints.html',
+      cancel_url: 'https://celloutz-backend.onrender.com/prints.html'
     });
 
-    console.log('✅ Stripe session created:', session.id);
-    res.json({ url: session.url });
+    return res.json({ url: session.url });
   } catch (err) {
-    console.error('❌ Stripe error:', err);
-    // Send the message back so we can see it in the browser for debugging
-    res.status(500).json({
-      error: err.message || 'Failed to create checkout session',
-    });
+    console.error('⚠️ Error creating checkout session:', err);
+    return res.status(500).json({ error: 'Server error creating checkout session' });
   }
 });
 
-const PORT = process.env.PORT || 10000;
+// Start server
 app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
+  console.log(`✅ Server listening on port ${PORT}`);
 });
