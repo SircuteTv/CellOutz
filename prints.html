@@ -352,6 +352,7 @@ function aspectFamily(w,h){
 }
 
 /* Catalog: Chaos Wizard only */
+/* Catalog: Chaos Wizard only */
 const PRODUCTS = [
   {
     title: "3D-Glass",
@@ -363,12 +364,13 @@ const PRODUCTS = [
     stripePriceId: "price_REPLACE_3D_GLASS"
   },
   {
-    title: "Fleshprison",
+    title: "Kill Everything",
     collection: "Chaos Wizard",
-    src: "images/chaos wizard/chaos (2).webp",
-    desc: "High quality A2 (200gsm) poster print. Coming soon.",
-    comingSoon: true,
-    stripePriceId: "price_REPLACE_FLESHPRISON"
+    src: "images/chaos wizard/chaos (4).webp",
+    desc: "High quality A2 (200gsm) poster print.",
+    sizes: ["A2"],
+    basePrice: 44.44,
+    stripePriceId: "price_REPLACE_KILL_EVERYTHING"
   },
   {
     title: "FinalFreedom",
@@ -380,13 +382,12 @@ const PRODUCTS = [
     stripePriceId: "price_REPLACE_FINALFREEDOM"
   },
   {
-    title: "Kill Everything",
+    title: "Fleshprison",
     collection: "Chaos Wizard",
-    src: "images/chaos wizard/chaos (4).webp",
-    desc: "High quality A2 (200gsm) poster print.",
-    sizes: ["A2"],
-    basePrice: 44.44,
-    stripePriceId: "price_REPLACE_KILL_EVERYTHING"
+    src: "images/chaos wizard/chaos (2).webp",
+    desc: "High quality A2 (200gsm) poster print. Coming soon.",
+    comingSoon: true,
+    stripePriceId: "price_REPLACE_FLESHPRISON"
   },
   {
     title: "Surfs Up",
@@ -405,6 +406,7 @@ const PRODUCTS = [
     stripePriceId: "price_REPLACE_MINDBODYSOUL"
   }
 ];
+
 
 /* ===== DOM build ===== */
 function makeCard(p){
