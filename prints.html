@@ -174,6 +174,36 @@ h2.section-title{
 
 /* Small helper */
 .note{ font-size:12px; opacity:.7 }
+
+/* Coming soon overlay */
+.coming-soon-overlay{
+  position:absolute;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:rgba(0,0,0,0.78);
+  backdrop-filter:blur(6px);
+  font-weight:700;
+  font-size:14px;
+  letter-spacing:0.16em;
+  text-transform:uppercase;
+  color:var(--text);
+  text-shadow:0 0 10px var(--glow);
+  opacity:1;
+  transition:opacity .2s ease;
+  pointer-events:none;
+}
+.card:hover .coming-soon-overlay{
+  opacity:0;
+}
+.card.coming-soon .btn{
+  opacity:0.6;
+  cursor:default;
+}
+.card.coming-soon .btn:hover{
+  transform:none;
+}
 </style>
 </head>
 <body class="vignette scan">
@@ -219,9 +249,8 @@ h2.section-title{
     All prints are archival. Sizes match the artwork’s aspect ratio. Prices in AUD.
   </p>
 
-<h2 class="section-title">Chaos Wizard</h2>
-<div class="grid three" id="grid-chaos"></div>
-
+  <h2 class="section-title">Chaos Wizard</h2>
+  <div class="grid three" id="grid-chaos"></div>
 </main>
 
 <!-- Modal -->
@@ -322,58 +351,86 @@ function aspectFamily(w,h){
   return "sqrt2"; // fallback
 }
 
-/* Catalog: paths exactly as named */
+/* Catalog: Chaos Wizard only */
 const PRODUCTS = [
   {
     title: "3D-Glass",
     collection: "Chaos Wizard",
     src: "images/chaos wizard/chaos (1).webp",
-    desc: "Limited edition fine art print."
+    desc: "High quality A2 (200gsm) poster print.",
+    sizes: ["A2"],
+    basePrice: 44.44,
+    stripePriceId: "price_REPLACE_3D_GLASS"
   },
   {
     title: "Fleshprison",
     collection: "Chaos Wizard",
     src: "images/chaos wizard/chaos (2).webp",
-    desc: "Limited edition fine art print."
+    desc: "High quality A2 (200gsm) poster print. Coming soon.",
+    comingSoon: true,
+    stripePriceId: "price_REPLACE_FLESHPRISON"
   },
   {
     title: "FinalFreedom",
     collection: "Chaos Wizard",
     src: "images/chaos wizard/chaos (3).webp",
-    desc: "Limited edition fine art print."
+    desc: "High quality A2 (200gsm) poster print.",
+    sizes: ["A2"],
+    basePrice: 44.44,
+    stripePriceId: "price_REPLACE_FINALFREEDOM"
   },
   {
     title: "Kill Everything",
     collection: "Chaos Wizard",
     src: "images/chaos wizard/chaos (4).webp",
-    desc: "Limited edition fine art print."
+    desc: "High quality A2 (200gsm) poster print.",
+    sizes: ["A2"],
+    basePrice: 44.44,
+    stripePriceId: "price_REPLACE_KILL_EVERYTHING"
   },
   {
     title: "Surfs Up",
     collection: "Chaos Wizard",
     src: "images/chaos wizard/chaos (5).webp",
-    desc: "Limited edition fine art print."
+    desc: "High quality A2 (200gsm) poster print. Coming soon.",
+    comingSoon: true,
+    stripePriceId: "price_REPLACE_SURFS_UP"
   },
   {
     title: "Mind Body Soul",
     collection: "Chaos Wizard",
     src: "images/chaos wizard/chaos (6).webp",
-    desc: "Limited edition fine art print."
+    desc: "High quality A2 (200gsm) poster print. Coming soon.",
+    comingSoon: true,
+    stripePriceId: "price_REPLACE_MINDBODYSOUL"
   }
 ];
-
 
 /* ===== DOM build ===== */
 function makeCard(p){
   const card = document.createElement('div');
   card.className = 'card';
+  if (p.comingSoon) card.classList.add('coming-soon');
 
   const wrap = document.createElement('div');
   wrap.className = 'thumb-wrap';
+
   const img = document.createElement('img');
   img.className = 'thumb';
-  img.src = p.src; img.alt = p.title; img.loading="lazy"; img.decoding="async";
+  img.src = p.src;
+  img.alt = p.title;
+  img.loading = "lazy";
+  img.decoding = "async";
   wrap.appendChild(img);
+
+  // Coming soon blur overlay
+  if (p.comingSoon){
+    const overlay = document.createElement('div');
+    overlay.className = 'coming-soon-overlay';
+    overlay.textContent = 'COMING SOON';
+    wrap.appendChild(overlay);
+  }
+
   card.appendChild(wrap);
 
   const body = document.createElement('div');
@@ -386,52 +443,87 @@ function makeCard(p){
       <input class="qty" type="number" min="1" value="1" style="width:72px">
       <div class="price">$— AUD</div>
     </div>
-    <button class="btn">Add to Cart</button>
+    <button class="btn">${p.comingSoon ? 'Coming Soon' : 'Add to Cart'}</button>
   `;
   card.appendChild(body);
 
+  const sizeSel  = body.querySelector('.sizeSel');
+  const qtyInput = body.querySelector('.qty');
+  const priceEl  = body.querySelector('.price');
+  const btn      = body.querySelector('.btn');
+
+  if (p.comingSoon){
+    sizeSel.innerHTML = '<option value="">A2</option>';
+    priceEl.textContent = 'Coming soon';
+    btn.disabled = true;
+  }
+
   img.addEventListener('load', ()=>{
-    const fam = aspectFamily(img.naturalWidth, img.naturalHeight);
-    const sizes = SIZE_SETS[fam] || SIZE_SETS.sqrt2;
-    const sel = body.querySelector('.sizeSel');
-    sel.innerHTML = sizes.map(s=>`<option value="${s}">${s}</option>`).join('');
-    updatePrice(body);
+    if (p.comingSoon) return;
+
+    const fam   = aspectFamily(img.naturalWidth, img.naturalHeight);
+    const sizes = p.sizes || SIZE_SETS[fam] || SIZE_SETS.sqrt2;
+
+    sizeSel.innerHTML = sizes.map(s => `<option value="${s}">${s}</option>`).join('');
+    updatePrice(body, p);
   });
 
-  img.addEventListener('error', ()=> card.style.display='none');
+  img.addEventListener('error', ()=> card.style.display = 'none');
 
-  body.querySelector('.sizeSel').addEventListener('change', ()=> updatePrice(body));
-  body.querySelector('.qty').addEventListener('input', ()=> updatePrice(body));
+  sizeSel.addEventListener('change', ()=> updatePrice(body, p));
+  qtyInput.addEventListener('input', ()=> updatePrice(body, p));
 
   wrap.addEventListener('click', ()=> openModal(p, img));
 
-  body.querySelector('.btn').addEventListener('click', ()=>{
-    const size = body.querySelector('.sizeSel').value;
-    const qty  = Math.max(1, parseInt(body.querySelector('.qty').value||'1',10));
-    const unit = PRICING_AUD[size] || 0;
-    addToCart({ title:p.title, collection:p.collection, size, qty, price:unit*qty });
-  });
+  if (!p.comingSoon){
+    btn.addEventListener('click', ()=>{
+      const size = sizeSel.value || (p.sizes && p.sizes[0]) || 'A2';
+      const qty  = Math.max(1, parseInt(qtyInput.value || '1', 10));
+      const unit = (typeof p.basePrice === 'number')
+        ? p.basePrice
+        : (PRICING_AUD[size] || 0);
+
+      addToCart({
+        title: p.title,
+        collection: p.collection,
+        size,
+        qty,
+        price: unit * qty,
+        stripePriceId: p.stripePriceId || null
+      });
+    });
+  }
 
   return card;
 }
 
-function updatePrice(body){
-  const size = body.querySelector('.sizeSel').value;
-  const qty  = Math.max(1, parseInt(body.querySelector('.qty').value||'1',10));
-  const unit = PRICING_AUD[size] || 0;
-  body.querySelector('.price').textContent = `$${(unit*qty).toFixed(2)} AUD`;
+function updatePrice(body, product){
+  if (product && product.comingSoon){
+    const priceEl = body.querySelector('.price');
+    if (priceEl) priceEl.textContent = 'Coming soon';
+    return;
+  }
+
+  const sizeSel  = body.querySelector('.sizeSel');
+  const qtyInput = body.querySelector('.qty');
+  const priceEl  = body.querySelector('.price');
+  if (!sizeSel || !qtyInput || !priceEl) return;
+
+  const size = sizeSel.value;
+  const qty  = Math.max(1, parseInt(qtyInput.value || '1', 10));
+
+  const unit = (product && typeof product.basePrice === 'number')
+    ? product.basePrice
+    : (PRICING_AUD[size] || 0);
+
+  priceEl.textContent = `$${(unit * qty).toFixed(2)} AUD`;
 }
 
-/* Sections */
-const gridPresent = document.getElementById('grid-present');
-const gridChaos   = document.getElementById('grid-chaos');
-const gridGenesis = document.getElementById('grid-genesis');
-
+/* Attach cards to Chaos Wizard grid */
+const gridChaos = document.getElementById('grid-chaos');
 PRODUCTS.forEach(p=>{
   const card = makeCard(p);
-  if (p.collection === "Present Polarity") gridPresent.appendChild(card);
-  else if (p.collection === "Chaos Wizard") gridChaos.appendChild(card);
-  else if (p.collection === "Genesis") gridGenesis.appendChild(card);
+  gridChaos.appendChild(card);
 });
 
 /* ===== Modal viewer ===== */
@@ -451,12 +543,14 @@ function openModal(p, imgEl){
   const maxSide300 = Math.floor(Math.max(w,h) / 300);
   const maxSide240 = Math.floor(Math.max(w,h) / 240);
   dpiNote.textContent = `Source: ${w}×${h}px — approx max at 300DPI: ${maxSide300}" on long edge (240DPI: ${maxSide240}").`;
-  viewer.classList.add('full'); // hide info by default
-  overlay.classList.add('show'); overlay.setAttribute('aria-hidden','false');
+  viewer.classList.add('full');
+  overlay.classList.add('show');
+  overlay.setAttribute('aria-hidden','false');
 }
 document.getElementById('infoToggle').addEventListener('click', ()=> viewer.classList.toggle('full'));
 document.getElementById('fsBtn').addEventListener('click', ()=>{
-  if(!document.fullscreenElement) viewer.requestFullscreen?.(); else document.exitFullscreen?.();
+  if(!document.fullscreenElement) viewer.requestFullscreen?.();
+  else document.exitFullscreen?.();
 });
 document.getElementById('closeBtn').addEventListener('click', ()=> overlay.classList.remove('show'));
 overlay.addEventListener('click', e=>{ if(e.target === overlay) overlay.classList.remove('show'); });
