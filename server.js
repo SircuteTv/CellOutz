@@ -46,8 +46,9 @@ app.post("/create-checkout-session", async (req, res) => {
       mode: "payment",
       line_items,
       // these pages can be simple HTML thank-you / error pages
-      success_url: "https://celloutz.onrender.com/success.html",
-      cancel_url: "https://celloutz.onrender.com/prints.html"
+success_url: "https://celloutz-backend.onrender.com/success.html",
+cancel_url: "https://celloutz-backend.onrender.com/prints.html",
+
     });
 
     res.json({ url: session.url });
