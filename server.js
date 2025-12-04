@@ -6,20 +6,19 @@ import { fileURLToPath } from "url";
 
 const app = express();
 
-// Figure out the current folder (needed for static files in ESM modules)
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// Stripe client, using your env var
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: "2023-10-16"
-});
-
 app.use(express.json());
 app.use(cors());
 
-// Serve your static site (index.html, prints.html, images, etc.)
+// Work out current directory (needed in ES modules)
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Serve your static files if needed (not strictly required for Stripe)
 app.use(express.static(__dirname));
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+  apiVersion: "2023-10-16"
+});
 
 app.post("/create-checkout-session", async (req, res) => {
   try {
@@ -30,11 +29,11 @@ app.post("/create-checkout-session", async (req, res) => {
       line_items: [
         {
           price: priceId,
-          quantity
+          quantity: quantity
         }
       ],
-      success_url: "https://celloutz.onrender.com/success.html",
-      cancel_url: "https://celloutz.onrender.com/prints.html"
+      success_url: "https://celloutz.onrender.com/prints.html?status=success",
+      cancel_url: "https://celloutz.onrender.com/prints.html?status=cancel"
     });
 
     res.json({ url: session.url });
@@ -44,7 +43,7 @@ app.post("/create-checkout-session", async (req, res) => {
   }
 });
 
-// IMPORTANT for Render: use their PORT, or 3000 locally
+// Use Render's port in production
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
