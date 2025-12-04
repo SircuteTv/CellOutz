@@ -219,14 +219,9 @@ h2.section-title{
     All prints are archival. Sizes match the artwork’s aspect ratio. Prices in AUD.
   </p>
 
-  <h2 class="section-title">Present Polarity</h2>
-  <div class="grid four" id="grid-present"></div>
+<h2 class="section-title">Chaos Wizard</h2>
+<div class="grid three" id="grid-chaos"></div>
 
-  <h2 class="section-title">Chaos Wizard</h2>
-  <div class="grid three" id="grid-chaos"></div>
-
-  <h2 class="section-title">Genesis</h2>
-  <div class="grid three" id="grid-genesis"></div>
 </main>
 
 <!-- Modal -->
@@ -329,28 +324,44 @@ function aspectFamily(w,h){
 
 /* Catalog: paths exactly as named */
 const PRODUCTS = [
-  // Present Polarity (4)
-  ...[1,2,3,4].map(i => ({
-    title:`Present Polarity — art (${i})`,
-    collection:"Present Polarity",
-    src:`images/${encodeURIComponent('Present Polarity')}/art (${i}).webp`,
-    desc:"Limited edition fine art print."
-  })),
-  // Chaos Wizard (9)
-  ...Array.from({length:9}, (_,i)=>i+1).map(i => ({
-    title:`Chaos Wizard — chaos (${i})`,
-    collection:"Chaos Wizard",
-    src:`images/${encodeURIComponent('chaos wizard')}/chaos (${i}).webp`,
-    desc:"Limited edition fine art print."
-  })),
-  // Genesis (1)
   {
-    title:"Genesis — latr",
-    collection:"Genesis",
-    src:`images/Genesis/latr.webp`,
-    desc:"Limited edition fine art print."
+    title: "3D-Glass",
+    collection: "Chaos Wizard",
+    src: "images/chaos wizard/chaos (1).webp",
+    desc: "Limited edition fine art print."
+  },
+  {
+    title: "Fleshprison",
+    collection: "Chaos Wizard",
+    src: "images/chaos wizard/chaos (2).webp",
+    desc: "Limited edition fine art print."
+  },
+  {
+    title: "FinalFreedom",
+    collection: "Chaos Wizard",
+    src: "images/chaos wizard/chaos (3).webp",
+    desc: "Limited edition fine art print."
+  },
+  {
+    title: "Kill Everything",
+    collection: "Chaos Wizard",
+    src: "images/chaos wizard/chaos (4).webp",
+    desc: "Limited edition fine art print."
+  },
+  {
+    title: "Surfs Up",
+    collection: "Chaos Wizard",
+    src: "images/chaos wizard/chaos (5).webp",
+    desc: "Limited edition fine art print."
+  },
+  {
+    title: "Mind Body Soul",
+    collection: "Chaos Wizard",
+    src: "images/chaos wizard/chaos (6).webp",
+    desc: "Limited edition fine art print."
   }
 ];
+
 
 /* ===== DOM build ===== */
 function makeCard(p){
