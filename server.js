@@ -5,12 +5,18 @@ dotenv.config();
 const express = require('express');
 const path = require('path');
 
-// VERY IMPORTANT: this must be your STRIPE **secret** key
-// from Stripe dashboard, same mode (test vs live) as your price IDs.
-if (!process.env.STRIPE_SECRET) {
-  console.error('⚠️ STRIPE_SECRET is not set in environment!');
+// Try both ENV names so you don't have to rename it in Render
+const STRIPE_KEY =
+  process.env.STRIPE_SECRET ||
+  process.env.STRIPE_SECRET_KEY ||
+  process.env.stripe_secret_key;
+
+if (!STRIPE_KEY) {
+  console.error('⚠️ No Stripe secret key found in ENV (STRIPE_SECRET or STRIPE_SECRET_KEY).');
 }
-const stripe = require('stripe')(process.env.STRIPE_SECRET);
+
+const stripe = require('stripe')(STRIPE_KEY);
+
 
 const app = express();
 
