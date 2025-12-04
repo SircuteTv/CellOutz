@@ -567,7 +567,7 @@ function addToCart(item){
 }
 
 function renderCart(){
-  if (CART.length > 0){
+  if (CART.length > 0) {
     cartCount.textContent = CART.length;
     cartCount.classList.remove('hidden');
   } else {
@@ -581,37 +581,32 @@ cartButton.addEventListener('click', async () => {
     return;
   }
 
-  // For now: just send the first item in the cart to Stripe
-  const first = CART[0];
-
-  if (!first.stripePriceId) {
-    alert('Stripe is not configured for this item yet.');
-    return;
-  }
-
   try {
-    const res = await fetch('https://celloutz-backend.onrender.com/create-checkout-session', {
+    const res = await fetch('/create-checkout-session', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        priceId: first.stripePriceId,
-        quantity: first.qty
-      })
+      body: JSON.stringify({ items: CART })
     });
 
-    const data = await res.json();
+    const data = await res.json().catch(() => ({}));
 
     if (!res.ok || !data.url) {
-      throw new Error(data.error || 'Checkout failed');
+      console.error('Checkout error response:', res.status, data);
+      const msg = data && data.error
+        ? data.error
+        : 'Checkout failed for an unknown reason.';
+      alert('Stripe error: ' + msg);
+      return;
     }
 
-    // Go to Stripe Checkout
+    // All good: send them to Stripe Checkout
     window.location.href = data.url;
   } catch (err) {
-    console.error(err);
+    console.error('Fetch failed:', err);
     alert('Sorry, something went wrong starting checkout. Please try again.');
   }
 });
+
 </script>
 </body>
 </html>
