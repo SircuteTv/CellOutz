@@ -3,68 +3,63 @@
 import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import dotenv from 'dotenv';
 import Stripe from 'stripe';
+import cors from 'cors';
 
+dotenv.config();
+
+const app = express();
+
+// ---- paths for static files ----
 const __filename = fileURLToPath(import.meta.url);
-const __dirname  = path.dirname(__filename);
-
-const app  = express();
-const PORT = process.env.PORT || 3000;
+const __dirname = path.dirname(__filename);
 
 // ---- Stripe ----
-const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY;
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
-if (!STRIPE_SECRET_KEY) {
-  console.warn('⚠️  STRIPE_SECRET_KEY is not set in the environment!');
-}
-
-const stripe = new Stripe(STRIPE_SECRET_KEY, {
-  apiVersion: '2024-06-20', // or whatever Stripe suggests in your dashboard
-});
-
-// Parse JSON bodies
+// ---- middleware ----
+app.use(cors());
 app.use(express.json());
+app.use(express.static(__dirname)); // serves your .html, images, etc.
 
-// Serve your static files (prints.html, images, etc.) from this folder
-app.use(express.static(__dirname));
-
-// ---- Checkout route ----
+// ---- THIS IS THE IMPORTANT PART ----
 app.post('/create-checkout-session', async (req, res) => {
   try {
-    const { items } = req.body || {};
-    console.log('🧾 Incoming items from client:', items);
+    const items = Array.isArray(req.body.items) ? req.body.items : [];
 
-    if (!Array.isArray(items) || items.length === 0) {
-      return res.status(400).json({ error: 'Cart is empty.' });
+    // Convert front-end items -> Stripe line_items
+    const line_items = items
+      .filter(it => it.priceId && it.quantity > 0)
+      .map(it => ({
+        // Stripe wants `price`, not `priceId`
+        price: it.priceId,
+        quantity: it.quantity
+      }));
+
+    if (!line_items.length) {
+      console.error('No valid line items from client:', items);
+      return res.status(400).json({ error: 'No valid items to charge' });
     }
-
-    // Map each cart item into a Stripe line item
-    const line_items = items.map((item) => ({
-      price: item.stripePriceId,        // must be like "price_123..."
-      quantity: item.qty || 1,
-    }));
-
-    console.log('📦 Stripe line_items:', line_items);
 
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',
       line_items,
-      success_url: `${req.protocol}://${req.get('host')}/success.html?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url:  `${req.protocol}://${req.get('host')}/prints.html`,
+      success_url: 'https://celloutz-backend.onrender.com/success.html',
+      cancel_url: 'https://celloutz-backend.onrender.com/prints.html'
     });
-
-    console.log('✅ Created checkout session:', session.id);
 
     return res.json({ url: session.url });
   } catch (err) {
-    console.error('❌ Stripe checkout error:', err);
-    return res.status(500).json({
-      error: err?.message || 'Internal server error',
-    });
+    console.error('Stripe checkout error:', err);
+    return res
+      .status(500)
+      .json({ error: err.message || 'Stripe error creating session' });
   }
 });
 
-// ---- Start server ----
+// ---- start server ----
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`🚀 CellOutz server listening on port ${PORT}`);
+  console.log(`Server listening on ${PORT}`);
 });
