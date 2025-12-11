@@ -128,7 +128,7 @@ h2.section-title{
   box-shadow:0 6px 24px rgba(0,0,0,.5); display:flex; flex-direction:column;
 }
 .thumb-wrap{ position:relative; background:#080000; display:flex; align-items:center; justify-content:center; }
-.thumb{ width:100%; height:100%; object-fit:cover; display:block; aspect-ratio: 4/5; } /* safe default aspect */
+.thumb{ width:100%; height:100%; object-fit:cover; display:block; aspect-ratio: 4/5; }
 .card:hover .thumb{ filter:contrast(1.05) brightness(1.02) }
 .card-body{ padding:12px 12px 14px; display:flex; flex-direction:column; gap:10px; }
 .card-title{ font-weight:700; font-size:14px; }
@@ -204,6 +204,83 @@ h2.section-title{
 .card.coming-soon .btn:hover{
   transform:none;
 }
+
+/* Mini cart panel */
+.mini-cart{
+  position:fixed;
+  top:90px;
+  right:16px;
+  width:260px;
+  max-height:70vh;
+  padding:12px;
+  border-radius:14px;
+  border:1px solid var(--red);
+  background:rgba(0,0,0,0.96);
+  box-shadow:0 0 20px var(--glow);
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  font-size:12px;
+  transform:translateX(120%);
+  opacity:0;
+  pointer-events:none;
+  transition:transform .18s ease, opacity .18s ease;
+  z-index:2100;
+}
+.mini-cart.open{
+  transform:translateX(0);
+  opacity:1;
+  pointer-events:auto;
+}
+.mini-cart-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  font-weight:700;
+}
+.mini-cart-close{
+  background:transparent;
+  border:1px solid var(--red);
+  border-radius:8px;
+  color:var(--text);
+  padding:2px 6px;
+  cursor:pointer;
+  font-size:10px;
+}
+.mini-cart-items{
+  max-height:38vh;
+  overflow-y:auto;
+}
+.mini-cart-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:6px;
+  margin-bottom:4px;
+}
+.mini-cart-row .note{
+  opacity:0.7;
+}
+.mini-cart-footer{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-top:4px;
+}
+.mini-cart-total{
+  font-weight:700;
+}
+.btn-small{
+  padding:6px 10px;
+  font-size:11px;
+}
+@media (max-width:600px){
+  .mini-cart{
+    right:8px;
+    left:8px;
+    width:auto;
+  }
+}
 </style>
 </head>
 <body class="vignette scan">
@@ -270,6 +347,19 @@ h2.section-title{
   </div>
 </div>
 
+<!-- Mini cart panel -->
+<div id="mini-cart" class="mini-cart">
+  <div class="mini-cart-header">
+    <span>Cart</span>
+    <button id="mini-cart-close" class="mini-cart-close" aria-label="Close cart">✕</button>
+  </div>
+  <div id="mini-cart-items" class="mini-cart-items"></div>
+  <div class="mini-cart-footer">
+    <span id="mini-cart-total" class="mini-cart-total">Total: $0.00 AUD</span>
+    <button id="mini-cart-checkout" class="btn btn-small">Checkout</button>
+  </div>
+</div>
+
 <script>
 /* ===== Theme persistence (shared across pages) ===== */
 (function(){
@@ -289,7 +379,7 @@ h2.section-title{
   }
 })();
 
-/* ===== Matrix background (theme-aware, animation-frame smooth) ===== */
+/* ===== Matrix background ===== */
 const canvas = document.getElementById('matrix');
 const ctx = canvas.getContext('2d');
 let letters = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ@#$%^&*",
@@ -323,8 +413,6 @@ document.addEventListener('visibilitychange', ()=>{ if(document.hidden){ cancelA
 document.addEventListener('themechanged', ()=>{/* color auto-updates next frame */});
 
 /* ===== CONFIG ===== */
-
-/* Price table (AUD) by size label – still here for future if you add other sizes */
 const PRICING_AUD = {
   "A4": 45, "A3": 75, "A2": 140,
   "12×12\"": 65, "16×16\"": 120, "20×20\"": 180,
@@ -332,7 +420,6 @@ const PRICING_AUD = {
   "12×15\"": 90, "16×20\"": 150, "20×25\"": 210
 };
 
-/* Size sets by aspect “family” */
 const SIZE_SETS = {
   square:   ["12×12\"", "16×16\"", "20×20\""],
   sqrt2:    ["A4","A3","A2"],
@@ -340,7 +427,6 @@ const SIZE_SETS = {
   fourFive: ["12×15\"","16×20\"","20×25\""]
 };
 
-/* Aspect categorizer */
 function aspectFamily(w,h){
   const r = w/h; const inv = h/w;
   const close = (a,b)=> Math.abs(a-b) < 0.06;
@@ -348,10 +434,10 @@ function aspectFamily(w,h){
   if (close(r,1.414) || close(inv,1.414)) return "sqrt2";
   if (close(r,1.5)   || close(inv,1.5))   return "threeTwo";
   if (close(r,1.25)  || close(inv,1.25))  return "fourFive";
-  return "sqrt2"; // fallback
+  return "sqrt2";
 }
 
-/* Catalog: Chaos Wizard only */
+/* Catalog */
 const PRODUCTS = [
   {
     title: "3D-Glass",
@@ -423,7 +509,6 @@ function makeCard(p){
   img.decoding = "async";
   wrap.appendChild(img);
 
-  // Coming soon blur overlay
   if (p.comingSoon){
     const overlay = document.createElement('div');
     overlay.className = 'coming-soon-overlay';
@@ -460,10 +545,8 @@ function makeCard(p){
 
   img.addEventListener('load', ()=>{
     if (p.comingSoon) return;
-
     const fam   = aspectFamily(img.naturalWidth, img.naturalHeight);
     const sizes = p.sizes || SIZE_SETS[fam] || SIZE_SETS.sqrt2;
-
     sizeSel.innerHTML = sizes.map(s => `<option value="${s}">${s}</option>`).join('');
     updatePrice(body, p);
   });
@@ -503,7 +586,6 @@ function updatePrice(body, product){
     if (priceEl) priceEl.textContent = 'Coming soon';
     return;
   }
-
   const sizeSel  = body.querySelector('.sizeSel');
   const qtyInput = body.querySelector('.qty');
   const priceEl  = body.querySelector('.price');
@@ -511,7 +593,6 @@ function updatePrice(body, product){
 
   const size = sizeSel.value;
   const qty  = Math.max(1, parseInt(qtyInput.value || '1', 10));
-
   const unit = (product && typeof product.basePrice === 'number')
     ? product.basePrice
     : (PRICING_AUD[size] || 0);
@@ -519,7 +600,6 @@ function updatePrice(body, product){
   priceEl.textContent = `$${(unit * qty).toFixed(2)} AUD`;
 }
 
-/* Attach cards to Chaos Wizard grid */
 const gridChaos = document.getElementById('grid-chaos');
 PRODUCTS.forEach(p=>{
   const card = makeCard(p);
@@ -555,51 +635,112 @@ document.getElementById('fsBtn').addEventListener('click', ()=>{
 document.getElementById('closeBtn').addEventListener('click', ()=> overlay.classList.remove('show'));
 overlay.addEventListener('click', e=>{ if(e.target === overlay) overlay.classList.remove('show'); });
 
-/* ===== Cart + Stripe checkout ===== */
-const cartButton = document.getElementById('cart-button');
-const cartCount  = document.getElementById('cart-count');
+/* ===== Cart + mini-cart + Stripe checkout ===== */
+const cartButton       = document.getElementById('cart-button');
+const cartCount        = document.getElementById('cart-count');
+const miniCart         = document.getElementById('mini-cart');
+const miniCartItems    = document.getElementById('mini-cart-items');
+const miniCartTotal    = document.getElementById('mini-cart-total');
+const miniCartCheckout = document.getElementById('mini-cart-checkout');
+const miniCartClose    = document.getElementById('mini-cart-close');
+
 let CART = [];
 
 function addToCart(item){
-  CART.push(item);
+  const existing = CART.find(
+    it => it.title === item.title &&
+          it.size  === item.size  &&
+          it.stripePriceId === item.stripePriceId
+  );
+  if (existing){
+    existing.qty   += item.qty;
+    existing.price += item.price;
+  } else {
+    CART.push(item);
+  }
   renderCart();
-  alert(`Added:\n${item.title}\nSize: ${item.size}\nQty: ${item.qty}\nSubtotal: $${item.price.toFixed(2)} AUD`);
+  openMiniCart();
 }
 
 function renderCart(){
-  if (CART.length > 0) {
-    cartCount.textContent = CART.length;
+  const totalQty = CART.reduce((sum, it) => sum + it.qty, 0);
+  if (totalQty > 0){
+    cartCount.textContent = totalQty;
     cartCount.classList.remove('hidden');
   } else {
     cartCount.classList.add('hidden');
   }
-}
 
-cartButton.addEventListener('click', async () => {
-  if (CART.length === 0) {
-    alert('Your cart is empty.');
+  miniCartItems.innerHTML = '';
+  if (CART.length === 0){
+    miniCartItems.innerHTML = '<div class="note">Cart is empty.</div>';
+    miniCartTotal.textContent = 'Total: $0.00 AUD';
     return;
   }
+
+  let total = 0;
+  CART.forEach(item => {
+    total += item.price;
+    const row = document.createElement('div');
+    row.className = 'mini-cart-row';
+    row.innerHTML = `
+      <div>
+        <div>${item.title}</div>
+        <div class="note">${item.size} × ${item.qty}</div>
+      </div>
+      <div>$${item.price.toFixed(2)}</div>
+    `;
+    miniCartItems.appendChild(row);
+  });
+
+  miniCartTotal.textContent = `Total: $${total.toFixed(2)} AUD`;
+}
+
+function openMiniCart(){
+  miniCart.classList.add('open');
+}
+function closeMiniCart(){
+  miniCart.classList.remove('open');
+}
+
+cartButton.addEventListener('click', () => {
+  if (miniCart.classList.contains('open')) closeMiniCart();
+  else openMiniCart();
+});
+
+miniCartClose.addEventListener('click', closeMiniCart);
+
+document.addEventListener('click', (e) => {
+  if (!miniCart.contains(e.target) && !cartButton.contains(e.target)){
+    closeMiniCart();
+  }
+});
+
+miniCartCheckout.addEventListener('click', async () => {
+  if (CART.length === 0) return;
 
   try {
     const res = await fetch('/create-checkout-session', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ items: CART })
+      body: JSON.stringify({
+        items: CART
+          .filter(it => it.stripePriceId)
+          .map(it => ({
+            priceId: it.stripePriceId,
+            quantity: it.qty
+          }))
+      })
     });
 
     const data = await res.json().catch(() => ({}));
-
-    if (!res.ok || !data.url) {
+    if (!res.ok || !data.url){
       console.error('Checkout error response:', res.status, data);
-      const msg = data && data.error
-        ? data.error
-        : 'Checkout failed for an unknown reason.';
+      const msg = data && data.error ? data.error : 'Checkout failed.';
       alert('Stripe error: ' + msg);
       return;
     }
 
-    // All good: send them to Stripe Checkout
     window.location.href = data.url;
   } catch (err) {
     console.error('Fetch failed:', err);
@@ -607,6 +748,8 @@ cartButton.addEventListener('click', async () => {
   }
 });
 
+// Initialize empty view
+renderCart();
 </script>
 </body>
 </html>
