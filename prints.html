@@ -354,129 +354,195 @@ h2.section-title{
 </div>
 
 <script>
-/* THEME */
-(function(){
-  const key='celloutz_theme';
-  const html=document.documentElement;
-  const sw=document.getElementById('themeSwitch');
-  const saved=localStorage.getItem(key);
-  if(saved==='halloween'){ html.setAttribute('data-theme','halloween'); sw.checked=true; }
-  if(sw){
-    sw.addEventListener('change',()=>{
-      sw.checked ? html.setAttribute('data-theme','halloween')
-                 : html.removeAttribute('data-theme');
-      localStorage.setItem(key, sw.checked?'halloween':'default');
+/* =============== THEME TOGGLE =============== */
+(function () {
+  const key = "celloutz_theme";
+  const html = document.documentElement;
+  const sw = document.getElementById("themeSwitch");
+  const saved = localStorage.getItem(key);
+
+  if (saved === "halloween") {
+    html.setAttribute("data-theme", "halloween");
+    if (sw) sw.checked = true;
+  }
+
+  if (sw) {
+    sw.addEventListener("change", () => {
+      if (sw.checked) {
+        html.setAttribute("data-theme", "halloween");
+        localStorage.setItem(key, "halloween");
+      } else {
+        html.removeAttribute("data-theme");
+        localStorage.setItem(key, "default");
+      }
     });
   }
 })();
 
-/* MATRIX */
-const canvas=document.getElementById('matrix');
-const ctx=canvas.getContext('2d');
-let letters="0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ@#$%^&*";
-let fontSize=16, cols, drops;
+/* =============== MATRIX BACKGROUND =============== */
+const canvas = document.getElementById("matrix");
+const ctx = canvas.getContext("2d");
+let letters = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ@#$%^&*";
+let fontSize = 16,
+  cols,
+  drops;
 
-function resize(){
-  canvas.width=innerWidth;
-  canvas.height=innerHeight;
-  cols=Math.floor(canvas.width/fontSize);
-  drops=Array(cols).fill(0);
+function resizeMatrix() {
+  canvas.width = innerWidth;
+  canvas.height = innerHeight;
+  cols = Math.floor(canvas.width / fontSize);
+  drops = Array(cols).fill(0);
 }
-resize(); addEventListener('resize',resize);
+resizeMatrix();
+addEventListener("resize", resizeMatrix);
 
-function draw(){
-  ctx.fillStyle="rgba(11,0,0,0.09)";
-  ctx.fillRect(0,0,canvas.width,canvas.height);
-  ctx.fillStyle=getComputedStyle(document.documentElement).getPropertyValue('--matrix');
-  ctx.font=fontSize+"px monospace";
-  for(let i=0;i<cols;i++){
-    const t = letters[(Math.random()*letters.length)|0];
-    ctx.fillText(t,i*fontSize,drops[i]);
-    drops[i]+=fontSize;
-    if(drops[i]>canvas.height && Math.random()>0.975) drops[i]=0;
+function drawMatrix() {
+  ctx.fillStyle = "rgba(11,0,0,0.09)";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue("--matrix").trim();
+  ctx.font = fontSize + "px monospace";
+
+  for (let i = 0; i < cols; i++) {
+    const t = letters[(Math.random() * letters.length) | 0];
+    ctx.fillText(t, i * fontSize, drops[i]);
+    drops[i] += fontSize;
+    if (drops[i] > canvas.height && Math.random() > 0.975) drops[i] = 0;
   }
-  requestAnimationFrame(draw);
+  requestAnimationFrame(drawMatrix);
 }
-draw();
+drawMatrix();
 
-/* PRODUCTS */
-const PRODUCTS=[
+/* =============== SHIPPING CONFIG =============== */
+/* You can tweak these prices/labels if you want later */
+const SHIPPING_OPTIONS = {
+  aus: { label: "Australia", price: 10.0 },
+  intl: { label: "International", price: 24.0 },
+};
+
+let selectedShipping = "aus";
+let shippingSelectElement = null;
+
+function initShippingSelector() {
+  const footer = document.querySelector(".mini-cart-footer");
+  if (!footer) return;
+
+  // Wrapper sits above the total + checkout
+  const wrapper = document.createElement("div");
+  wrapper.style.display = "flex";
+  wrapper.style.alignItems = "center";
+  wrapper.style.justifyContent = "space-between";
+  wrapper.style.gap = "6px";
+  wrapper.style.marginBottom = "6px";
+  wrapper.style.fontSize = "11px";
+
+  const label = document.createElement("span");
+  label.textContent = "Shipping";
+
+  const select = document.createElement("select");
+  select.id = "shipping-select";
+  select.className = "select";
+  select.style.flex = "1";
+
+  Object.entries(SHIPPING_OPTIONS).forEach(([key, cfg]) => {
+    const opt = document.createElement("option");
+    opt.value = key;
+    opt.textContent = `${cfg.label} (+$${cfg.price.toFixed(2)})`;
+    select.appendChild(opt);
+  });
+
+  select.value = selectedShipping;
+  select.addEventListener("change", () => {
+    selectedShipping = select.value;
+    renderCart(); // Recalculate total including new shipping
+  });
+
+  wrapper.appendChild(label);
+  wrapper.appendChild(select);
+  footer.parentNode.insertBefore(wrapper, footer);
+
+  shippingSelectElement = select;
+}
+
+/* =============== PRODUCTS =============== */
+const PRODUCTS = [
   {
-    title:"3D-Glass",
-    collection:"Chaos Wizard",
-    src:"images/chaos wizard/chaos (1).webp",
-    desc:"High quality A2 print.",
-    basePrice:55.55,
-    stripePriceId:"price_1Sd24I356zBUvSosnvtIu8PR"
+    title: "3D-Glass",
+    collection: "Chaos Wizard",
+    src: "images/chaos wizard/chaos (1).webp",
+    desc: "High quality A2 print.",
+    basePrice: 55.55,
+    stripePriceId: "price_1Sd24I356zBUvSosnvtIu8PR",
   },
   {
-    title:"Kill Everything",
-    collection:"Chaos Wizard",
-    src:"images/chaos wizard/chaos (4).webp",
-    desc:"High quality A2 print.",
-    basePrice:55.55,
-    stripePriceId:"price_1Sd2CD356zBUvSosfipidxu0"
+    title: "Kill Everything",
+    collection: "Chaos Wizard",
+    src: "images/chaos wizard/chaos (4).webp",
+    desc: "High quality A2 print.",
+    basePrice: 55.55,
+    stripePriceId: "price_1Sd2CD356zBUvSosfipidxu0",
   },
   {
-    title:"FinalFreedom",
-    collection:"Chaos Wizard",
-    src:"images/chaos wizard/chaos (3).webp",
-    desc:"High quality A2 print.",
-    basePrice:55.55,
-    stripePriceId:"price_1Sd2EB356zBUvSosMeykru5y"
+    title: "FinalFreedom",
+    collection: "Chaos Wizard",
+    src: "images/chaos wizard/chaos (3).webp",
+    desc: "High quality A2 print.",
+    basePrice: 55.55,
+    stripePriceId: "price_1Sd2EB356zBUvSosMeykru5y",
   },
   {
-    title:"Fleshprison",
-    comingSoon:true,
-    collection:"Chaos Wizard",
-    src:"images/chaos wizard/chaos (2).webp",
-    desc:"Coming soon."
+    title: "Fleshprison",
+    comingSoon: true,
+    collection: "Chaos Wizard",
+    src: "images/chaos wizard/chaos (2).webp",
+    desc: "Coming soon.",
   },
   {
-    title:"Surfs Up",
-    comingSoon:true,
-    collection:"Chaos Wizard",
-    src:"images/chaos wizard/chaos (5).webp",
-    desc:"Coming soon."
+    title: "Surfs Up",
+    comingSoon: true,
+    collection: "Chaos Wizard",
+    src: "images/chaos wizard/chaos (5).webp",
+    desc: "Coming soon.",
   },
   {
-    title:"Mind Body Soul",
-    comingSoon:true,
-    collection:"Chaos Wizard",
-    src:"images/chaos wizard/chaos (6).webp",
-    desc:"Coming soon."
-  }
+    title: "Mind Body Soul",
+    comingSoon: true,
+    collection: "Chaos Wizard",
+    src: "images/chaos wizard/chaos (6).webp",
+    desc: "Coming soon.",
+  },
 ];
 
-/* BUILD CARDS */
-const grid=document.getElementById('grid-chaos');
+/* =============== BUILD PRODUCT CARDS =============== */
+const grid = document.getElementById("grid-chaos");
 
-function makeCard(p){
-  const c=document.createElement('div');
-  c.className='card';
-  if(p.comingSoon) c.classList.add('coming-soon');
+function makeCard(p) {
+  const c = document.createElement("div");
+  c.className = "card";
+  if (p.comingSoon) c.classList.add("coming-soon");
 
-  const wrap=document.createElement('div');
-  wrap.className='thumb-wrap';
+  const wrap = document.createElement("div");
+  wrap.className = "thumb-wrap";
 
-  const img=document.createElement('img');
-  img.className='thumb';
-  img.src=p.src;
+  const img = document.createElement("img");
+  img.className = "thumb";
+  img.src = p.src;
+  img.alt = p.title;
   wrap.appendChild(img);
 
-  if(p.comingSoon){
-    const o=document.createElement('div');
-    o.className='coming-soon-overlay';
-    o.textContent='COMING SOON';
+  if (p.comingSoon) {
+    const o = document.createElement("div");
+    o.className = "coming-soon-overlay";
+    o.textContent = "COMING SOON";
     wrap.appendChild(o);
   }
 
-  wrap.addEventListener('click',()=>openModal(p));
+  wrap.addEventListener("click", () => openModal(p));
 
-  const body=document.createElement('div');
-  body.className='card-body';
+  const body = document.createElement("div");
+  body.className = "card-body";
 
-  body.innerHTML=`
+  body.innerHTML = `
     <div class="card-title">${p.title}</div>
     <div class="card-collection">${p.collection}</div>
     <div class="row">
@@ -487,14 +553,16 @@ function makeCard(p){
     <button class="btn">${p.comingSoon ? "Coming Soon" : "Add to Cart"}</button>
   `;
 
-  if(!p.comingSoon){
-    body.querySelector('.btn').addEventListener('click',()=>{
-      const qty=parseInt(body.querySelector('.qty').value)||1;
+  if (!p.comingSoon) {
+    const btn = body.querySelector(".btn");
+    const qtyInput = body.querySelector(".qty");
+    btn.addEventListener("click", () => {
+      const qty = Math.max(1, parseInt(qtyInput.value || "1", 10));
       addToCart({
-        title:p.title,
+        title: p.title,
         qty,
-        price:p.basePrice*qty,
-        stripePriceId:p.stripePriceId
+        price: p.basePrice * qty,
+        stripePriceId: p.stripePriceId,
       });
     });
   }
@@ -504,99 +572,123 @@ function makeCard(p){
   return c;
 }
 
-PRODUCTS.forEach(p=>grid.appendChild(makeCard(p)));
+PRODUCTS.forEach((p) => grid.appendChild(makeCard(p)));
 
-/* MODAL */
-function openModal(p){
-  document.getElementById('bigImg').src=p.src;
-  document.getElementById('sideTitle').textContent=p.title;
-  document.getElementById('sideDesc').textContent=p.desc;
-  document.getElementById('overlay').classList.add('show');
+/* =============== MODAL VIEWER =============== */
+function openModal(p) {
+  document.getElementById("bigImg").src = p.src;
+  document.getElementById("sideTitle").textContent = p.title;
+  document.getElementById("sideDesc").textContent = p.desc || "";
+  document.getElementById("overlay").classList.add("show");
 }
-document.getElementById('closeBtn').onclick=()=>{
-  document.getElementById('overlay').classList.remove('show');
+document.getElementById("closeBtn").onclick = () => {
+  document.getElementById("overlay").classList.remove("show");
 };
 
-/* CART */
-let CART=[];
-const cartBtn=document.getElementById('cart-button');
-const cartCount=document.getElementById('cart-count');
-const miniCart=document.getElementById('mini-cart');
-const miniItems=document.getElementById('mini-cart-items');
-const miniTotal=document.getElementById('mini-cart-total');
+/* =============== CART + MINI CART =============== */
+let CART = [];
 
-cartBtn.onclick=()=>{
-  miniCart.classList.toggle('open');
+const cartBtn = document.getElementById("cart-button");
+const cartCount = document.getElementById("cart-count");
+const miniCart = document.getElementById("mini-cart");
+const miniItems = document.getElementById("mini-cart-items");
+const miniTotal = document.getElementById("mini-cart-total");
+const miniCartClose = document.getElementById("mini-cart-close");
+const miniCartCheckout = document.getElementById("mini-cart-checkout");
+
+cartBtn.onclick = () => {
+  miniCart.classList.toggle("open");
 };
 
-document.getElementById('mini-cart-close').onclick=()=>{
-  miniCart.classList.remove('open');
+miniCartClose.onclick = () => {
+  miniCart.classList.remove("open");
 };
 
-function addToCart(item){
-  const ex=CART.find(i=>i.title===item.title);
-  if(ex){
-    ex.qty+=item.qty;
-    ex.price+=item.price;
+function addToCart(item) {
+  const existing = CART.find((i) => i.title === item.title);
+  if (existing) {
+    existing.qty += item.qty;
+    existing.price += item.price;
   } else {
     CART.push(item);
   }
   renderCart();
-  miniCart.classList.add('open');
+  miniCart.classList.add("open");
 }
 
-function renderCart(){
-  const qtyTotal=CART.reduce((a,b)=>a+b.qty,0);
-  if(qtyTotal>0){
-    cartCount.textContent=qtyTotal;
-    cartCount.classList.remove('hidden');
+function renderCart() {
+  const qtyTotal = CART.reduce((sum, i) => sum + i.qty, 0);
+  if (qtyTotal > 0) {
+    cartCount.textContent = qtyTotal;
+    cartCount.classList.remove("hidden");
   } else {
-    cartCount.classList.add('hidden');
+    cartCount.classList.add("hidden");
   }
 
-  miniItems.innerHTML='';
-  if(CART.length===0){
-    miniItems.innerHTML='<div class="note">Cart is empty.</div>';
-    miniTotal.textContent='Total: $0.00 AUD';
+  miniItems.innerHTML = "";
+  if (CART.length === 0) {
+    miniItems.innerHTML = '<div class="note">Cart is empty.</div>';
+    miniTotal.textContent = "Total: $0.00 AUD";
     return;
   }
 
-  let total=0;
-  CART.forEach(i=>{
-    total+=i.price;
-    const r=document.createElement('div');
-    r.className='mini-cart-row';
-    r.innerHTML=`
+  let itemTotal = 0;
+  CART.forEach((i) => {
+    itemTotal += i.price;
+    const row = document.createElement("div");
+    row.className = "mini-cart-row";
+    row.innerHTML = `
       <div>
         <div>${i.title}</div>
         <div class="note">× ${i.qty}</div>
       </div>
       <div>$${i.price.toFixed(2)}</div>
     `;
-    miniItems.appendChild(r);
+    miniItems.appendChild(row);
   });
 
-  miniTotal.textContent=`Total: $${total.toFixed(2)} AUD`;
+  // Add shipping into displayed total
+  const shipCfg = SHIPPING_OPTIONS[selectedShipping] || { price: 0 };
+  const finalTotal = itemTotal + shipCfg.price;
+  miniTotal.textContent = `Total: $${finalTotal.toFixed(2)} AUD`;
 }
 
-document.getElementById('mini-cart-checkout').onclick=async()=>{
-  if(!CART.length) return;
+/* =============== CHECKOUT (with shipping) =============== */
+miniCartCheckout.addEventListener("click", async () => {
+  if (!CART.length) return;
 
-  const res=await fetch('/create-checkout-session',{
-    method:"POST",
-    headers:{ "Content-Type":"application/json" },
-    body:JSON.stringify({
-      items:CART.map(i=>({
-        priceId:i.stripePriceId,
-        quantity:i.qty
-      }))
-    })
-  });
+  const shipCfg = SHIPPING_OPTIONS[selectedShipping] || { price: 0 };
+  const shippingCost = shipCfg.price;
 
-  const data=await res.json();
-  if(data.url) window.location=data.url;
-  else alert("Stripe error: "+data.error);
-};
+  try {
+    const res = await fetch("/create-checkout-session", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        items: CART.map((i) => ({
+          priceId: i.stripePriceId,
+          quantity: i.qty,
+        })),
+        shippingCost: shippingCost,
+      }),
+    });
+
+    const data = await res.json();
+    if (data.url) {
+      window.location.href = data.url;
+    } else {
+      alert("Stripe error: " + (data.error || "Unknown issue"));
+      console.error("Stripe response:", data);
+    }
+  } catch (err) {
+    alert("Network error during checkout.");
+    console.error("Checkout error:", err);
+  }
+});
+
+/* =============== INIT =============== */
+initShippingSelector();
+renderCart();
 </script>
 
 </body>
