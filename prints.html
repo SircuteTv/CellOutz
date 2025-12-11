@@ -14,10 +14,9 @@
   --red:#FF1A1A;
   --accent: rgba(255,26,26,.15);
   --glow: rgba(255,26,26,.35);
-  --matrix: var(--text); /* matrix glyph color */
+  --matrix: var(--text);
 }
 html[data-theme="halloween"]{
-  /* Halloween: orange UI + slime-green matrix */
   --bg:#090107;
   --text:#FF6A00;
   --red:#FF6A00;
@@ -59,6 +58,7 @@ nav a{
 nav a::after{ content:''; position:absolute; inset:0; background:var(--accent); mix-blend-mode:screen; opacity:0; transition:.25s }
 nav a:hover::after{opacity:1}
 nav a:hover{ background:var(--red); color:#000; box-shadow:0 0 18px var(--glow), inset 0 0 28px var(--glow) }
+
 nav .insta-link svg{ width:20px; height:20px; display:block; }
 
 /* Floating cart bubble */
@@ -78,7 +78,7 @@ nav .insta-link svg{ width:20px; height:20px; display:block; }
 
 /* ===== Halloween toggle ===== */
 .theme-toggle{
-  position:fixed; top:18px; right:100px; /* sits left of cart */
+  position:fixed; top:18px; right:100px;
   display:inline-flex; align-items:center; gap:8px;
   font:12px/1 'Share Tech Mono', monospace; z-index:3000; user-select:none;
 }
@@ -99,7 +99,7 @@ nav .insta-link svg{ width:20px; height:20px; display:block; }
 }
 .theme-toggle input:checked + .track .knob{
   transform: translateX(26px);
-  background:#B3FF38; /* slime when ON */
+  background:#B3FF38;
 }
 @media(max-width:600px){
   .theme-toggle{ right:14px; top:14px; }
@@ -107,7 +107,6 @@ nav .insta-link svg{ width:20px; height:20px; display:block; }
 
 main{ max-width:1300px; margin:12px auto 80px; padding:0 18px; }
 
-/* Section titles */
 h2.section-title{
   font-family:'UnifrakturCook',cursive; text-align:center; margin:34px 0 14px;
   text-shadow:0 0 10px var(--red), 0 0 24px var(--glow);
@@ -139,6 +138,7 @@ h2.section-title{
   background:rgba(0,0,0,.5); color:var(--text); border:1px solid var(--red); border-radius:8px; padding:8px;
 }
 .price{ margin-left:auto; font-weight:700; }
+
 .btn{
   width:100%; padding:10px; border-radius:10px; border:1px solid var(--red);
   background:var(--red); color:#000; font-weight:700; cursor:pointer;
@@ -163,17 +163,6 @@ h2.section-title{
 .side{ min-width:280px; padding:16px; background:linear-gradient(180deg, rgba(255,26,26,.06), rgba(0,0,0,.35)) }
 .side h3{ margin:6px 0 10px; font-family:'UnifrakturCook',cursive; }
 .side p{ margin:0; line-height:1.35 }
-
-.infobtn, .fsbtn, .closeX{
-  position:absolute; border:1px solid var(--red); border-radius:999px; background:rgba(0,0,0,.45);
-  color:var(--text); padding:8px 12px; cursor:pointer;
-}
-.infobtn{ top:10px; left:14px }
-.fsbtn{ left:50%; transform:translateX(-50%); bottom:12px }
-.closeX{ top:10px; right:14px; border-radius:10px }
-
-/* Small helper */
-.note{ font-size:12px; opacity:.7 }
 
 /* Coming soon overlay */
 .coming-soon-overlay{
@@ -205,7 +194,7 @@ h2.section-title{
   transform:none;
 }
 
-/* Mini cart panel */
+/* Mini cart */
 .mini-cart{
   position:fixed;
   top:90px;
@@ -283,6 +272,7 @@ h2.section-title{
 }
 </style>
 </head>
+
 <body class="vignette scan">
 
 <canvas id="matrix" aria-hidden="true"></canvas>
@@ -292,7 +282,6 @@ h2.section-title{
     <a href="index.html"><img src="images/logo.png" alt="CellOutz Logo"></a>
   </div>
 
-  <!-- Theme toggle -->
   <label class="theme-toggle" title="Halloween mode">
     <input id="themeSwitch" type="checkbox" aria-label="Toggle Halloween theme">
     <span class="track"><span class="knob">🎃</span></span>
@@ -303,8 +292,8 @@ h2.section-title{
     <a href="index.html">Home</a>
     <a href="prints.html">Prints</a>
     <a href="clothes.html">Clothes</a>
-    <a class="insta-link" href="https://www.instagram.com/allusionstoograndeur/" target="_blank" rel="noopener" aria-label="Instagram">
-      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <a class="insta-link" href="https://www.instagram.com/allusionstoograndeur/" target="_blank">
+      <svg viewBox="0 0 24 24" fill="none">
         <rect x="3" y="3" width="18" height="18" rx="5" stroke="currentColor" stroke-width="2"/>
         <circle cx="12" cy="12" r="4.2" stroke="currentColor" stroke-width="2"/>
         <circle cx="17.3" cy="6.7" r="1.2" fill="currentColor"/>
@@ -315,7 +304,7 @@ h2.section-title{
     <a href="contact.html">Contact</a>
   </nav>
 
-  <div id="cart-button" aria-label="Cart" title="Cart">
+  <div id="cart-button">
     <img src="images/cart.png" alt="Cart">
     <div id="cart-count" class="hidden">0</div>
   </div>
@@ -347,7 +336,7 @@ h2.section-title{
   </div>
 </div>
 
-<!-- Mini cart panel -->
+<!-- Mini cart -->
 <div id="mini-cart" class="mini-cart">
   <div class="mini-cart-header">
     <span>Cart</span>
@@ -359,9 +348,8 @@ h2.section-title{
     <button id="mini-cart-checkout" class="btn btn-small">Checkout</button>
   </div>
 </div>
-
 <script>
-/* ===== Theme persistence (shared across pages) ===== */
+/* ===== Theme persistence ===== */
 (function(){
   const KEY='celloutz_theme';
   const html=document.documentElement;
@@ -374,7 +362,6 @@ h2.section-title{
       if(mode==='halloween') html.setAttribute('data-theme','halloween');
       else html.removeAttribute('data-theme');
       localStorage.setItem(KEY,mode);
-      document.dispatchEvent(new CustomEvent('themechanged',{detail:{mode}}));
     });
   }
 })();
@@ -384,17 +371,9 @@ const canvas = document.getElementById('matrix');
 const ctx = canvas.getContext('2d');
 let letters = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ@#$%^&*",
     fontSize = 16, cols, drops;
-
-function getMatrixColor(){
-  const v=getComputedStyle(document.documentElement).getPropertyValue('--matrix').trim();
-  return v || '#FF1A1A';
-}
-function resizeCanvas(){
-  canvas.width = innerWidth; canvas.height = innerHeight;
-  cols = Math.floor(canvas.width / fontSize); drops = Array(cols).fill(0);
-}
+function getMatrixColor(){ return getComputedStyle(document.documentElement).getPropertyValue('--matrix').trim(); }
+function resizeCanvas(){ canvas.width = innerWidth; canvas.height = innerHeight; cols = Math.floor(canvas.width / fontSize); drops = Array(cols).fill(0); }
 resizeCanvas(); addEventListener('resize', resizeCanvas);
-
 let raf;
 function draw(){
   ctx.fillStyle = "rgba(11,0,0,0.09)";
@@ -404,40 +383,75 @@ function draw(){
   for(let i=0;i<cols;i++){
     const t = letters[(Math.random()*letters.length)|0];
     ctx.fillText(t, i*fontSize, drops[i]);
-    drops[i]+= fontSize; if(drops[i] > canvas.height && Math.random()>0.975) drops[i]=0;
+    drops[i]+= fontSize;
+    if(drops[i] > canvas.height && Math.random()>0.975) drops[i]=0;
   }
   raf = requestAnimationFrame(draw);
 }
 raf = requestAnimationFrame(draw);
-document.addEventListener('visibilitychange', ()=>{ if(document.hidden){ cancelAnimationFrame(raf); } else { raf=requestAnimationFrame(draw); }});
-document.addEventListener('themechanged', ()=>{/* color auto-updates next frame */});
 
-/* ===== CONFIG ===== */
-const PRICING_AUD = {
-  "A4": 45, "A3": 75, "A2": 140,
-  "12×12\"": 65, "16×16\"": 120, "20×20\"": 180,
-  "12×18\"": 95, "16×24\"": 165, "24×36\"": 280,
-  "12×15\"": 90, "16×20\"": 150, "20×25\"": 210
+/* ===========================================================
+   SHIPPING CONFIG  🚚
+   =========================================================== */
+
+const SHIPPING_OPTIONS = {
+  "aus_standard": {
+    label: "Australia — Standard",
+    price: 12.00
+  },
+  "aus_express": {
+    label: "Australia — Express",
+    price: 18.00
+  },
+  "intl_standard": {
+    label: "International — Standard",
+    price: 28.00
+  },
+  "intl_tracked": {
+    label: "International — Tracked",
+    price: 38.00
+  }
 };
 
-const SIZE_SETS = {
-  square:   ["12×12\"", "16×16\"", "20×20\""],
-  sqrt2:    ["A4","A3","A2"],
-  threeTwo: ["12×18\"","16×24\"","24×36\""],
-  fourFive: ["12×15\"","16×20\"","20×25\""]
-};
+let selectedShipping = "aus_standard";  // default
 
-function aspectFamily(w,h){
-  const r = w/h; const inv = h/w;
-  const close = (a,b)=> Math.abs(a-b) < 0.06;
-  if (close(r,1)) return "square";
-  if (close(r,1.414) || close(inv,1.414)) return "sqrt2";
-  if (close(r,1.5)   || close(inv,1.5))   return "threeTwo";
-  if (close(r,1.25)  || close(inv,1.25))  return "fourFive";
-  return "sqrt2";
+/* Populate shipping dropdown */
+function initShippingSelector(){
+  const select = document.createElement('select');
+  select.id = "shipping-select";
+  select.style.padding = "6px";
+  select.style.background = "rgba(0,0,0,0.6)";
+  select.style.color = "var(--text)";
+  select.style.border = "1px solid var(--red)";
+  select.style.borderRadius = "6px";
+
+  for(const key in SHIPPING_OPTIONS){
+    const op = document.createElement('option');
+    op.value = key;
+    op.textContent = `${SHIPPING_OPTIONS[key].label} (+$${SHIPPING_OPTIONS[key].price.toFixed(2)})`;
+    select.appendChild(op);
+  }
+
+  select.value = selectedShipping;
+  select.addEventListener('change', ()=>{
+    selectedShipping = select.value;
+    renderCart(); // recalc total
+  });
+
+  const footer = document.querySelector('.mini-cart-footer');
+  const shippingWrapper = document.createElement('div');
+  shippingWrapper.style.fontSize = "11px";
+  shippingWrapper.style.marginBottom = "6px";
+  shippingWrapper.innerHTML = `<span>Shipping</span>`;
+  shippingWrapper.appendChild(select);
+
+  footer.parentNode.insertBefore(shippingWrapper, footer);
 }
 
-/* Catalog */
+/* ===========================================================
+   PRODUCTS
+   =========================================================== */
+
 const PRODUCTS = [
   {
     title: "3D-Glass",
@@ -472,7 +486,7 @@ const PRODUCTS = [
     src: "images/chaos wizard/chaos (2).webp",
     desc: "High quality A2 (200gsm) poster print. Coming soon.",
     comingSoon: true,
-    stripePriceId: "price_REPLACE_FLESHPRISON"
+    stripePriceId: null
   },
   {
     title: "Surfs Up",
@@ -480,7 +494,7 @@ const PRODUCTS = [
     src: "images/chaos wizard/chaos (5).webp",
     desc: "High quality A2 (200gsm) poster print. Coming soon.",
     comingSoon: true,
-    stripePriceId: "price_REPLACE_SURFS_UP"
+    stripePriceId: null
   },
   {
     title: "Mind Body Soul",
@@ -488,11 +502,14 @@ const PRODUCTS = [
     src: "images/chaos wizard/chaos (6).webp",
     desc: "High quality A2 (200gsm) poster print. Coming soon.",
     comingSoon: true,
-    stripePriceId: "price_REPLACE_MINDBODYSOUL"
+    stripePriceId: null
   }
 ];
 
-/* ===== DOM build ===== */
+/* ===========================================================
+   BUILD PRODUCT CARDS
+   =========================================================== */
+
 function makeCard(p){
   const card = document.createElement('div');
   card.className = 'card';
@@ -504,9 +521,6 @@ function makeCard(p){
   const img = document.createElement('img');
   img.className = 'thumb';
   img.src = p.src;
-  img.alt = p.title;
-  img.loading = "lazy";
-  img.decoding = "async";
   wrap.appendChild(img);
 
   if (p.comingSoon){
@@ -524,118 +538,62 @@ function makeCard(p){
     <div class="card-title">${p.title}</div>
     <div class="card-collection">${p.collection}</div>
     <div class="row">
-      <select class="select sizeSel"><option>Loading sizes…</option></select>
+      <select class="select sizeSel"><option>A2</option></select>
       <input class="qty" type="number" min="1" value="1" style="width:72px">
-      <div class="price">$— AUD</div>
+      <div class="price">$${p.basePrice.toFixed(2)} AUD</div>
     </div>
-    <button class="btn">${p.comingSoon ? 'Coming Soon' : 'Add to Cart'}</button>
+    <button class="btn">${p.comingSoon ? "Coming Soon" : "Add to Cart"}</button>
   `;
   card.appendChild(body);
 
-  const sizeSel  = body.querySelector('.sizeSel');
+  const btn = body.querySelector('.btn');
   const qtyInput = body.querySelector('.qty');
-  const priceEl  = body.querySelector('.price');
-  const btn      = body.querySelector('.btn');
-
-  if (p.comingSoon){
-    sizeSel.innerHTML = '<option value="">A2</option>';
-    priceEl.textContent = 'Coming soon';
-    btn.disabled = true;
-  }
-
-  img.addEventListener('load', ()=>{
-    if (p.comingSoon) return;
-    const fam   = aspectFamily(img.naturalWidth, img.naturalHeight);
-    const sizes = p.sizes || SIZE_SETS[fam] || SIZE_SETS.sqrt2;
-    sizeSel.innerHTML = sizes.map(s => `<option value="${s}">${s}</option>`).join('');
-    updatePrice(body, p);
-  });
-
-  img.addEventListener('error', ()=> card.style.display = 'none');
-
-  sizeSel.addEventListener('change', ()=> updatePrice(body, p));
-  qtyInput.addEventListener('input', ()=> updatePrice(body, p));
-
-  wrap.addEventListener('click', ()=> openModal(p, img));
 
   if (!p.comingSoon){
     btn.addEventListener('click', ()=>{
-      const size = sizeSel.value || (p.sizes && p.sizes[0]) || 'A2';
-      const qty  = Math.max(1, parseInt(qtyInput.value || '1', 10));
-      const unit = (typeof p.basePrice === 'number')
-        ? p.basePrice
-        : (PRICING_AUD[size] || 0);
-
+      const qty = Math.max(1, parseInt(qtyInput.value || "1"));
       addToCart({
         title: p.title,
-        collection: p.collection,
-        size,
+        size: "A2",
         qty,
-        price: unit * qty,
-        stripePriceId: p.stripePriceId || null
+        price: p.basePrice * qty,
+        stripePriceId: p.stripePriceId
       });
     });
   }
 
+  wrap.addEventListener('click', ()=> openModal(p, img));
+
   return card;
 }
 
-function updatePrice(body, product){
-  if (product && product.comingSoon){
-    const priceEl = body.querySelector('.price');
-    if (priceEl) priceEl.textContent = 'Coming soon';
-    return;
-  }
-  const sizeSel  = body.querySelector('.sizeSel');
-  const qtyInput = body.querySelector('.qty');
-  const priceEl  = body.querySelector('.price');
-  if (!sizeSel || !qtyInput || !priceEl) return;
-
-  const size = sizeSel.value;
-  const qty  = Math.max(1, parseInt(qtyInput.value || '1', 10));
-  const unit = (product && typeof product.basePrice === 'number')
-    ? product.basePrice
-    : (PRICING_AUD[size] || 0);
-
-  priceEl.textContent = `$${(unit * qty).toFixed(2)} AUD`;
-}
-
 const gridChaos = document.getElementById('grid-chaos');
-PRODUCTS.forEach(p=>{
-  const card = makeCard(p);
-  gridChaos.appendChild(card);
-});
+PRODUCTS.forEach(p=> gridChaos.appendChild(makeCard(p)));
 
-/* ===== Modal viewer ===== */
+/* ===========================================================
+   MODAL VIEWER
+   =========================================================== */
 const overlay = document.getElementById('overlay');
-const viewer  = document.getElementById('viewer');
-const bigImg  = document.getElementById('bigImg');
-const side    = document.getElementById('side');
+const viewer = document.getElementById('viewer');
+const bigImg = document.getElementById('bigImg');
 const sideTitle = document.getElementById('sideTitle');
-const sideDesc  = document.getElementById('sideDesc');
-const dpiNote   = document.getElementById('dpiNote');
+const sideDesc = document.getElementById('sideDesc');
+const dpiNote = document.getElementById('dpiNote');
 
 function openModal(p, imgEl){
   bigImg.src = p.src;
   sideTitle.textContent = p.title;
-  sideDesc.textContent  = p.desc || '';
-  const w = imgEl.naturalWidth, h = imgEl.naturalHeight;
-  const maxSide300 = Math.floor(Math.max(w,h) / 300);
-  const maxSide240 = Math.floor(Math.max(w,h) / 240);
-  dpiNote.textContent = `Source: ${w}×${h}px — approx max at 300DPI: ${maxSide300}" on long edge (240DPI: ${maxSide240}").`;
+  sideDesc.textContent  = p.desc;
   viewer.classList.add('full');
   overlay.classList.add('show');
-  overlay.setAttribute('aria-hidden','false');
 }
-document.getElementById('infoToggle').addEventListener('click', ()=> viewer.classList.toggle('full'));
-document.getElementById('fsBtn').addEventListener('click', ()=>{
-  if(!document.fullscreenElement) viewer.requestFullscreen?.();
-  else document.exitFullscreen?.();
-});
-document.getElementById('closeBtn').addEventListener('click', ()=> overlay.classList.remove('show'));
-overlay.addEventListener('click', e=>{ if(e.target === overlay) overlay.classList.remove('show'); });
 
-/* ===== Cart + mini-cart + Stripe checkout ===== */
+document.getElementById('closeBtn').addEventListener('click', ()=> overlay.classList.remove('show'));
+
+/* ===========================================================
+   CART + SHIPPING + STRIPE CHECKOUT
+   =========================================================== */
+
 const cartButton       = document.getElementById('cart-button');
 const cartCount        = document.getElementById('cart-count');
 const miniCart         = document.getElementById('mini-cart');
@@ -647,13 +605,9 @@ const miniCartClose    = document.getElementById('mini-cart-close');
 let CART = [];
 
 function addToCart(item){
-  const existing = CART.find(
-    it => it.title === item.title &&
-          it.size  === item.size  &&
-          it.stripePriceId === item.stripePriceId
-  );
+  const existing = CART.find(i => i.title === item.title && i.size === item.size);
   if (existing){
-    existing.qty   += item.qty;
+    existing.qty += item.qty;
     existing.price += item.price;
   } else {
     CART.push(item);
@@ -663,7 +617,7 @@ function addToCart(item){
 }
 
 function renderCart(){
-  const totalQty = CART.reduce((sum, it) => sum + it.qty, 0);
+  const totalQty = CART.reduce((s,i)=>s+i.qty,0);
   if (totalQty > 0){
     cartCount.textContent = totalQty;
     cartCount.classList.remove('hidden');
@@ -674,13 +628,13 @@ function renderCart(){
   miniCartItems.innerHTML = '';
   if (CART.length === 0){
     miniCartItems.innerHTML = '<div class="note">Cart is empty.</div>';
-    miniCartTotal.textContent = 'Total: $0.00 AUD';
+    miniCartTotal.textContent = `Total: $0.00 AUD`;
     return;
   }
 
-  let total = 0;
-  CART.forEach(item => {
-    total += item.price;
+  let itemTotal = 0;
+  CART.forEach(item=>{
+    itemTotal += item.price;
     const row = document.createElement('div');
     row.className = 'mini-cart-row';
     row.innerHTML = `
@@ -693,62 +647,58 @@ function renderCart(){
     miniCartItems.appendChild(row);
   });
 
-  miniCartTotal.textContent = `Total: $${total.toFixed(2)} AUD`;
+  const ship = SHIPPING_OPTIONS[selectedShipping].price;
+  const finalTotal = itemTotal + ship;
+  miniCartTotal.textContent = `Total: $${finalTotal.toFixed(2)} AUD`;
 }
 
-function openMiniCart(){
-  miniCart.classList.add('open');
-}
-function closeMiniCart(){
-  miniCart.classList.remove('open');
-}
+function openMiniCart(){ miniCart.classList.add('open'); }
+function closeMiniCart(){ miniCart.classList.remove('open'); }
 
-cartButton.addEventListener('click', () => {
-  if (miniCart.classList.contains('open')) closeMiniCart();
+cartButton.addEventListener('click', ()=>{
+  if(miniCart.classList.contains('open')) closeMiniCart();
   else openMiniCart();
 });
 
 miniCartClose.addEventListener('click', closeMiniCart);
 
-document.addEventListener('click', (e) => {
-  if (!miniCart.contains(e.target) && !cartButton.contains(e.target)){
-    closeMiniCart();
-  }
-});
-
-miniCartCheckout.addEventListener('click', async () => {
-  if (CART.length === 0) return;
+/* Checkout */
+miniCartCheckout.addEventListener('click', async ()=>{
+  if(CART.length === 0) return;
 
   try {
     const res = await fetch('/create-checkout-session', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method: "POST",
+      headers: { "Content-Type":"application/json" },
       body: JSON.stringify({
-        items: CART
-          .filter(it => it.stripePriceId)
-          .map(it => ({
-            priceId: it.stripePriceId,
-            quantity: it.qty
-          }))
+        items: CART.map(i=> ({
+          priceId: i.stripePriceId,
+          quantity: i.qty
+        })),
+        shipping: {
+          id: selectedShipping,
+          label: SHIPPING_OPTIONS[selectedShipping].label,
+          price: SHIPPING_OPTIONS[selectedShipping].price
+        }
       })
     });
 
-    const data = await res.json().catch(() => ({}));
-    if (!res.ok || !data.url){
-      console.error('Checkout error response:', res.status, data);
-      const msg = data && data.error ? data.error : 'Checkout failed.';
-      alert('Stripe error: ' + msg);
-      return;
+    const data = await res.json();
+
+    if(data.url){
+      window.location.href = data.url;
+    } else {
+      alert("Stripe failed: " + (data.error || "Unknown error."));
     }
 
-    window.location.href = data.url;
   } catch (err) {
-    console.error('Fetch failed:', err);
-    alert('Sorry, something went wrong starting checkout. Please try again.');
+    alert("Network error during checkout.");
+    console.error(err);
   }
 });
 
-// Initialize empty view
+/* INIT */
+initShippingSelector();
 renderCart();
 </script>
 </body>
