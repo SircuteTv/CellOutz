@@ -1,65 +1,87 @@
-// server.js  (no CORS, clean Stripe checkout)
+// server.js - ESM backend for CellOutz
+import express from "express";
+import Stripe from "stripe";
+import cors from "cors";
+import path from "path";
+import { fileURLToPath } from "url";
+import dotenv from "dotenv";
 
-import express from 'express';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import dotenv from 'dotenv';
-import Stripe from 'stripe';
-import cors from 'cors';
-
+// Load environment variables (STRIPE_SECRET_KEY etc.)
 dotenv.config();
 
-const app = express();
-
-// ---- paths for static files ----
+// ------------------------------------------------------
+// Paths / basic Express setup
+// ------------------------------------------------------
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// ---- Stripe ----
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
-
-// ---- middleware ----
-app.use(cors());
+const app = express();
 app.use(express.json());
-app.use(express.static(__dirname)); // serves your .html, images, etc.
+app.use(cors());
 
-// ---- THIS IS THE IMPORTANT PART ----
-app.post('/create-checkout-session', async (req, res) => {
+// Serve static files (index.html, prints.html, images, etc.)
+app.use(express.static(__dirname));
+
+// ------------------------------------------------------
+// Stripe setup
+// ------------------------------------------------------
+// IMPORTANT: in Render, set env var STRIPE_SECRET_KEY to your sk_live_… key
+const stripeSecret = process.env.STRIPE_SECRET_KEY;
+
+if (!stripeSecret) {
+  console.error("❌ Missing STRIPE_SECRET_KEY env var");
+}
+
+const stripe = new Stripe(stripeSecret, {
+  apiVersion: "2024-06-20"
+});
+
+// ------------------------------------------------------
+// Create Checkout Session
+// Front-end sends: { items: [ { priceId, quantity }, ... ] }
+// ------------------------------------------------------
+app.post("/create-checkout-session", async (req, res) => {
   try {
     const items = Array.isArray(req.body.items) ? req.body.items : [];
 
-    // Convert front-end items -> Stripe line_items
-    const line_items = items
-      .filter(it => it.priceId && it.quantity > 0)
-      .map(it => ({
-        // Stripe wants `price`, not `priceId`
+    const lineItems = items
+      .filter((it) => it && it.priceId && it.quantity > 0)
+      .map((it) => ({
         price: it.priceId,
         quantity: it.quantity
       }));
 
-    if (!line_items.length) {
-      console.error('No valid line items from client:', items);
-      return res.status(400).json({ error: 'No valid items to charge' });
+    if (!lineItems.length) {
+      return res
+        .status(400)
+        .json({ error: "No valid items to charge (missing priceId/quantity)." });
     }
 
     const session = await stripe.checkout.sessions.create({
-      mode: 'payment',
-      line_items,
-      success_url: 'https://celloutz-backend.onrender.com/success.html',
-      cancel_url: 'https://celloutz-backend.onrender.com/prints.html'
+      mode: "payment",
+      line_items: lineItems,
+      // Currency comes from the Price objects, but AUD is your intent anyway.
+      success_url: "https://celloutz-backend.onrender.com/success.html",
+      cancel_url: "https://celloutz-backend.onrender.com/prints.html",
+      billing_address_collection: "auto",
+      shipping_address_collection: {
+        allowed_countries: ["AU"]
+      }
     });
 
     return res.json({ url: session.url });
   } catch (err) {
-    console.error('Stripe checkout error:', err);
+    console.error("Stripe error:", err);
     return res
       .status(500)
-      .json({ error: err.message || 'Stripe error creating session' });
+      .json({ error: err.message || "Stripe error creating session." });
   }
 });
 
-// ---- start server ----
+// ------------------------------------------------------
+// Start server
+// ------------------------------------------------------
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`Server listening on ${PORT}`);
+  console.log(`✅ Server running on port ${PORT}`);
 });

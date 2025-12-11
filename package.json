@@ -1,13 +1,16 @@
 {
   "name": "celloutz",
   "version": "1.0.0",
+  "description": "CellOutz backend + static site",
+  "main": "server.js",
   "type": "module",
   "scripts": {
     "start": "node server.js"
   },
   "dependencies": {
-    "express": "^4.21.2",
-    "stripe": "^16.8.0",
-    "cors": "^2.8.5"
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "stripe": "^16.9.0",
+    "dotenv": "^16.4.5"
   }
 }
